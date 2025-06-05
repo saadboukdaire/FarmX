@@ -1,0 +1,975 @@
+<?php
+session_start();
+
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "farmx";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle post creation if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
+    // Get the active user's details
+    if (!isset($_SESSION['user_id']) || !isset($_SESSION['username']) || !isset($_SESSION['profile_pic'])) {
+        die(json_encode(["status" => "error", "message" => "User not logged in."]));
+    }
+
+    $userId = $_SESSION['user_id'];
+    $username = $_SESSION['username'];
+    $profilePic = $_SESSION['profile_pic'];
+
+    // Get post data
+    $content = $_POST['content'];
+    $mediaUrl = isset($_POST['media_url']) ? $_POST['media_url'] : '';
+
+    // Insert post into the database
+    $sql = "INSERT INTO posts (user_id, username, profile_pic, content, media_url) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issss", $userId, $username, $profilePic, $content, $mediaUrl);
+
+    if ($stmt->execute()) {
+        echo json_encode(["status" => "success", "message" => "Post created successfully!"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Error creating post: " . $stmt->error]);
+    }
+
+    $stmt->close();
+    $conn->close();
+    exit(); // Stop further execution after handling the POST request
+}
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmX - Réseau Social Agricole</title>
+    <link rel="icon" href="Images/logo.jpg">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Verdana, sans-serif;
+        }
+
+        /* General styles */
+        body {
+            background-color: #e8efe4;
+            color: #333;
+        }
+
+       /* Header */
+       header {
+          background-color: #3e8e41; /* FarmX green */
+          color: white;
+          padding: 8px 0;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          position: sticky; /* Makes the header sticky */
+         top: 0; /* Sticks it to the top of the page */
+          z-index: 1000; /* Ensures the header stays above other content */
+        }
+
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            margin: 0 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            color: white;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7); /* Light gray icon */
+        }
+
+        .nav-links {
+            display: flex;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+            padding: 10px 15px;
+            display: inline-block;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3e8e41; /* FarmX green */
+            background-color: white;
+        }
+       
+        .nav-links a.activated {
+             color: #3e8e41 !important; /* FarmX green */
+             background-color: white !important;
+        }
+       /* Layout container */
+.layout-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+    margin-top: 20px;
+    align-items: stretch; /* Ensure all sections stretch to the same height */
+    height: calc(100vh - 100px); /* Adjust height to fit the viewport minus header */
+}
+
+.left-section, .right-section, .middle-section {
+    border-radius: 8px;
+    padding: 15px;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    height: 100%; /* Ensure all sections take full height of the container */
+    display: flex;
+    flex-direction: column; /* Ensure content inside sections is properly aligned */
+}
+
+.left-section, .right-section {
+    flex: 1; /* Allow left and right sections to grow equally */
+    margin: 0 5px;
+}
+
+.middle-section {
+    flex: 4; /* Middle section takes more space */
+    margin: 0 5px;
+}
+
+        /* Post Composer */
+       /* Updated Middle Section Styles */
+.post-creation {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #2d682f; /* Darker green */
+}
+
+.post-input input {
+    flex-grow: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    background-color: #e8efe4; /* Light green */
+    outline: none;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #ccc;
+    padding-top: 0.8rem;
+}
+
+.post-type {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #4A7C59; /* Accent green */
+}
+
+.post-btn {
+    background-color: #3e8e41; /* Primary green */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.post-btn:hover {
+    background-color: #2d682f; /* Darker green */
+}
+
+.post {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.post-info h3 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.post-info span {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.post-content {
+    margin: 0.5rem 0;
+}
+
+.post-image {
+    width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    overflow: hidden; /* Ensure the media stays within the container */
+    margin: 0.5rem 0;
+    display: flex;
+    justify-content: center; /* Center the media horizontally */
+    align-items: center; /* Center the media vertically */
+    background-color: #f0f0f0; /* Add a background color for empty space */
+}
+
+.post-image img,
+.post-image video {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain; /* Show the entire image without cropping */
+    border-radius: 10px;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ccc;
+    margin-top: 0.5rem;
+}
+
+.post-reactions {
+    display: flex;
+    gap: 1rem;
+}
+
+.reaction {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+}
+/* Like button animation */
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.reaction.liked {
+    color: #3e8e41; /* Green color for liked state */
+}
+
+.reaction.liked i {
+    animation: likeAnimation 0.3s ease-in-out; /* Apply animation */
+}
+/* Comments Section */
+.comments-section {
+    margin-top: 10px;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #f9f9f9; /* Light background for the comments section */
+    border-radius: 8px;
+}
+
+.comment-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.comment-input input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.comment-input button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background-color: #3e8e41; /* FarmX green */
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.comment-input button:hover {
+    background-color: #2d682f; /* Darker green on hover */
+}
+
+.comment-input button i {
+    font-size: 16px;
+}
+
+.comments-list {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comment-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover; /* Ensure the image fits well */
+}
+
+.comment-content {
+    flex-grow: 1;
+}
+
+.comment-content strong {
+    color: #3e8e41; /* FarmX green for the username */
+    font-weight: 600;
+}
+
+.comment-content p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Scrollbar styling for comments list */
+.comments-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.comments-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+/* Weather Widget */
+.weather-widget {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+.weather-widget h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #3e8e41; /* FarmX green */
+}
+
+#weather-info {
+    font-size: 0.9rem;
+}
+
+#weather-info p {
+    margin: 0.5rem 0;
+}
+
+.weather-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.5rem;
+}
+
+.weather-status {
+    font-weight: bold;
+    color: #3e8e41; /* FarmX green */
+}
+
+.bad-weather {
+    color: #ff4d4d; /* Red for bad weather */
+}
+
+
+/* Add styles for the mini calendar */
+.mini-calendar {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .mini-calendar h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #3e8e41; /* FarmX green */
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #e8efe4; /* Light green */
+        }
+
+        .calendar-day.today {
+            background-color: #3e8e41; /* FarmX green */
+            color: white;
+        }
+
+        .season-display {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .season-display strong {
+            color: #3e8e41; /* FarmX green */
+        }
+    </style>
+
+
+<header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="Images/logoinv.png" height="60px" title="Cultivez l’avenir, récoltez le succès">    
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search FarmX...">
+                <i class='bx bx-search-alt-2'></i>
+            </div>
+            <div class="nav-links">
+                <a href="main.html" class="activated">Home</a>
+                <a href="message.php">Messages</a>
+                <a href="market.php">Marketplace</a>
+                <a href="profile.php">Profile</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-container">
+    <div class="left-section">
+            <!-- Mini Calendar -->
+            <div class="mini-calendar">
+                <h3>Calendar</h3>
+                <div id="calendar"></div>
+                <div class="season-display">
+                    <strong>Season:</strong> <span id="season"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="middle-section">
+            <!-- Post Creation -->
+            <div class="post-creation">
+                <div class="post-input">
+                    <!-- Display the active user's profile picture -->
+                    <img id="profile-picture" src="<?php echo isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                    <input type="text" id="post-content" placeholder="Share farming updates, questions, or tips...">
+                </div>
+                <div class="post-actions">
+                    <div class="post-type">
+                        <div class="action-btn" onclick="openFilePicker('image')">
+                            <i class='bx bx-image'></i>
+                            <span>Photo</span>
+                        </div>
+                        <div class="action-btn" onclick="openFilePicker('video')">
+                            <i class='bx bx-video'></i>
+                            <span>Video</span>
+                        </div>
+                    </div>
+                    <button class="post-btn" onclick="createPost()">Post Update</button>
+                </div>
+                <!-- Hidden file input for media upload -->
+                <input type="file" id="media-upload" style="display: none;" onchange="handleMediaUpload(event)">
+            </div>
+
+            <!-- Posts Container -->
+            <div id="posts-container">
+                <!-- Posts will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <div class="right-section">
+    <!-- Weather Widget -->
+    <div class="weather-widget">
+        <h3>Weather</h3>
+        <div id="weather-info">
+            <p>Loading weather data...</p>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script>
+    // Function to open the file picker
+    function openFilePicker(type) {
+        const fileInput = document.getElementById('media-upload');
+        fileInput.setAttribute('accept', type === 'image' ? 'image/*' : 'video/*');
+        fileInput.click();
+    }
+
+    // Function to handle media upload
+    function handleMediaUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            // Upload the file to the server and get the URL
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('upload_media.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Store the media URL for the post
+                    window.mediaUrl = data.url;
+                } else {
+                    alert('Error uploading media: ' + data.message);
+                }
+            });
+        }
+    }
+
+   // Function to create a post
+function createPost() {
+    const content = document.getElementById('post-content').value.trim();
+    const mediaUrl = window.mediaUrl || '';
+
+    // Validate that the post has either content or media
+    if (!content && !mediaUrl) {
+        alert('Post cannot be blank. Please add content or attach a photo/video.');
+        return; // Stop execution if both content and media are empty
+    }
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('media_url', mediaUrl);
+
+    fetch('main.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Clear the input fields
+            document.getElementById('post-content').value = '';
+            window.mediaUrl = ''; // Reset media URL
+            document.getElementById('media-upload').value = ''; // Clear the file input
+
+            // Reload posts
+            loadPosts();
+        } else {
+            alert('Error creating post: ' + data.message);
+        }
+    });
+}
+// Function to handle media upload
+function handleMediaUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Upload the file to the server and get the URL
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('upload_media.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Store the media URL for the post
+                window.mediaUrl = data.url;
+            } else {
+                alert('Error uploading media: ' + data.message);
+            }
+        });
+    }
+}
+
+    // Function to load posts
+    function loadPosts() {
+        fetch('get_posts.php')
+        .then(response => response.json())
+        .then(data => {
+            const postsContainer = document.getElementById('posts-container');
+            postsContainer.innerHTML = '';
+
+            data.forEach(post => {
+                // Default likes and comments to 0 if undefined
+                const likes = post.likes || 0;
+                const comments = post.comments || 0;
+
+                // Check if the current user has liked the post
+                const isLiked = post.is_liked || false; // Ensure this is returned from get_posts.php
+
+                const postHtml = `
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="${post.profile_pic}" alt="Profile Picture" class="profile-pic">
+                            <div class="post-info">
+                                <h3>${post.username}</h3>
+                                <span>${new Date(post.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <p>${post.content}</p>
+                        </div>
+                        ${post.media_url ? `
+                            <div class="post-image">
+                                ${post.media_url.endsWith('.mp4') ? `
+                                    <video controls>
+                                        <source src="${post.media_url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                ` : `
+                                    <img src="${post.media_url}" alt="Post Media">
+                                `}
+                            </div>
+                        ` : ''}
+                        <div class="post-footer">
+                            <div class="post-reactions">
+                                <div class="reaction ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
+                                    <i class='bx bx-like'></i>
+                                    <span>${likes}</span>
+                                </div>
+                                <div class="reaction" onclick="toggleComments(${post.id})">
+                                    <i class='bx bx-message'></i>
+                                    <span>${comments}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                            <div class="comment-input">
+                                <input type="text" id="comment-input-${post.id}" placeholder="Add a comment...">
+                                <button onclick="addComment(${post.id})">
+                                    <i class='bx bx-send'></i> <!-- Send message icon -->
+                                </button>
+                            </div>
+                            <div class="comments-list" id="comments-list-${post.id}">
+                                <!-- Comments will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+                postsContainer.innerHTML += postHtml;
+            });
+        });
+    }
+
+ // Function to like/unlike a post
+function likePost(postId) {
+    const likeButton = document.querySelector(`.reaction[onclick="likePost(${postId})"]`);
+
+    fetch('like_post.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            post_id: postId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Toggle liked state
+            likeButton.classList.toggle('liked');
+
+            // Reload posts to update like count
+            loadPosts();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while processing your request.');
+    });
+}
+
+function addComment(postId) {
+    const content = document.getElementById(`comment-input-${postId}`).value.trim();
+
+    if (!content) {
+        alert('Comment cannot be empty.');
+        return;
+    }
+
+    fetch('add_comment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            post_id: postId,
+            content: content
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            loadComments(postId); // Reload comments after adding a new one
+            document.getElementById(`comment-input-${postId}`).value = ''; // Clear the input field
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while processing your request.');
+    });
+}
+// Function to toggle comments visibility
+function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-${postId}`);
+    if (commentsSection.style.display === 'none') {
+        commentsSection.style.display = 'block';
+        loadComments(postId); // Load comments when the section is shown
+    } else {
+        commentsSection.style.display = 'none';
+    }
+}
+
+function loadComments(postId) {
+    fetch(`add_comment.php?post_id=${postId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        commentsList.innerHTML = ''; // Clear existing comments
+
+        if (data.length === 0) {
+            commentsList.innerHTML = '<div class="comment">No comments yet.</div>';
+        } else {
+            data.forEach(comment => {
+                // Add the new HTML structure for each comment
+                const commentHtml = `
+                    <div class="comment">
+                        <img src="${comment.profile_pic}" alt="Profile Picture" class="comment-profile-pic">
+                        <div class="comment-content">
+                            <strong>${comment.username}</strong>
+                            <p>${comment.content}</p>
+                        </div>
+                    </div>
+                `;
+                commentsList.innerHTML += commentHtml;
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error loading comments:', error);
+        alert('An error occurred while loading comments: ' + error.message);
+    });
+}
+    // Load posts when the page loads
+    loadPosts();
+
+    // Function to fetch weather data
+function fetchWeather(latitude, longitude) {
+    const apiKey = '6b1952abec10b0d047487e7b84568617'; // Replace with your API key
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const weatherInfo = document.getElementById('weather-info');
+            const weatherIcon = data.weather[0].icon; // Weather icon code
+            const temperature = data.main.temp; // Temperature in Celsius
+            const humidity = data.main.humidity; // Humidity percentage
+            const windSpeed = data.wind.speed; // Wind speed in m/s
+            const weatherDescription = data.weather[0].description; // Weather description
+
+            // Determine if the weather is good or bad for farming
+            let weatherStatus = '';
+            let statusClass = 'weather-status';
+            if (weatherDescription.includes('rain') || weatherDescription.includes('storm')) {
+                weatherStatus = 'Bad for farming 🌧️';
+                statusClass += ' bad-weather';
+            } else if (temperature > 30 || temperature < 10) {
+                weatherStatus = 'Bad for farming 🌡️';
+                statusClass += ' bad-weather';
+            } else {
+                weatherStatus = 'Good for farming 🌞';
+            }
+
+            // Update the weather widget
+            weatherInfo.innerHTML = `
+                <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Weather Icon" class="weather-icon">
+                <p><strong>Temperature:</strong> ${temperature}°C</p>
+                <p><strong>Humidity:</strong> ${humidity}%</p>
+                <p><strong>Wind Speed:</strong> ${windSpeed} m/s</p>
+                <p><strong>Condition:</strong> ${weatherDescription}</p>
+                <p class="${statusClass}">${weatherStatus}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+            document.getElementById('weather-info').innerHTML = '<p>Failed to load weather data.</p>';
+        });
+}
+
+// Function to get the user's location
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                fetchWeather(latitude, longitude); // Fetch weather data
+            },
+            error => {
+                console.error('Error getting location:', error);
+                document.getElementById('weather-info').innerHTML = '<p>Unable to fetch location.</p>';
+            }
+        );
+    } else {
+        document.getElementById('weather-info').innerHTML = '<p>Geolocation is not supported by your browser.</p>';
+    }
+}
+
+// Load weather data when the page loads
+getLocation();
+
+ // Function to generate the mini calendar
+ function generateMiniCalendar() {
+            const calendarElement = document.getElementById('calendar');
+            const seasonElement = document.getElementById('season');
+            const today = new Date();
+            const month = today.getMonth();
+            const year = today.getFullYear();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const seasonNames = ["Winter", "Spring", "Summer", "Autumn"];
+
+            // Determine the season based on the month
+            let season;
+            if (month >= 11 || month < 2) {
+                season = seasonNames[0]; // Winter
+            } else if (month >= 2 && month < 5) {
+                season = seasonNames[1]; // Spring
+            } else if (month >= 5 && month < 8) {
+                season = seasonNames[2]; // Summer
+            } else {
+                season = seasonNames[3]; // Autumn
+            }
+
+            // Display the season
+            seasonElement.textContent = season;
+
+            // Generate the calendar grid
+            let calendarHTML = `<div class="calendar-grid">`;
+
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarHTML += `<div class="calendar-day"></div>`;
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === today.getDate() && month === today.getMonth();
+                calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
+            }
+
+            calendarHTML += `</div>`;
+            calendarElement.innerHTML = calendarHTML;
+        }
+
+        // Generate the mini calendar when the page loads
+        generateMiniCalendar();
+</script>
+</body>
+</html>
