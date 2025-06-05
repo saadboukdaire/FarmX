@@ -7,6 +7,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Check if user is a FarmX Producer
+if (!isset($_SESSION['user_tag']) || $_SESSION['user_tag'] !== 'FarmX Producer') {
+    header("Location: market.php");
+    exit();
+}
+
 // Database connection
 $servername = "localhost";
 $username = "root";

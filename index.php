@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Query the database to find the user
     // Select user_type along with other user data
-    $sql = "SELECT id, username, email, password, profile_pic, user_type FROM users WHERE username = ? OR email = ?";
+    $sql = "SELECT id, username, email, password, profile_pic, user_type, user_tag FROM users WHERE username = ? OR email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $username_or_email, $username_or_email);
     $stmt->execute();
@@ -35,13 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['profile_pic'] = $user['profile_pic'];
-            $_SESSION['user_type'] = $user['user_type']; // Store user_type in session
+            $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['user_tag'] = $user['user_tag']; // Store user_tag in session
 
             // Redirect based on user type
             if ($user['user_type'] === 'farmer') {
-                header("Location: farmer_interface/main.php");
+                header("Location: main.php");
             } else { // Assuming 'user' is the other type
-                header("Location: user_interface/main.php");
+                header("Location: main.php");
             }
             exit();
         } else {

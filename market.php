@@ -620,9 +620,11 @@ $current_username = $user['username'];
                     <button type="submit" class="search-button">
                         <i class='bx bx-search'></i> Search
                     </button>
+                    <?php if (isset($_SESSION['user_tag']) && $_SESSION['user_tag'] === 'FarmX Producer'): ?>
                     <button type="button" onclick="window.location.href='add_product.php'" class="add-product-btn">
                         <i class='bx bx-plus'></i> Add Product
                     </button>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>

@@ -1,3 +1,11 @@
+<?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Start the session at the very top
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -517,13 +525,6 @@
   </script>
 
   <?php
-  // Enable error reporting
-  error_reporting(E_ALL);
-  ini_set('display_errors', 1);
-
-  // Start the session at the very top
-  session_start();
-
   // Database connection
   $servername = "localhost";
   $username = "root";
@@ -550,20 +551,12 @@
 
     // Basic server-side validation for user type
     if (!in_array($user_type, ['farmer', 'user'])) {
-      // Handle invalid user type - this shouldn't happen with client-side validation,
-      // but is good practice for security.
-      // You might log this error or show a generic error message.
       echo "<script>showAlert('Invalid account type selected', 'error');</script>";
       exit();
     }
 
-    // Determine user tag based on user type
-    $user_tag = '';
-    if ($user_type === 'farmer') {
-      $user_tag = 'FarmX Producer';
-    } else { // Assuming 'user' is the other type
-      $user_tag = 'FarmX Member';
-    }
+    // Set user tag based on user type
+    $user_tag = ($user_type === 'farmer') ? 'FarmX Producer' : 'FarmX Member';
 
     // Check for duplicate username
     $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
@@ -601,6 +594,7 @@
     // If no duplicates found, proceed with registration
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
+    // Modified INSERT statement to include user_tag
     $stmt = $conn->prepare("INSERT INTO users (username, email, phone, password, user_type, user_tag) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssss", $username, $email, $phone, $hashed_password, $user_type, $user_tag);
 
@@ -608,7 +602,6 @@
       session_start();
       $_SESSION['registration_success'] = true;
       $_SESSION['registered_username'] = $username;
-      // Store user_type and user_tag in session upon successful registration
       $_SESSION['user_type'] = $user_type;
       $_SESSION['user_tag'] = $user_tag;
       echo "<script>window.location.href = 'index.php';</script>";
