@@ -105,8 +105,6 @@ $current_username = $user['username'];
     <title>FarmX - Marketplace</title>
     <link rel="icon" href="Images/logo.jpg">   
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
-<body>
     <style>
         * {
             margin: 0;
@@ -115,21 +113,24 @@ $current_username = $user['username'];
             font-family: 'Segoe UI', Verdana, sans-serif;
         }
 
-        /* General styles */
         body {
-            background-color: #f5f5f5; /* Soft white background */
-            color: #333; /* Dark text */
+            background-color: #f5f5f5;
+            color: #333;
+            overflow-y: scroll; /* Always show vertical scrollbar */
+            margin-right: calc(100vw - 100%); /* Compensate for scrollbar width */
         }
 
         /* Header */
         header {
-          background-color: #3e8e41; 
-          color: white;
-          padding: 8px 0;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          position: sticky; /* Makes the header sticky */
-         top: 0; /* Sticks it to the top of the page */
-          z-index: 1000; /* Ensures the header stays above other content */
+            background-color: #3e8e41;
+            color: white;
+            padding: 4px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .header-content {
@@ -137,66 +138,167 @@ $current_username = $user['username'];
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
         }
 
         .logo {
+            margin-left: -140px;
             display: flex;
             align-items: center;
         }
 
-        .header-search-bar {
-            flex-grow: 1;
-            margin: 0 20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .header-search-bar input {
-            width: 100%;
-            padding: 8px 15px 8px 35px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
-            color: white;
-        }
-
-        .header-search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
-        }
-
-        .header-search-bar i {
-            position: absolute;
-            left: 12px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7); /* Light gray icon */
+        .logo img {
+            height: 65px;
+            width: auto;
         }
 
         .nav-links {
             display: flex;
+            gap: 25px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            align-items: center;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            font-size: 24px;
         }
 
         .nav-links a:hover {
-            color: #3e8e41; /* FarmX green */
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.activated {
+            color: #3e8e41;
             background-color: white;
         }
-       
-        .nav-links a.activated {
-             color: #3e8e41 !important; /* FarmX green */
-             background-color: white !important;
+
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .right-nav {
+            display: flex;
+            gap: 12px;
+            margin-right: -70px;
+            position: absolute;
+            right: 0;
+        }
+
+        .right-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .right-nav a i {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-nav a:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .right-nav a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .notification-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .notification-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
         }
 
         /* Marketplace Styles */
@@ -569,6 +671,46 @@ $current_username = $user['username'];
             font-size: 20px;
         }
     </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <a href="main.php">
+                    <img src="Images/logoinv.png" alt="FarmX Logo">
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="main.php" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="market.php" class="activated" title="Marketplace">
+                    <i class='bx bxs-store'></i>
+                    <span class="tooltip">Marketplace</span>
+                </a>
+            </div>
+            <div class="right-nav">
+                <a href="notifications.php" class="notification-container" title="Notifications">
+                    <i class='bx bx-bell notification-icon'></i>
+                    <span class="notification-badge">0</span>
+                    <span class="tooltip">Notifications</span>
+                </a>
+                <a href="profile.php" title="Profile">
+                    <i class='bx bxs-user'></i>
+                    <span class="tooltip">Profile</span>
+                </a>
+                <a href="logout.php" title="Logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="tooltip">Logout</span>
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- Add this right after the opening body tag -->
     <div class="popup-overlay" id="popupOverlay"></div>
@@ -579,24 +721,6 @@ $current_username = $user['username'];
         <div class="popup-message" id="popupMessage"></div>
         <button class="popup-button" onclick="closePopup()">OK</button>
     </div>
-
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l'avenir, récoltez le succès">    
-            </div>
-            <div class="header-search-bar">
-                <input type="text" placeholder="Search FarmX...">
-                <i class='bx bx-search-alt-2'></i>
-            </div>
-            <div class="nav-links">
-                <a href="main.php">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php">Marketplace</a>
-                <a href="profile.php">Profile</a>
-            </div>
-        </div>
-    </header>
 
     <div class="marketplace-container">
         <!-- Search and Filter Section -->
@@ -803,6 +927,24 @@ $current_username = $user['username'];
     document.getElementById('categoryFilter').addEventListener('change', function() {
         document.getElementById('searchForm').submit();
     });
+
+    // Function to update notification count
+    function updateNotificationCount() {
+        fetch('get_notification_count.php')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('.notification-badge');
+                badge.textContent = data.count;
+                badge.style.display = data.count > 0 ? 'flex' : 'none';
+            })
+            .catch(error => console.error('Error updating notification count:', error));
+    }
+
+    // Update notification count when page loads
+    document.addEventListener('DOMContentLoaded', updateNotificationCount);
+
+    // Update notification count every 30 seconds
+    setInterval(updateNotificationCount, 30000);
 </script>
 </body>
 </html>

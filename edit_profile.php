@@ -26,11 +26,11 @@ if ($conn->connect_error) {
 
 // Fetch user data
 $userId = $_SESSION['user_id']; // Use 'user_id' instead of 'id'
-$sql = "SELECT username, email, phone, profile_pic, bio FROM users WHERE id = ?";
+$sql = "SELECT username, email, phone, profile_pic, bio, gender FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
-$stmt->bind_result($username, $email, $phone, $profilePic, $bio);
+$stmt->bind_result($username, $email, $phone, $profilePic, $bio, $gender);
 $stmt->fetch();
 $stmt->close();
 
@@ -52,12 +52,13 @@ $conn->close();
             box-sizing: border-box;
             font-family: 'Segoe UI', Verdana, sans-serif;
         }
+
         html, body {
-    overflow: hidden; /* Prevent scrolling */
-    height: 100%; /* Ensure the body takes up the full height of the viewport */
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-}
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: #f5f5f5;
             color: #333;
@@ -66,32 +67,31 @@ $conn->close();
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
         /* Edit Profile Container */
         .profile-container {
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
-            padding: 30px;
+            padding: 20px;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .profile-container h2 {
-           
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border-bottom: 2px solid #3e8e41;
             text-align: center;
-            color: white; /* White text for better contrast */
+            color: white;
             font-family: 'Poppins', sans-serif;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 27px 0;
-            background: linear-gradient(to right, #3e8e41, #2d682f); /* FarmX green gradient */
+            letter-spacing: 1px;
+            padding: 15px 0;
+            background: linear-gradient(to right, #3e8e41, #2d682f);
             border-radius: 8px;
             display: inline-block;
             width: 100%;
@@ -101,21 +101,22 @@ $conn->close();
         .profile-container form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .profile-container label {
-            font-size: 16px;
+            font-size: 14px;
             color: #333;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .profile-container input[type="email"],
         .profile-container input[type="tel"],
+        .profile-container input[type="text"],
         .profile-container input[type="file"] {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
@@ -125,20 +126,22 @@ $conn->close();
 
         .profile-container input[type="email"]:focus,
         .profile-container input[type="tel"]:focus,
+        .profile-container input[type="text"]:focus,
         .profile-container input[type="file"]:focus {
             border-color: #3e8e41;
             box-shadow: 0 0 5px rgba(62, 142, 65, 0.3);
         }
 
         .profile-container button[type="submit"] {
-            padding: 12px 20px;
+            padding: 10px 20px;
             background-color: #3e8e41;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 5px;
         }
 
         .profile-container button[type="submit"]:hover {
@@ -150,19 +153,19 @@ $conn->close();
         .back-button {
             width: 100%;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .back-button a {
             display: block;
             width: 100%;
-            padding: 12px 20px;
+            padding: 10px 20px;
             background-color: #ff4d4d;
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             text-decoration: none;
             transition: background-color 0.3s ease, transform 0.2s ease;
             text-align: center;
@@ -175,57 +178,37 @@ $conn->close();
 
         /* File Input Customization */
         .profile-container input[type="file"] {
-            padding: 10px;
+            padding: 8px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             cursor: pointer;
         }
 
         .profile-container input[type="file"]::file-selector-button {
-            padding: 8px 12px;
+            padding: 6px 12px;
             background-color: #3e8e41;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 13px;
         }
 
         .profile-container input[type="file"]::file-selector-button:hover {
             background-color: #2d682f;
         }
-        /* Style for the username input field */
-.profile-container input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.profile-container input[type="text"]:focus {
-    border-color: #3e8e41;
-    box-shadow: 0 0 5px rgba(62, 142, 65, 0.3);
-}
-
-/* Optional: Add a subtle placeholder style */
-.profile-container input[type="text"]::placeholder {
-    color: #999;
-    font-style: italic;
-}
 
         /* Bio Textarea Styles */
         .profile-container textarea {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
             outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
             font-family: inherit;
         }
@@ -235,19 +218,67 @@ $conn->close();
             box-shadow: 0 0 5px rgba(62, 142, 65, 0.3);
         }
 
+        /* Gender Select Styles */
+        .profile-container select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .profile-container select:focus {
+            border-color: #3e8e41;
+            box-shadow: 0 0 5px rgba(62, 142, 65, 0.3);
+        }
+
         /* Character Count Styles */
         .char-count {
             font-size: 12px;
             color: #666;
             text-align: right;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         /* Form Group Styles */
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
+        }
+
+        @media (max-width: 480px) {
+            .profile-container {
+                padding: 15px;
+            }
+
+            .profile-container h2 {
+                font-size: 20px;
+                padding: 12px 0;
+            }
+
+            .profile-container input[type="email"],
+            .profile-container input[type="tel"],
+            .profile-container input[type="text"],
+            .profile-container input[type="file"],
+            .profile-container textarea {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .profile-container label {
+                font-size: 13px;
+            }
+
+            .profile-container button[type="submit"],
+            .back-button a {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -280,6 +311,15 @@ $conn->close();
                 <label for="bio">Bio:</label>
                 <textarea id="bio" name="bio" maxlength="500" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio ?? ''); ?></textarea>
                 <div class="char-count"><span id="bio-char-count">0</span>/500 characters</div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
+                    <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
+                </select>
             </div>
 
             <button type="submit">Save Changes</button>

@@ -29,11 +29,11 @@ try {
 
 // Fetch user data
 $userId = $_SESSION['user_id']; // Use 'user_id' instead of 'id'
-$sql = "SELECT username, email, phone, profile_pic, bio FROM users WHERE id = ?";
+$sql = "SELECT username, email, phone, profile_pic, bio, user_type, user_tag, gender, created_at FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
-$stmt->bind_result($username, $email, $phone, $profilePic, $bio);
+$stmt->bind_result($username, $email, $phone, $profilePic, $bio, $userType, $userTag, $gender, $createdAt);
 $stmt->fetch();
 $stmt->close();
 
@@ -107,17 +107,21 @@ $conn->close();
         body {
             background-color: #f5f5f5;
             color: #333;
+            overflow-y: scroll; /* Always show vertical scrollbar */
+            margin-right: calc(100vw - 100%); /* Compensate for scrollbar width */
         }
 
-        /* Header (unchanged) */
+        /* Header */
         header {
             background-color: #3e8e41;
             color: white;
-            padding: 8px 0;
+            padding: 4px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .header-content {
@@ -125,66 +129,164 @@ $conn->close();
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
+            margin-left: -140px;
         }
 
-        .search-bar {
-            flex-grow: 1;
-            margin: 0 20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 8px 15px 8px 35px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 12px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7);
+        .logo img {
+            height: 65px;
+            width: auto;
         }
 
         .nav-links {
             display: flex;
+            gap: 25px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            font-size: 24px;
         }
 
         .nav-links a:hover {
             color: #3e8e41;
             background-color: white;
+            transform: translateY(-2px);
         }
 
         .nav-links a.activated {
-            color: #3e8e41 !important;
-            background-color: white !important;
+            color: #3e8e41;
+            background-color: white;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .right-nav {
+            display: flex;
+            gap: 12px;
+            margin-right: -70px;
+            position: absolute;
+            right: 0;
+        }
+
+        .right-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .right-nav a i {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-nav a:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .right-nav a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .notification-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .notification-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
         }
 
         /* Simplified Profile Container */
@@ -200,7 +302,7 @@ $conn->close();
         /* Profile Header */
         .profile-header {
             text-align: center;
-            margin-bottom: 30px; /* Added space below the profile header */
+            margin-bottom: 35px;
         }
 
         .profile-header img {
@@ -208,13 +310,20 @@ $conn->close();
             height: 120px;
             border-radius: 50%;
             border: 4px solid #3e8e41;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .profile-header h1 {
             font-size: 24px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             color: #333;
+        }
+
+        .profile-header .user-tag {
+            font-size: 16px;
+            color: #3e8e41;
+            font-weight: 500;
+            margin-top: 8px;
         }
 
         .profile-header p {
@@ -224,8 +333,10 @@ $conn->close();
 
         /* Profile Info Section */
         .profile-section {
-            margin-top: 70px;
-            margin-bottom: 200px; /* Added space below the profile info */
+            margin-top: 40px;
+            margin-bottom: 25px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .profile-section h2 {
@@ -239,27 +350,47 @@ $conn->close();
         .profile-section .info {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-section .info:hover {
+            background-color: #f0f0f0;
+            transform: translateX(5px);
         }
 
         .profile-section .info i {
             font-size: 20px;
             color: #3e8e41;
-            margin-right: 10px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
         }
 
         .profile-section .info span {
-            font-size: 16px;
+            font-size: 15px;
             color: #333;
+        }
+
+        .profile-section .info .user-type {
+            color: #3e8e41;
+            font-weight: 500;
+        }
+
+        .profile-section .info .join-date {
+            color: #666;
         }
 
         /* Buttons Container */
         .buttons-container {
             display: flex;
             justify-content: center;
-            align-items: center; /* Align buttons vertically */
-            gap: 20px; /* Space between buttons */
-            margin-top: 20px; /* Space above the buttons */
+            align-items: center;
+            gap: 25px;
+            margin: 25px 0;
         }
 
        /* Button Styles with Animations */
@@ -299,17 +430,15 @@ $conn->close();
 
         /* Bio Section */
         .bio-section {
-            margin: 20px 0;
-            padding: 15px;
+            margin: 30px 0;
+            padding: 20px;
             background-color: #f9f9f9;
             border-radius: 8px;
             border-left: 4px solid #3e8e41;
         }
 
         .bio-section h2 {
-            font-size: 18px;
-            color: #3e8e41;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .bio-section p {
@@ -320,15 +449,15 @@ $conn->close();
 
         /* Posts Section */
         .posts-section {
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         .posts-section h2 {
             font-size: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #3e8e41;
             border-bottom: 2px solid #3e8e41;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
 
        .posts-grid {
@@ -462,23 +591,62 @@ $conn->close();
 .delete-form {
     display: inline;
 }
+
+        /* Add these styles to your existing CSS */
+        .user-tag {
+            font-size: 16px;
+            color: #3e8e41;
+            font-weight: 500;
+            margin: 5px 0;
+        }
+
+        .join-date {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .profile-header p {
+            margin: 3px 0;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
             <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l'avenir, récoltez le succès">    
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search FarmX...">
-                <i class='bx bx-search-alt-2'></i>
+                <a href="main.php">
+                    <img src="Images/logoinv.png" alt="FarmX Logo">
+                </a>
             </div>
             <div class="nav-links">
-                <a href="main.php">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php">Marketplace</a>
-                <a href="profile.php" class="activated">Profile</a>
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="main.php" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="market.php" title="Marketplace">
+                    <i class='bx bxs-store'></i>
+                    <span class="tooltip">Marketplace</span>
+                </a>
+            </div>
+            <div class="right-nav">
+                <a href="notifications.php" class="notification-container" title="Notifications">
+                    <i class='bx bx-bell notification-icon'></i>
+                    <span class="notification-badge">0</span>
+                    <span class="tooltip">Notifications</span>
+                </a>
+                <a href="profile.php" title="Profile">
+                    <i class='bx bxs-user'></i>
+                    <span class="tooltip">Profile</span>
+                </a>
+                <a href="logout.php" title="Logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="tooltip">Logout</span>
+                </a>
             </div>
         </div>
     </header>
@@ -490,6 +658,7 @@ $conn->close();
             <!-- Add a timestamp to the image URL to force browser refresh -->
             <img id="profile-picture" src="<?php echo isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture">
             <h1 id="profile-name"><?php echo htmlspecialchars($username ?? ''); ?></h1>
+            <p class="user-tag"><?php echo htmlspecialchars($userTag ?? ''); ?></p>
         </div>
 
         <!-- Bio Section -->
@@ -502,6 +671,14 @@ $conn->close();
         <div class="profile-section">
             <h2>Profile Information</h2>
             <div class="info">
+                <i class='bx bx-badge-check'></i>
+                <span class="user-type"><?php echo htmlspecialchars($userTag ?? ''); ?></span>
+            </div>
+            <div class="info">
+                <i class='bx bx-calendar'></i>
+                <span class="join-date">Member since <?php echo date('F Y', strtotime($createdAt)); ?></span>
+            </div>
+            <div class="info">
                 <i class='bx bx-envelope'></i>
                 <span id="profile-email"><?php echo htmlspecialchars($email ?? ''); ?></span>
             </div>
@@ -509,6 +686,12 @@ $conn->close();
                 <i class='bx bx-phone'></i>
                 <span id="profile-phone"><?php echo htmlspecialchars($phone ?? ''); ?></span>
             </div>
+            <?php if (!empty($gender)): ?>
+            <div class="info">
+                <i class='bx bx-user'></i>
+                <span id="profile-gender"><?php echo ucfirst(htmlspecialchars($gender)); ?></span>
+            </div>
+            <?php endif; ?>
         </div>
 
       <!-- Posts Section -->
@@ -568,5 +751,45 @@ $conn->close();
             </div>
         </div>
     </div>
+
+    <script>
+        // Function to update notification count
+        function updateNotificationCount() {
+            fetch('get_notification_count.php')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.querySelector('.notification-badge');
+                    badge.textContent = data.count;
+                    badge.style.display = data.count > 0 ? 'flex' : 'none';
+                })
+                .catch(error => console.error('Error updating notification count:', error));
+        }
+
+        // Update notification count when page loads
+        document.addEventListener('DOMContentLoaded', updateNotificationCount);
+
+        // Update notification count every 30 seconds
+        setInterval(updateNotificationCount, 30000);
+
+        // Function to apply hover style based on current page
+        function applyCurrentPageStyle() {
+            const currentPath = window.location.pathname;
+            const profileLink = document.querySelector('a[href="profile.php"]');
+            const notificationsLink = document.querySelector('a[href="notifications.php"]');
+            
+            if (currentPath.includes('/profile.php')) {
+                profileLink.style.color = '#3e8e41';
+                profileLink.style.backgroundColor = 'white';
+                profileLink.style.transform = 'translateY(-2px)';
+            } else if (currentPath.includes('/notifications.php')) {
+                notificationsLink.style.color = '#3e8e41';
+                notificationsLink.style.backgroundColor = 'white';
+                notificationsLink.style.transform = 'translateY(-2px)';
+            }
+        }
+
+        // Apply styles when page loads
+        document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
+    </script>
 </body>
 </html>

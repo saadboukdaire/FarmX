@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $bio = $_POST['bio'] ?? ''; // Get bio from POST data, default to empty string if not set
+    $gender = $_POST['gender'] ?? ''; // Get gender from POST data, default to empty string if not set
 
     // Handle file upload
     if (isset($_FILES['profile-pic-upload']) && $_FILES['profile-pic-upload']['error'] === UPLOAD_ERR_OK) {
@@ -52,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $profilePicUrl = $uploadFile; // Relative path for web access
 
                 // Update the profile picture in the users table
-                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, profile_pic = ?, bio = ? WHERE id = ?");
-                $stmt->bind_param("sssssi", $username, $email, $phone, $profilePicUrl, $bio, $userId);
+                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, profile_pic = ?, bio = ?, gender = ? WHERE id = ?");
+                $stmt->bind_param("ssssssi", $username, $email, $phone, $profilePicUrl, $bio, $gender, $userId);
 
                 if ($stmt->execute()) {
                     // Update the profile picture in all the user's posts
@@ -83,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // No new file uploaded, update other fields
-        $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, bio = ? WHERE id = ?");
-        $stmt->bind_param("ssssi", $username, $email, $phone, $bio, $userId);
+        $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, bio = ?, gender = ? WHERE id = ?");
+        $stmt->bind_param("sssssi", $username, $email, $phone, $bio, $gender, $userId);
 
         if ($stmt->execute()) {
             // Redirect to profile.php after successful update

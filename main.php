@@ -52,8 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     <title>FarmX - Réseau Social Agricole</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
-<body>
     <style>
         * {
             margin: 0;
@@ -66,85 +64,185 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         body {
             background-color: #e8efe4;
             color: #333;
+            overflow-y: scroll; /* Always show vertical scrollbar */
+            margin-right: calc(100vw - 100%); /* Compensate for scrollbar width */
         }
 
        /* Header */
        header {
-          background-color: #3e8e41; /* FarmX green */
+          background-color: #3e8e41;
           color: white;
-          padding: 8px 0;
+          padding: 4px 0;
           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          position: sticky; /* Makes the header sticky */
-         top: 0; /* Sticks it to the top of the page */
-          z-index: 1000; /* Ensures the header stays above other content */
+          position: sticky;
+          top: 0;
+          z-index: 1000;
         }
-
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
+            margin-left: -140px;
         }
 
-        .search-bar {
-            flex-grow: 1;
-            margin: 0 20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 8px 15px 8px 35px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
-            color: white;
-        }
-
-        .search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 12px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7); /* Light gray icon */
+        .logo img {
+            height: 65px;
+            width: auto;
         }
 
         .nav-links {
             display: flex;
+            gap: 25px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            align-items: center;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            font-size: 24px;
         }
 
         .nav-links a:hover {
-            color: #3e8e41; /* FarmX green */
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.activated {
+            color: #3e8e41;
             background-color: white;
         }
-       
-        .nav-links a.activated {
-             color: #3e8e41 !important; /* FarmX green */
-             background-color: white !important;
+
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .right-nav {
+            display: flex;
+            gap: 12px;
+            margin-right: -70px;
+            position: absolute;
+            right: 0;
+        }
+
+        .right-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .right-nav a i {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-nav a:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .right-nav a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .notification-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .notification-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
         }
        /* Layout container */
 .layout-container {
@@ -152,8 +250,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     justify-content: space-between;
     padding: 0 5px;
     margin-top: 20px;
-    align-items: stretch; /* Ensure all sections stretch to the same height */
-    height: calc(100vh - 100px); /* Adjust height to fit the viewport minus header */
+    align-items: stretch;
+    height: calc(100vh - 100px);
+    width: 100%;
+    box-sizing: border-box; /* Ensure padding is included in width calculation */
 }
 
 .left-section, .right-section, .middle-section {
@@ -509,23 +609,209 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         .season-display strong {
             color: #3e8e41; /* FarmX green */
         }
+
+        /* Notification styles */
+        .notification-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .notification-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .notification-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .notification-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-item .sender {
+            font-weight: bold;
+            color: #3e8e41;
+        }
+
+        .notification-item .time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .notification-item .message {
+            margin-top: 5px;
+            color: #333;
+        }
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+            margin-top: 10px;
+        }
+
+        .notification-wrapper:hover .notification-dropdown {
+            display: block;
+        }
+
+        .notification-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .view-all {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #666;
+        }
     </style>
-
-
-<header>
-        <div class="container header-content">
+</head>
+<body>
+    <header>
+        <div class="header-content">
             <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l’avenir, récoltez le succès">    
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search FarmX...">
-                <i class='bx bx-search-alt-2'></i>
+                <a href="main.php">
+                    <img src="Images/logoinv.png" alt="FarmX Logo">
+                </a>
             </div>
             <div class="nav-links">
-                <a href="main.html" class="activated">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php">Marketplace</a>
-                <a href="profile.php">Profile</a>
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="main.php" class="activated" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="market.php" title="Marketplace">
+                    <i class='bx bxs-store'></i>
+                    <span class="tooltip">Marketplace</span>
+                </a>
+            </div>
+            <div class="right-nav">
+                <a href="notifications.php" class="notification-container" title="Notifications">
+                    <i class='bx bx-bell notification-icon'></i>
+                    <span class="notification-badge">0</span>
+                    <span class="tooltip">Notifications</span>
+                </a>
+                <a href="profile.php" title="Profile">
+                    <i class='bx bxs-user'></i>
+                    <span class="tooltip">Profile</span>
+                </a>
+                <a href="logout.php" title="Logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="tooltip">Logout</span>
+                </a>
             </div>
         </div>
     </header>
@@ -970,6 +1256,105 @@ getLocation();
 
         // Generate the mini calendar when the page loads
         generateMiniCalendar();
+
+    // Function to load notifications
+    function loadNotifications() {
+        fetch('get_notifications.php')
+            .then(response => response.json())
+            .then(data => {
+                const notificationList = document.querySelector('.notification-list');
+                const badge = document.querySelector('.notification-badge');
+                
+                // Update badge count
+                badge.textContent = data.unread_count || '0';
+                badge.style.display = data.unread_count > 0 ? 'block' : 'none';
+                
+                // Update notification list
+                if (data.notifications && data.notifications.length > 0) {
+                    notificationList.innerHTML = data.notifications.map(notification => `
+                        <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
+                             onclick="handleNotificationClick(${JSON.stringify(notification)})">
+                            <img src="${notification.sender_picture || 'Images/profile.jpg'}" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    <strong>${notification.sender_username}</strong> 
+                                    ${notification.type === 'like' ? 'liked your post' : 
+                                      notification.type === 'comment' ? 'commented on your post' : 
+                                      'sent you a message'}
+                                </div>
+                                <div class="notification-time">
+                                    ${formatTimeAgo(notification.created_at)}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    notificationList.innerHTML = '<div class="notification-item">No notifications</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading notifications:', error);
+                const notificationList = document.querySelector('.notification-list');
+                notificationList.innerHTML = '<div class="notification-item">Error loading notifications</div>';
+            });
+    }
+
+    // Function to handle notification click
+    function handleNotificationClick(notification) {
+        // Mark as read
+        fetch('mark_notification_read.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notification_id: notification.id })
+        });
+
+        // Navigate to appropriate page
+        if (notification.type === 'message') {
+            window.location.href = `message.php?user=${notification.sender_id}`;
+        } else if (notification.type === 'like' || notification.type === 'comment') {
+            window.location.href = `view_post.php?id=${notification.post_id}`;
+        }
+    }
+
+    // Function to format time ago
+    function formatTimeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+        
+        if (seconds < 60) return 'just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        return `${Math.floor(seconds / 86400)}d ago`;
+    }
+
+    // Load notifications when page loads
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+
+    // Refresh notifications every 30 seconds
+    setInterval(loadNotifications, 30000);
+
+    // Function to update notification count
+    function updateNotificationCount() {
+        fetch('get_notification_count.php')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('.notification-badge');
+                badge.textContent = data.count;
+                badge.style.display = data.count > 0 ? 'flex' : 'none';
+            })
+            .catch(error => console.error('Error updating notification count:', error));
+    }
+
+    // Update notification count when page loads
+    document.addEventListener('DOMContentLoaded', updateNotificationCount);
+
+    // Update notification count every 30 seconds
+    setInterval(updateNotificationCount, 30000);
 </script>
 </body>
 </html>
