@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Réseau Social Agricole</title>
+    <title>FarmX - Agricultural Social Network</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -974,10 +974,10 @@ function handleMediaUpload(event) {
                 const comments = post.comments || 0;
 
                 // Check if the current user has liked the post
-                const isLiked = post.is_liked || false; // Ensure this is returned from get_posts.php
+                const isLiked = post.is_liked || false;
 
                 const postHtml = `
-                    <div class="post">
+                    <div class="post" id="post-${post.id}">
                         <div class="post-header">
                             <img src="${post.profile_pic}" alt="Profile Picture" class="profile-pic">
                             <div class="post-info">
@@ -1027,6 +1027,20 @@ function handleMediaUpload(event) {
                 `;
                 postsContainer.innerHTML += postHtml;
             });
+
+            // Check if there's a post_id in the URL and scroll to it
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('post_id');
+            if (postId) {
+                const postElement = document.getElementById(`post-${postId}`);
+                if (postElement) {
+                    postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    postElement.style.backgroundColor = '#f0f0f0';
+                    setTimeout(() => {
+                        postElement.style.backgroundColor = 'white';
+                    }, 2000);
+                }
+            }
         });
     }
 
@@ -1140,7 +1154,7 @@ function loadComments(postId) {
     });
 }
     // Load posts when the page loads
-    loadPosts();
+    document.addEventListener('DOMContentLoaded', loadPosts);
 
     // Function to fetch weather data
 function fetchWeather(latitude, longitude) {

@@ -156,8 +156,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
         $message_id = $pdo->lastInsertId();
 
         // Create notification
-        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content, message_id) VALUES (?, ?, 'message', ?, ?)");
-        $stmt->execute([$receiver_id, $logged_in_user_id, $content, $message_id]);
+        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content, message_id) VALUES (?, ?, 'message', 'sent you a message', ?)");
+        $stmt->execute([$receiver_id, $logged_in_user_id, $message_id]);
 
         $pdo->commit();
         echo json_encode(['success' => true]);
@@ -195,7 +195,7 @@ if (isset($_GET['to'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Réseau Social Agricole</title>
+    <title>FarmX - Messages</title>
     <link rel="icon" href="Images/logo.jpg">  
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -552,6 +552,19 @@ if (isset($_GET['to'])) {
             overflow-y: auto;
         }
 
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .welcome-message strong {
+            color: #3e8e41;
+            font-weight: 600;
+        }
+
         .message {
             display: flex;
             margin-bottom: 10px;
@@ -571,6 +584,7 @@ if (isset($_GET['to'])) {
             border-radius: 8px;
             background-color: #f0f0f0; /* Light gray */
             color: #333; /* Dark text */
+            position: relative;
         }
 
         .message.sent .message-content {
@@ -581,6 +595,17 @@ if (isset($_GET['to'])) {
         .message.received .message-content {
             background-color: #f0f0f0; /* Light gray */
             color: #333; /* Dark text */
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .chat-input {
@@ -751,6 +776,8 @@ if (isset($_GET['to'])) {
     const preFilledMessage = `Hello, I'm interested in your item: ${<?php echo json_encode($item_details['title']); ?>} (${<?php echo json_encode(number_format($item_details['price'], 2)); ?>} MAD). Could you please provide more details?`;
     <?php endif; ?>
 
+    let lastMessageCount = 0; // Add this variable to track message count
+
     // Load all users for the sidebar
     function loadContacts() {
         fetch('message.php?fetch_users=1')
@@ -815,16 +842,75 @@ if (isset($_GET['to'])) {
         fetch(`message.php?fetch_messages=1&contact_id=${currentContactId}`)
         .then(res => res.json())
         .then(messages => {
+            const currentScrollPosition = chatMessagesEl.scrollTop;
+            const wasAtBottom = chatMessagesEl.scrollHeight - chatMessagesEl.scrollTop === chatMessagesEl.clientHeight;
+            
             chatMessagesEl.innerHTML = '';
-            messages.forEach(msg => {
-                const div = document.createElement('div');
-                div.classList.add('message');
-                div.classList.add(msg.sender_id == loggedInUserId ? 'sent' : 'received');
-                div.innerHTML = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
-                chatMessagesEl.appendChild(div);
-            });
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            
+            if (messages.length === 0) {
+                // Get the username from the chat header
+                const username = chatHeaderEl.querySelector('h2').textContent;
+                chatMessagesEl.innerHTML = `
+                    <div class="welcome-message">
+                        Start a new conversation with <strong>${escapeHtml(username)}</strong>!
+                    </div>`;
+            } else {
+                messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.classList.add('message');
+                    div.classList.add(msg.sender_id == loggedInUserId ? 'sent' : 'received');
+                    div.innerHTML = `
+                        <div class="message-content">
+                            ${escapeHtml(msg.content)}
+                            <div class="message-time">${formatMessageTime(msg.created_at)}</div>
+                        </div>`;
+                    chatMessagesEl.appendChild(div);
+                });
+            }
+
+            // Only auto-scroll if:
+            // 1. User was already at the bottom, or
+            // 2. New messages were added
+            if (wasAtBottom || messages.length > lastMessageCount) {
+                chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            } else {
+                chatMessagesEl.scrollTop = currentScrollPosition;
+            }
+            
+            lastMessageCount = messages.length;
         });
+    }
+
+    // Format message timestamp
+    function formatMessageTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Format time as HH:MM AM/PM
+        const timeStr = date.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+        });
+
+        // Check if message is from today
+        if (date.toDateString() === now.toDateString()) {
+            return timeStr;
+        }
+        
+        // Check if message is from yesterday
+        if (date.toDateString() === yesterday.toDateString()) {
+            return `Yesterday at ${timeStr}`;
+        }
+        
+        // For older messages, show full date and time
+        return date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        }) + ` at ${timeStr}`;
     }
 
     // Send a message

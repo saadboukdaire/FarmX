@@ -399,13 +399,17 @@ if (!$item) {
             .then(res => res.json())
             .then(response => {
                 if (response.success) {
-                    showPopup('Message sent successfully! The seller will be notified.');
+                    if (response.message === 'Message already sent') {
+                        showPopup('Seller already notified about your interest in this item.');
+                    } else {
+                        showPopup('Seller has been notified about your interest in this item.');
+                    }
                 } else {
-                    showPopup('Failed to send message: ' + (response.error || 'Unknown error'), false);
+                    showPopup('Failed to notify seller: ' + (response.error || 'Unknown error'), false);
                 }
             })
             .catch(error => {
-                showPopup('Error sending message: ' + error.message, false);
+                showPopup('Error notifying seller: ' + error.message, false);
             });
         }
 

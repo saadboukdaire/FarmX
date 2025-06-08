@@ -51,21 +51,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Check if this is the first message about this item
+    // Check if this is the first message about this specific item
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages 
-                          WHERE sender_id = ? AND receiver_id = ? 
+                          WHERE sender_id = ? 
+                          AND receiver_id = ? 
                           AND content LIKE ?");
-    $stmt->execute([$buyer_id, $seller_id, "%item_id=$item_id%"]);
+    $stmt->execute([$buyer_id, $seller_id, "%[item_id=$item_id]%"]);
     $message_exists = $stmt->fetchColumn();
     
     if (!$message_exists) {
+        // Create a message with the item ID embedded in the content
         $content = "Hello, I'm interested in your item: {$item['title']} ({$item['price']} MAD). [item_id=$item_id]";
-        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content) VALUES (?, ?, ?)");
-        $success = $stmt->execute([$buyer_id, $seller_id, $content]);
         
-        if ($success) {
+        try {
+            $pdo->beginTransaction();
+            
+            // Insert the message
+            $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content) VALUES (?, ?, ?)");
+            $stmt->execute([$buyer_id, $seller_id, $content]);
+            
+            // Create a notification for the seller
+            $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content) VALUES (?, ?, 'message', 'sent you a message about an item')");
+            $stmt->execute([$seller_id, $buyer_id]);
+            
+            $pdo->commit();
             echo json_encode(['success' => true, 'message' => 'Message sent successfully']);
-        } else {
+        } catch (Exception $e) {
+            $pdo->rollBack();
             http_response_code(500);
             echo json_encode(['error' => 'Failed to send message']);
         }

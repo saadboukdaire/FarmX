@@ -34,6 +34,36 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $notifications = $stmt->fetchAll();
 
+    // Group notifications by time period
+    $groupedNotifications = [
+        'today' => [],
+        'yesterday' => [],
+        'this_week' => [],
+        'this_month' => [],
+        'older' => []
+    ];
+
+    $now = new DateTime();
+    $yesterday = new DateTime('yesterday');
+    $weekAgo = new DateTime('-1 week');
+    $monthAgo = new DateTime('-1 month');
+
+    foreach ($notifications as $notification) {
+        $notificationDate = new DateTime($notification['created_at']);
+        
+        if ($notificationDate->format('Y-m-d') === $now->format('Y-m-d')) {
+            $groupedNotifications['today'][] = $notification;
+        } elseif ($notificationDate->format('Y-m-d') === $yesterday->format('Y-m-d')) {
+            $groupedNotifications['yesterday'][] = $notification;
+        } elseif ($notificationDate >= $weekAgo) {
+            $groupedNotifications['this_week'][] = $notification;
+        } elseif ($notificationDate >= $monthAgo) {
+            $groupedNotifications['this_month'][] = $notification;
+        } else {
+            $groupedNotifications['older'][] = $notification;
+        }
+    }
+
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
@@ -222,6 +252,23 @@ try {
             font-size: 24px;
         }
 
+        .notification-group {
+            margin-bottom: 30px;
+        }
+
+        .notification-group-header {
+            color: #666;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-group:empty {
+            display: none;
+        }
+
         .notification-card {
             background: white;
             border-radius: 10px;
@@ -364,7 +411,103 @@ try {
                 <p>No notifications yet</p>
             </div>
         <?php else: ?>
-            <?php foreach ($notifications as $notification): ?>
+            <?php if (!empty($groupedNotifications['today'])): ?>
+                <div class="notification-group">
+                    <div class="notification-group-header">Today</div>
+                    <?php foreach ($groupedNotifications['today'] as $notification): ?>
+                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
+                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
+                                    <span class="notification-time"><?php echo date('g:i a', strtotime($notification['created_at'])); ?></span>
+                                </div>
+                                <div class="notification-text">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($notification['post_content']): ?>
+                                    <div class="notification-preview">
+                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($groupedNotifications['yesterday'])): ?>
+                <div class="notification-group">
+                    <div class="notification-group-header">Yesterday</div>
+                    <?php foreach ($groupedNotifications['yesterday'] as $notification): ?>
+                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
+                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
+                                    <span class="notification-time"><?php echo date('g:i a', strtotime($notification['created_at'])); ?></span>
+                                </div>
+                                <div class="notification-text">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($notification['post_content']): ?>
+                                    <div class="notification-preview">
+                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($groupedNotifications['this_week'])): ?>
+                <div class="notification-group">
+                    <div class="notification-group-header">This Week</div>
+                    <?php foreach ($groupedNotifications['this_week'] as $notification): ?>
+                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
+                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
+                                    <span class="notification-time"><?php echo date('D, g:i a', strtotime($notification['created_at'])); ?></span>
+                                </div>
+                                <div class="notification-text">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($notification['post_content']): ?>
+                                    <div class="notification-preview">
+                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($groupedNotifications['this_month'])): ?>
+                <div class="notification-group">
+                    <div class="notification-group-header">This Month</div>
+                    <?php foreach ($groupedNotifications['this_month'] as $notification): ?>
                 <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
                     <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
                          alt="Profile" 
@@ -375,25 +518,44 @@ try {
                             <span class="notification-time"><?php echo date('M j, g:i a', strtotime($notification['created_at'])); ?></span>
                         </div>
                         <div class="notification-text">
-                            <?php
-                            switch ($notification['type']) {
-                                case 'like':
-                                    echo 'liked your post';
-                                    break;
-                                case 'comment':
-                                    echo 'commented on your post';
-                                    break;
-                                case 'message':
-                                    echo 'sent you a message';
-                                    break;
-                            }
-                            ?>
-                        </div>
-                        <?php if ($notification['type'] === 'message' && $notification['message_content']): ?>
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($notification['post_content']): ?>
                             <div class="notification-preview">
-                                <?php echo htmlspecialchars(substr($notification['message_content'], 0, 100)) . (strlen($notification['message_content']) > 100 ? '...' : ''); ?>
+                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        <?php elseif ($notification['type'] !== 'message' && $notification['post_content']): ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($groupedNotifications['older'])): ?>
+                <div class="notification-group">
+                    <div class="notification-group-header">Older</div>
+                    <?php foreach ($groupedNotifications['older'] as $notification): ?>
+                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
+                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
+                                    <span class="notification-time"><?php echo date('M j, Y', strtotime($notification['created_at'])); ?></span>
+                                </div>
+                                <div class="notification-text">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($notification['post_content']): ?>
                             <div class="notification-preview">
                                 <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
                             </div>
@@ -401,15 +563,17 @@ try {
                     </div>
                 </div>
             <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 
     <script>
         function handleNotificationClick(notification) {
             if (notification.type === 'message') {
-                window.location.href = `message.php?user=${notification.sender_id}`;
+                window.location.href = `message.php?to=${notification.sender_id}`;
             } else if (notification.type === 'like' || notification.type === 'comment') {
-                window.location.href = `view_post.php?id=${notification.post_id}`;
+                window.location.href = `main.php?post_id=${notification.post_id}`;
             }
         }
 

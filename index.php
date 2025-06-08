@@ -73,7 +73,7 @@ if (isset($_SESSION['registration_success'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Authentification FarmX</title>
+  <title>FarmX - Authentification</title>
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="icon" href="Images/logo.jpg" class="icon1">
   <style>
@@ -143,28 +143,24 @@ if (isset($_SESSION['registration_success'])) {
     .wrapper .btn {
       width: 100%;
       height: 45px;
-      background: #fff;
+      background: #4CAF50;
       border: none;
       outline: none;
       border-radius: 40px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
       cursor: pointer;
       font-size: 16px;
-      color: #333;
+      color: #fff;
       font-weight: 600;
+      transition: all 0.3s ease;
     }
     .wrapper .btn:hover {
-      width: 100%;
-      height: 45px;
-      background: #d1d1d1;
-      border: none;
-      outline: none;
-      border-radius: 40px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .1);
-      cursor: pointer;
-      font-size: 16px;
-      color: #333;
-      font-weight: 600;
+      background: #45a049;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+      transform: translateY(-2px);
+    }
+    .wrapper .btn:active {
+      transform: translateY(0);
     }
     .wrapper .register-link {
       font-size: 14.5px;
@@ -172,12 +168,14 @@ if (isset($_SESSION['registration_success'])) {
       margin: 20px 0 15px;
     }
     .register-link p a {
-      color: #fff;
+      color: #4CAF50;
       text-decoration: none;
       font-weight: 600;
+      transition: all 0.3s ease;
     }
     .register-link p a:hover {
-      text-decoration: underline;
+      color: #45a049;
+      text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
     }
     img {
       margin-left: 110px;

@@ -11,7 +11,7 @@ session_start();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Authentification FarmX</title>
+  <title>FarmX - Authentification</title>
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="icon" href="Images/logo.jpg" class="icon1">
   
@@ -194,11 +194,11 @@ session_start();
 
     .alert-content {
       background-color: #fff;
-      padding: 35px;
-      border-radius: 20px;
+      padding: 25px;
+      border-radius: 15px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
-      max-width: 400px;
+      max-width: 300px;
       width: 90%;
       transform: scale(0.9);
       animation: scaleIn 0.3s ease forwards;
@@ -222,21 +222,21 @@ session_start();
     }
 
     .alert-content p {
-      font-size: 18px;
-      margin-bottom: 25px;
+      font-size: 16px;
+      margin-bottom: 20px;
       color: #333;
-      line-height: 1.6;
+      line-height: 1.4;
       font-weight: 500;
     }
 
     .alert-content button {
-      padding: 12px 35px;
+      padding: 10px 25px;
       background: linear-gradient(135deg, #4CAF50, #45a049);
       color: #fff;
       border: none;
-      border-radius: 25px;
+      border-radius: 20px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
@@ -294,8 +294,8 @@ session_start();
 
     /* Alert Icon Styles */
     .alert-content i {
-      font-size: 48px;
-      margin-bottom: 20px;
+      font-size: 36px;
+      margin-bottom: 15px;
       display: block;
     }
 

@@ -859,13 +859,17 @@ $current_username = $user['username'];
         .then(res => res.json())
         .then(response => {
             if (response.success) {
-                showPopup('Message sent successfully! The seller will be notified.');
+                if (response.message === 'Message already sent') {
+                    showPopup('Seller already notified about your interest in this item.');
+                } else {
+                    showPopup('Seller has been notified about your interest in this item.');
+                }
             } else {
-                showPopup('Failed to send message: ' + (response.error || 'Unknown error'), false);
+                showPopup('Failed to notify seller: ' + (response.error || 'Unknown error'), false);
             }
         })
         .catch(error => {
-            showPopup('Error sending message: ' + error.message, false);
+            showPopup('Error notifying seller: ' + error.message, false);
         });
     }
     
@@ -905,12 +909,26 @@ $current_username = $user['username'];
     document.getElementById('popupOverlay').addEventListener('click', closePopup);
 
     // Update search and filter functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        document.getElementById('searchForm').submit();
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchInput = document.getElementById('searchInput').value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        
+        // Update URL with search parameters
+        const url = new URL(window.location.href);
+        url.searchParams.set('search', searchInput);
+        url.searchParams.set('category', categoryFilter);
+        
+        // Navigate to the new URL
+        window.location.href = url.toString();
     });
 
-    document.getElementById('categoryFilter').addEventListener('change', function() {
-        document.getElementById('searchForm').submit();
+    // Allow Enter key to submit the form
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        }
     });
 </script>
 </body>
