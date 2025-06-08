@@ -67,7 +67,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_users'])) {
             u.id, 
             u.username, 
             u.profile_pic,
-            COUNT(CASE WHEN m.is_read = FALSE AND m.receiver_id = :user_id THEN 1 END) as unread_count
+            COUNT(CASE WHEN m.is_read = FALSE AND m.receiver_id = :user_id THEN 1 END) as unread_count,
+            (SELECT COUNT(*) FROM messages WHERE sender_id = u.id AND receiver_id = :user_id) as messages_received,
+            (SELECT content FROM messages 
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
+             ORDER BY created_at DESC LIMIT 1) as last_message,
+            (SELECT created_at FROM messages 
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
+             ORDER BY created_at DESC LIMIT 1) as last_message_time,
+            (SELECT sender_id FROM messages 
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
+             ORDER BY created_at DESC LIMIT 1) as last_message_sender
         FROM users u
         LEFT JOIN messages m ON (m.sender_id = u.id AND m.receiver_id = :user_id)
         WHERE u.id != :user_id
@@ -508,12 +521,29 @@ if (isset($_GET['to'])) {
             font-size: 16px;
             margin: 0;
             color: #333; /* Dark text */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-info h3 .unread-badge {
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            min-width: 20px;
+            text-align: center;
         }
 
         .contact-info p {
             font-size: 14px;
             margin: 0;
             color: #666; /* Light gray text */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
         }
         .contact.active {
     background-color: #e0f7e0; /* Light green background */
@@ -799,8 +829,11 @@ if (isset($_GET['to'])) {
                 contact.innerHTML = `
                     <img src="${user.profile_pic ? user.profile_pic + '?t=' + Date.now() : 'Images/profile.jpg'}" alt="Profile">
                     <div class="contact-info">
-                        <h3>${escapeHtml(user.username)}</h3>
-                        <p>Click to chat</p>
+                        <h3>${escapeHtml(user.username)}${user.unread_count > 0 ? ` <span class="unread-badge">${user.unread_count}</span>` : ''}</h3>
+                        <p>${user.messages_received === 0 ? 'Start a new chat!' : 
+                            (user.last_message_sender == loggedInUserId ? 
+                                `You: ${escapeHtml(user.last_message)}` : 
+                                escapeHtml(user.last_message))}</p>
                     </div>
                 `;
                 contact.addEventListener('click', () => selectContact(user));
@@ -825,7 +858,14 @@ if (isset($_GET['to'])) {
     function selectContact(user) {
         currentContactId = user.id;
         document.querySelectorAll('.contact').forEach(c => c.classList.remove('active'));
-        document.querySelector(`.contact[data-user-id="${user.id}"]`).classList.add('active');
+        const selectedContact = document.querySelector(`.contact[data-user-id="${user.id}"]`);
+        selectedContact.classList.add('active');
+        
+        // Remove unread badge when chat is selected
+        const unreadBadge = selectedContact.querySelector('.unread-badge');
+        if (unreadBadge) {
+            unreadBadge.remove();
+        }
         
         chatHeaderEl.innerHTML = `<h2>${escapeHtml(user.username)}</h2>`;
         inputEl.disabled = false;

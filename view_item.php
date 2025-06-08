@@ -69,11 +69,13 @@ if (!$item) {
         header {
             background-color: #3e8e41;
             color: white;
-            padding: 8px 0;
+            padding: 4px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .header-content {
@@ -81,164 +83,369 @@ if (!$item) {
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
         }
 
         .logo {
+            margin-left: -140px;
             display: flex;
             align-items: center;
         }
 
-        .search-bar {
-            flex-grow: 1;
-            margin: 0 20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 8px 15px 8px 35px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 12px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7);
+        .logo img {
+            height: 65px;
+            width: auto;
         }
 
         .nav-links {
             display: flex;
+            gap: 25px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            align-items: center;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            font-size: 24px;
         }
 
         .nav-links a:hover {
             color: #3e8e41;
             background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.activated {
+            color: #3e8e41;
+            background-color: white;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .right-nav {
+            display: flex;
+            gap: 12px;
+            margin-right: -70px;
+            position: absolute;
+            right: 0;
+        }
+
+        .right-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .right-nav a i {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right-nav a:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .right-nav a:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: -35px;
+        }
+
+        .notification-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .notification-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-icon:hover {
+            color: #3e8e41;
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: none;
         }
 
         .item-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 30px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .item-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            gap: 20px;
         }
 
         .item-title {
-            font-size: 24px;
-            color: #3e8e41;
+            font-size: 32px;
+            color: #2d682f;
+            font-weight: 600;
+            line-height: 1.3;
+            flex: 1;
         }
 
         .item-price {
-            font-size: 24px;
+            font-size: 36px;
             font-weight: bold;
-            color: #2d682f;
+            color: #3e8e41;
+            background-color: #f0f7f0;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .item-price::before {
+            content: 'MAD';
+            font-size: 18px;
+            color: #666;
+            font-weight: normal;
         }
 
         .item-category {
-            font-size: 18px;
+            font-size: 16px;
             color: #555;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 500;
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #f0f7f0;
+            border-radius: 20px;
+            color: #3e8e41;
         }
 
         .item-image {
             width: 100%;
-            max-height: 400px;
+            max-height: 500px;
             object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .item-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
             margin-bottom: 30px;
         }
 
         .item-description {
             font-size: 16px;
-            line-height: 1.6;
-            color: #666;
+            line-height: 1.8;
+            color: #444;
             margin-bottom: 20px;
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #3e8e41;
         }
 
         .item-posted-time {
             font-size: 14px;
             color: #888;
-            margin-top: 10px;
-            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            flex: 1;
+        }
+
+        .item-posted-time i {
+            font-size: 18px;
+            color: #3e8e41;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .seller-info {
             background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 35px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .seller-info h3 {
+            color: #2d682f;
+            margin-bottom: 25px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .seller-info h3 i {
             color: #3e8e41;
-            margin-bottom: 10px;
         }
 
         .seller-info p {
-            margin: 5px 0;
-            color: #666;
+            margin: 15px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .seller-info p i {
+            color: #3e8e41;
+            font-size: 20px;
         }
 
         .contact-seller {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background-color: #3e8e41;
             color: white;
-            padding: 12px 24px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 500;
-            transition: background-color 0.3s ease;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            justify-content: center;
         }
 
         .contact-seller:hover {
             background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
+        }
+
+        .contact-seller i {
+            font-size: 20px;
         }
 
         .back-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             color: #666;
             text-decoration: none;
             margin-bottom: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #f5f5f5;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+            color: #333;
         }
 
         .back-button i {
-            margin-right: 5px;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .item-details {
+                grid-template-columns: 1fr;
+            }
+
+            .item-header {
+                flex-direction: column;
+            }
+
+            .item-price {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .item-title {
+                font-size: 24px;
+            }
         }
 
         /* Custom Popup Styles */
@@ -301,17 +508,40 @@ if (!$item) {
     <header>
         <div class="header-content">
             <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l'avenir, récoltez le succès">    
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search FarmX...">
-                <i class='bx bx-search-alt-2'></i>
+                <a href="main.php">
+                    <img src="Images/logoinv.png" alt="FarmX Logo">
+                </a>
             </div>
             <div class="nav-links">
-                <a href="main.php">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php" class="activated">Marketplace</a>
-                <a href="profile.php">Profile</a>
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="main.php" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="market.php" class="activated" title="Marketplace">
+                    <i class='bx bxs-store'></i>
+                    <span class="tooltip">Marketplace</span>
+                </a>
+            </div>
+            <div class="right-nav">
+                <div class="notification-container">
+                    <a href="notifications.php" title="Notifications">
+                        <i class='bx bx-bell notification-icon'></i>
+                        <span class="notification-badge">0</span>
+                        <span class="tooltip">Notifications</span>
+                    </a>
+                </div>
+                <a href="profile.php" title="Profile">
+                    <i class='bx bxs-user'></i>
+                    <span class="tooltip">Profile</span>
+                </a>
+                <a href="logout.php" title="Logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="tooltip">Logout</span>
+                </a>
             </div>
         </div>
     </header>
@@ -323,35 +553,44 @@ if (!$item) {
 
         <div class="item-header">
             <h1 class="item-title"><?php echo htmlspecialchars($item['title']); ?></h1>
-            <div class="item-price"><?php echo number_format($item['price'], 2); ?> MAD</div>
-            <p class="item-category">Category: <?php echo htmlspecialchars(ucfirst($item['category'])); ?></p>
         </div>
+
+        <p class="item-category"><?php echo htmlspecialchars(ucfirst($item['category'])); ?></p>
 
         <?php if ($item['image_url']): ?>
             <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="item-image">
         <?php endif; ?>
 
         <div class="item-details">
-            <div class="item-description">
-                <?php echo nl2br(htmlspecialchars($item['description'])); ?>
+            <div class="main-content">
+                <div class="item-description">
+                    <?php echo nl2br(htmlspecialchars($item['description'])); ?>
+                </div>
+                <div class="item-price"><?php echo number_format($item['price'], 2); ?></div>
+                <div class="action-row">
+                    <p class="item-posted-time">
+                        <i class='bx bx-time'></i>
+                        Posted: <?php echo date('Y-m-d H:i', strtotime($item['created_at'])); ?>
+                    </p>
+
+                    <button onclick="contactSeller(<?php echo $item['seller_id']; ?>, <?php echo $item['id']; ?>)" class="contact-seller">
+                        <i class='bx bx-message-square-dots'></i> Contact Seller
+                    </button>
+                </div>
             </div>
-            <p class="item-posted-time">Posted: <?php echo date('Y-m-d H:i', strtotime($item['created_at'])); ?></p>
 
-            <div class="seller-info">
-                <h3>Seller Information</h3>
-                <p><strong>Name:</strong> <?php echo htmlspecialchars($item['username']); ?></p>
-                <?php if ($item['email']): ?>
-                    <p><strong>Email:</strong> <?php echo htmlspecialchars($item['email']); ?></p>
-                <?php endif; ?>
-                <?php if ($item['phone']): ?>
-                    <p><strong>Phone:</strong> <?php echo htmlspecialchars($item['phone']); ?></p>
-                <?php endif; ?>
+            <div class="sidebar">
+                <div class="seller-info">
+                    <h3><i class='bx bx-user'></i> Seller Information</h3>
+                    <p><i class='bx bx-user-circle'></i> <strong>Name:</strong> <?php echo htmlspecialchars($item['username']); ?></p>
+                    <?php if ($item['email']): ?>
+                        <p><i class='bx bx-envelope'></i> <strong>Email:</strong> <?php echo htmlspecialchars($item['email']); ?></p>
+                    <?php endif; ?>
+                    <?php if ($item['phone']): ?>
+                        <p><i class='bx bx-phone'></i> <strong>Phone:</strong> <?php echo htmlspecialchars($item['phone']); ?></p>
+                    <?php endif; ?>
+                </div>
             </div>
-
-            <button onclick="contactSeller(<?php echo $item['seller_id']; ?>, <?php echo $item['id']; ?>)" class="contact-seller">
-                Contact Seller
-            </button>
-
         </div>
     </div>
 

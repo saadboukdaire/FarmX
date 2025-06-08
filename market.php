@@ -424,6 +424,7 @@ $current_username = $user['username'];
             flex-direction: column;
             height: 100%;
             border: 1px solid #e0e0e0;
+            position: relative;
         }
 
         .product-card:hover {
@@ -436,6 +437,11 @@ $current_username = $user['username'];
             height: 250px;
             object-fit: cover;
             border-bottom: 1px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
         }
 
         .product-info {
@@ -444,6 +450,7 @@ $current_username = $user['username'];
             flex-direction: column;
             flex-grow: 1;
             gap: 10px;
+            position: relative;
         }
 
         .product-info h3 {
@@ -451,6 +458,7 @@ $current_username = $user['username'];
             font-weight: 600;
             color: #333;
             margin: 0;
+            line-height: 1.4;
         }
 
         .product-info .price {
@@ -458,6 +466,16 @@ $current_username = $user['username'];
             font-weight: bold;
             color: #3e8e41;
             margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .product-info .price::before {
+            content: 'MAD';
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
         }
 
         .product-info .category {
@@ -465,6 +483,11 @@ $current_username = $user['username'];
             color: #555;
             margin: 5px 0;
             font-weight: 500;
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #f0f7f0;
+            border-radius: 20px;
+            color: #3e8e41;
         }
 
         .product-info .description {
@@ -473,6 +496,11 @@ $current_username = $user['username'];
             line-height: 1.5;
             margin: 0;
             flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .product-info .seller {
@@ -480,35 +508,53 @@ $current_username = $user['username'];
             color: #888;
             margin: 0;
             font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .product-info .seller i {
+            color: #3e8e41;
         }
 
         .product-info .posted-time {
             font-size: 13px;
             color: #999;
             margin: 0;
-            margin-top: auto; /* Push to the bottom */
+            margin-top: auto;
             text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .product-info .posted-time i {
+            font-size: 16px;
         }
 
         .product-actions {
             margin-top: 15px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .edit-btn, .delete-btn, .view-btn, .contact-btn {
             flex: 1;
+            min-width: 120px;
             padding: 10px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .edit-btn {
@@ -518,6 +564,8 @@ $current_username = $user['username'];
 
         .edit-btn:hover {
             background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(62, 142, 65, 0.2);
         }
 
         .delete-btn {
@@ -527,17 +575,19 @@ $current_username = $user['username'];
 
         .delete-btn:hover {
             background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
         }
 
         .view-btn {
             background-color: #3e8e41;
             color: white;
-            text-decoration: none;
-            text-align: center;
         }
 
         .view-btn:hover {
             background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(62, 142, 65, 0.2);
         }
 
         .contact-btn {
@@ -547,6 +597,8 @@ $current_username = $user['username'];
 
         .contact-btn:hover {
             background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2);
         }
 
         .success-message {
@@ -585,7 +637,112 @@ $current_username = $user['username'];
             font-weight: bold;
         }
 
+        /* Delete Confirmation Modal */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .delete-modal-icon {
+            font-size: 48px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .delete-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .delete-modal-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .delete-modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .delete-modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .delete-modal-cancel {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #dee2e6;
+        }
+
+        .delete-modal-cancel:hover {
+            background-color: #e9ecef;
+        }
+
+        .delete-modal-confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-modal-confirm:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+        }
+
         /* Custom Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
         .custom-popup {
             display: none;
             position: fixed;
@@ -595,31 +752,41 @@ $current_username = $user['username'];
             background-color: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1002;
-            min-width: 350px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
             text-align: center;
-            border-top: 4px solid #3e8e41;
+            min-width: 300px;
+            animation: popupSlideIn 0.3s ease;
         }
 
-        .custom-popup .popup-icon {
-            font-size: 50px;
-            color: #3e8e41;
+        @keyframes popupSlideIn {
+            from {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        .popup-icon {
+            font-size: 48px;
             margin-bottom: 20px;
         }
 
-        .custom-popup .popup-message {
-            color: #333;
+        .popup-message {
             font-size: 16px;
+            color: #333;
             margin-bottom: 25px;
             line-height: 1.5;
         }
 
-        .custom-popup .popup-button {
+        .popup-button {
+            padding: 12px 30px;
             background-color: #3e8e41;
             color: white;
             border: none;
-            padding: 12px 30px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 15px;
@@ -627,27 +794,15 @@ $current_username = $user['username'];
             transition: all 0.3s ease;
         }
 
-        .custom-popup .popup-button:hover {
+        .popup-button:hover {
             background-color: #2d682f;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1001;
-            backdrop-filter: blur(3px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(62, 142, 65, 0.2);
         }
 
         .search-button {
             padding: 12px 25px;
-            background-color: #17a2b8; /* A color for action buttons */
+            background-color: #17a2b8;
             color: white;
             border: none;
             border-radius: 8px;
@@ -663,8 +818,8 @@ $current_username = $user['username'];
 
         .search-button:hover {
             background-color: #138496;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2);
         }
 
         .search-button i {
@@ -722,6 +877,21 @@ $current_username = $user['username'];
         </div>
         <div class="popup-message" id="popupMessage"></div>
         <button class="popup-button" onclick="closePopup()">OK</button>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-icon">
+                <i class='bx bx-trash'></i>
+            </div>
+            <h3 class="delete-modal-title">Delete Product</h3>
+            <p class="delete-modal-message">Are you sure you want to delete this product? This action cannot be undone.</p>
+            <div class="delete-modal-buttons">
+                <button class="delete-modal-btn delete-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="delete-modal-btn delete-modal-confirm" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
     </div>
 
     <div class="marketplace-container">
@@ -878,7 +1048,12 @@ $current_username = $user['username'];
     }
 
     function deleteProduct(productId) {
-        if (confirm('Are you sure you want to delete this product?')) {
+        const modal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        
+        modal.style.display = 'flex';
+        
+        confirmBtn.onclick = function() {
             const formData = new FormData();
             formData.append('product_id', productId);
 
@@ -898,15 +1073,26 @@ $current_username = $user['username'];
                 } else {
                     showPopup(data.message || 'Failed to delete product', false);
                 }
+                closeDeleteModal();
             })
             .catch(error => {
                 showPopup('An error occurred while deleting the product', false);
+                closeDeleteModal();
             });
-        }
+        };
     }
 
-    // Close popup when clicking outside
-    document.getElementById('popupOverlay').addEventListener('click', closePopup);
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
 
     // Update search and filter functionality
     document.getElementById('searchForm').addEventListener('submit', function(e) {
