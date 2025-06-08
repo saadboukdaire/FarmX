@@ -137,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .add-container {
             max-width: 800px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 30px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .add-form h2 {
@@ -151,73 +151,171 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
-            padding: 15px 0;
+            padding: 20px 0;
             background: linear-gradient(to right, #3e8e41, #2d682f);
-            border-radius: 8px;
+            border-radius: 12px;
             display: inline-block;
             width: 100%;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
             margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
         }
 
         .add-form input,
         .add-form textarea,
         .add-form select {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 14px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
             outline: none;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
         }
 
         .add-form input:focus,
         .add-form textarea:focus,
         .add-form select:focus {
             border-color: #3e8e41;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(62, 142, 65, 0.1);
+        }
+
+        .add-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .file-upload-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed #3e8e41;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            background-color: #f0f7f0;
+            border-color: #2d682f;
+        }
+
+        .file-upload-icon {
+            font-size: 40px;
+            color: #3e8e41;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+
+        .file-upload-text span {
+            color: #3e8e41;
+            font-weight: 500;
+        }
+
+        .preview-container {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .preview-container img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .add-form button {
-            padding: 10px 20px;
+            width: 100%;
+            padding: 15px;
             background-color: #3e8e41;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
         .add-form button:hover {
             background-color: #2d682f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .success-message {
             background-color: #d4edda;
             color: #155724;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
         }
 
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
         }
 
         .back-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             color: #666;
             text-decoration: none;
             margin-bottom: 20px;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #f0f0f0;
+            color: #333;
         }
 
         .back-button i {
-            margin-right: 5px;
+            margin-right: 8px;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -248,23 +346,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form action="add_product.php" method="POST" enctype="multipart/form-data">
-                <input type="text" name="product_name" placeholder="Product Name" required>
-                <textarea name="product_description" placeholder="Product Description" required></textarea>
-                <input type="number" name="product_price" placeholder="Price" step="0.01" min="0" required>
-                <select name="product_category" required>
-                    <option value="">Select Category</option>
-                    <option value="vegetables">Vegetables</option>
-                    <option value="fruits">Fruits</option>
-                    <option value="dairy">Dairy Products</option>
-                    <option value="meat">Meat & Poultry</option>
-                    <option value="honey">Honey & Bee Products</option>
-                    <option value="grains">Grains & Cereals</option>
-                    <option value="other">Other</option>
-                </select>
-                <input type="file" name="product_image" accept="image/*" required>
+                <div class="form-group">
+                    <label for="product_name">Product Name</label>
+                    <input type="text" id="product_name" name="product_name" placeholder="Enter product name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product_description">Description</label>
+                    <textarea id="product_description" name="product_description" placeholder="Enter product description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product_price">Price (MAD)</label>
+                    <input type="number" id="product_price" name="product_price" placeholder="Enter price" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product_category">Category</label>
+                    <select id="product_category" name="product_category" required>
+                        <option value="">Select Category</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="fruits">Fruits</option>
+                        <option value="dairy">Dairy Products</option>
+                        <option value="meat">Meat & Poultry</option>
+                        <option value="honey">Honey & Bee Products</option>
+                        <option value="grains">Grains & Cereals</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Image</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="product_image" name="product_image" accept="image/*" class="file-upload-input" required>
+                        <label for="product_image" class="file-upload-label">
+                            <i class='bx bx-cloud-upload file-upload-icon'></i>
+                            <div class="file-upload-text">
+                                <span>Click to upload</span> or drag and drop<br>
+                                PNG, JPG or JPEG (max. 5MB)
+                            </div>
+                        </label>
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <img id="imagePreview" src="#" alt="Preview">
+                    </div>
+                </div>
+
                 <button type="submit">Add Product</button>
             </form>
         </div>
     </div>
+
+    <script>
+        // Preview image before upload
+        document.getElementById('product_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                const previewContainer = document.getElementById('previewContainer');
+                const imagePreview = document.getElementById('imagePreview');
+
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                }
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Drag and drop functionality
+        const dropZone = document.querySelector('.file-upload-label');
+        const fileInput = document.getElementById('product_image');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('highlight');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('highlight');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            // Trigger change event to show preview
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        }
+    </script>
 </body>
 </html> 
