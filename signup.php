@@ -32,7 +32,6 @@ session_start();
       background-position: center;
       opacity: 0;
       animation: fadeInBody 0.80s ease-in-out forwards;
-      padding: 20px;
     }
 
     @keyframes fadeInBody {
@@ -45,30 +44,26 @@ session_start();
     }
 
     .wrapper {
-      width: 100%;
-      max-width: 400px;
+      width: 420px;
       background-color: rgba(14, 14, 14, 0.699);
       border: 2px solid rgba(255, 255, 255, .2);
       color: #fff;
       border-radius: 12px;
-      padding: 25px 30px;
+      padding: 20px 30px;
       position: relative;
-      margin: 0 auto;
+      margin: 20px auto;
     }
-
     .wrapper h1 {
       font-size: 28px;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
-
     .wrapper .input-box {
       position: relative;
       width: 100%;
       height: 45px;
-      margin: 20px 0;
+      margin: 15px 0;
     }
-
     .input-box input {
       width: 100%;
       height: 100%;
@@ -81,20 +76,16 @@ session_start();
       color: #fff;
       padding: 15px 45px 15px 20px;
     }
-
     .input-box input::placeholder {
       color: #fff;
-      font-size: 14px;
     }
-
     .input-box i {
       position: absolute;
       right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
+      top: 30%;
+      transform: translate(-50%);
+      font-size: 20px;
     }
-
     .input-box select {
       width: 100%;
       height: 100%;
@@ -111,86 +102,74 @@ session_start();
       -webkit-appearance: none;
       -moz-appearance: none;
     }
-
     .input-box select option {
       background-color: #1a1a1a;
       color: #fff;
       padding: 10px;
     }
-
     .input-box select:focus {
       border-color: rgba(255, 255, 255, .5);
     }
-
     .input-box select::-ms-expand {
       display: none;
     }
-
     .wrapper .remember-forgot {
       display: flex;
       justify-content: space-between;
-      font-size: 14.5px;
-      margin: 0 0 15px;
-      padding: 0 20px;
+      font-size: 13.5px;
+      margin: 0 0 10px;
+      padding: 0 15px;
     }
-
     .remember-forgot label input {
       accent-color: #fff;
       margin-right: 3px;
     }
-
     .remember-forgot a {
       color: #fff;
       text-decoration: none;
     }
-
     .remember-forgot a:hover {
       text-decoration: underline;
     }
-
     .wrapper .btn {
       width: 100%;
-      height: 45px;
-      background: #fff;
+      height: 40px;
+      background: #4CAF50;
       border: none;
       outline: none;
       border-radius: 40px;
       box-shadow: 0 0 10px rgba(0, 0, 0, .1);
       cursor: pointer;
       font-size: 15px;
-      color: #333;
+      color: #fff;
       font-weight: 600;
       margin-top: 10px;
+      transition: all 0.3s ease;
     }
-
     .wrapper .btn:hover {
-      width: 100%;
-      height: 45px;
-      background: #d1d1d1;
-      border: none;
-      outline: none;
-      border-radius: 40px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .1);
-      cursor: pointer;
-      font-size: 15px;
-      color: #333;
-      font-weight: 600;
+      background: #45a049;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+      transform: translateY(-1px);
     }
-
+    .wrapper .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+    }
     .wrapper .register-link {
-      font-size: 14px;
+      font-size: 13.5px;
       text-align: center;
       margin: 15px 0 10px;
     }
-
     .register-link p a {
-      color: #fff;
+      color: #4CAF50;
       text-decoration: none;
       font-weight: 600;
+      transition: all 0.3s ease;
     }
-
     .register-link p a:hover {
-      text-decoration: underline;
+      color: #45a049;
+      text-decoration: none;
+      text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
     }
 
     /* Enhanced Alert Modal Styles */
@@ -215,11 +194,11 @@ session_start();
 
     .alert-content {
       background-color: #fff;
-      padding: 25px;
+      padding: 35px;
       border-radius: 20px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
-      max-width: 350px;
+      max-width: 400px;
       width: 90%;
       transform: scale(0.9);
       animation: scaleIn 0.3s ease forwards;
@@ -243,21 +222,21 @@ session_start();
     }
 
     .alert-content p {
-      font-size: 16px;
-      margin-bottom: 20px;
+      font-size: 18px;
+      margin-bottom: 25px;
       color: #333;
       line-height: 1.6;
       font-weight: 500;
     }
 
     .alert-content button {
-      padding: 10px 30px;
+      padding: 12px 35px;
       background: linear-gradient(135deg, #4CAF50, #45a049);
       color: #fff;
       border: none;
       border-radius: 25px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
@@ -330,15 +309,15 @@ session_start();
 
     /* User type selection styles */
     .user-type-selection {
-      margin: 20px 0;
+      margin: 15px 0;
       color: #fff;
-      padding: 0 10px;
+      padding: 0 15px;
     }
 
     .user-type-label {
       display: block;
-      font-size: 14px;
-      margin-bottom: 10px;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
       font-weight: 500;
       color: #fff;
     }
@@ -360,8 +339,8 @@ session_start();
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid rgba(255, 255, 255, .1);
       border-radius: 30px;
-      padding: 10px 20px;
-      font-size: 14px;
+      padding: 8px 20px;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.3s ease;
       flex-grow: 1;
@@ -386,37 +365,6 @@ session_start();
     .radio-group input[type="radio"]:checked + label:hover {
       background-color: rgba(76, 175, 80, 0.45);
       color: #fff;
-    }
-
-    @media (max-width: 480px) {
-      .wrapper {
-        padding: 20px;
-      }
-
-      .wrapper h1 {
-        font-size: 24px;
-      }
-
-      .input-box {
-        height: 40px;
-        margin: 15px 0;
-      }
-
-      .input-box input,
-      .input-box select {
-        font-size: 14px;
-        padding: 12px 40px 12px 15px;
-      }
-
-      .radio-group label {
-        padding: 8px 15px;
-        font-size: 13px;
-      }
-
-      .wrapper .btn {
-        height: 40px;
-        font-size: 14px;
-      }
     }
   </style>
 </head>
@@ -445,18 +393,6 @@ session_start();
         <i class='bx bxs-lock-alt'></i>
       </div>
 
-      <!-- Gender selection -->
-      <div class="user-type-selection">
-        <label class="user-type-label">Gender (Optional):</label>
-        <div class="radio-group">
-          <input type="radio" id="male" name="gender" value="male">
-          <label for="male">Male</label>
-
-          <input type="radio" id="female" name="gender" value="female">
-          <label for="female">Female</label>
-        </div>
-      </div>
-
       <!-- User type selection -->
       <div class="user-type-selection">
         <label class="user-type-label">Account Type:</label>
@@ -466,6 +402,18 @@ session_start();
 
           <input type="radio" id="user" name="user_type" value="user" required>
           <label for="user"> Consumer</label>
+        </div>
+      </div>
+
+      <!-- Gender selection -->
+      <div class="user-type-selection">
+        <label class="user-type-label">Gender (Optional):</label>
+        <div class="radio-group">
+          <input type="radio" id="male" name="gender" value="male">
+          <label for="male">Male</label>
+
+          <input type="radio" id="female" name="gender" value="female">
+          <label for="female">Female</label>
         </div>
       </div>
 
@@ -611,6 +559,7 @@ session_start();
     $phone = trim($_POST['phone']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
+    $gender = isset($_POST['gender']) ? $_POST['gender'] : null;
 
     // Get user type from radio button
     $user_type = $_POST['user_type'] ?? '';
@@ -660,11 +609,8 @@ session_start();
     // If no duplicates found, proceed with registration
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
-    // Get gender from form (optional)
-    $gender = $_POST['gender'] ?? null;
-    
     // Modified INSERT statement to include user_tag and gender
-    $stmt = $conn->prepare("INSERT INTO users (username, email, phone, password, user_type, user_tag, gender, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+    $stmt = $conn->prepare("INSERT INTO users (username, email, phone, password, user_type, user_tag, gender) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssss", $username, $email, $phone, $hashed_password, $user_type, $user_tag, $gender);
 
     if ($stmt->execute()) {
@@ -673,7 +619,6 @@ session_start();
       $_SESSION['registered_username'] = $username;
       $_SESSION['user_type'] = $user_type;
       $_SESSION['user_tag'] = $user_tag;
-      $_SESSION['gender'] = $gender;
       echo "<script>window.location.href = 'index.php';</script>";
     } else {
       echo "<script>showAlert('Error creating account: " . $stmt->error . "', 'error');</script>";

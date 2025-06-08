@@ -695,11 +695,13 @@ $current_username = $user['username'];
                 </a>
             </div>
             <div class="right-nav">
-                <a href="notifications.php" class="notification-container" title="Notifications">
-                    <i class='bx bx-bell notification-icon'></i>
-                    <span class="notification-badge">0</span>
-                    <span class="tooltip">Notifications</span>
-                </a>
+                <div class="notification-container">
+                    <a href="notifications.php" title="Notifications">
+                        <i class='bx bx-bell notification-icon'></i>
+                        <span class="notification-badge">0</span>
+                        <span class="tooltip">Notifications</span>
+                    </a>
+                </div>
                 <a href="profile.php" title="Profile">
                     <i class='bx bxs-user'></i>
                     <span class="tooltip">Profile</span>
@@ -804,43 +806,26 @@ $current_username = $user['username'];
     </div>
 
    <script>
-     // Product details modal
-    const modal = document.getElementById('productModal');
-    const span = document.getElementsByClassName('close')[0];
-    
-    function showProductDetails(productId) {
-        fetch(`get_product_details.php?id=${productId}`)
+    // Function to update notification count
+    function updateNotificationCount() {
+        fetch('get_notification_count.php')
             .then(response => response.json())
-            .then(product => {
-                document.getElementById('productDetails').innerHTML = `
-                    <img src="${product.image_url || 'Images/default-product.jpg'}" alt="${product.title}">
-                    <h2>${product.title}</h2>
-                    <p><strong>Price:</strong> €${product.price.toFixed(2)}</p>
-                    <p><strong>Category:</strong> ${product.category.charAt(0).toUpperCase() + product.category.slice(1)}</p>
-                    <p><strong>Seller:</strong> ${product.username}</p>
-                    <p><strong>Description:</strong><br>${product.description}</p>
-                    ${product.seller_id == <?= $_SESSION['user_id'] ?> ? 
-                        `<div class="product-actions">
-                            <button class="edit-btn" data-id="${product.id}" onclick="window.location.href='edit_product.php?id=${product.id}'">Edit</button>
-                            <button class="delete-btn" data-id="${product.id}" onclick="deleteProduct(${product.id})">Delete</button>
-                        </div>` : 
-                        `<button class="buy-btn" onclick="contactSeller(${product.id}, ${product.seller_id})">View Contact</button>`
-                    }
-                `;
-                modal.style.display = 'block';
-            });
+            .then(data => {
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    badge.textContent = data.count;
+                    badge.style.display = data.count > 0 ? 'flex' : 'none';
+                }
+            })
+            .catch(error => console.error('Error updating notification count:', error));
     }
-    
-    span.onclick = function() {
-        modal.style.display = 'none';
-    }
-    
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
-    
+
+    // Update notification count when page loads
+    document.addEventListener('DOMContentLoaded', updateNotificationCount);
+
+    // Update notification count every 30 seconds
+    setInterval(updateNotificationCount, 30000);
+
     function showPopup(message, isSuccess = true) {
         const popup = document.getElementById('customPopup');
         const overlay = document.getElementById('popupOverlay');
@@ -927,24 +912,6 @@ $current_username = $user['username'];
     document.getElementById('categoryFilter').addEventListener('change', function() {
         document.getElementById('searchForm').submit();
     });
-
-    // Function to update notification count
-    function updateNotificationCount() {
-        fetch('get_notification_count.php')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.querySelector('.notification-badge');
-                badge.textContent = data.count;
-                badge.style.display = data.count > 0 ? 'flex' : 'none';
-            })
-            .catch(error => console.error('Error updating notification count:', error));
-    }
-
-    // Update notification count when page loads
-    document.addEventListener('DOMContentLoaded', updateNotificationCount);
-
-    // Update notification count every 30 seconds
-    setInterval(updateNotificationCount, 30000);
 </script>
 </body>
 </html>
