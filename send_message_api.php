@@ -52,17 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Check if this is the first message about this specific item
+    $content = "Hello, I'm interested in your item: {$item['title']} ({$item['price']} MAD).";
+    
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages 
                           WHERE sender_id = ? 
                           AND receiver_id = ? 
-                          AND content LIKE ?");
-    $stmt->execute([$buyer_id, $seller_id, "%[item_id=$item_id]%"]);
+                          AND content = ?");
+    $stmt->execute([$buyer_id, $seller_id, $content]);
     $message_exists = $stmt->fetchColumn();
     
     if (!$message_exists) {
-        // Create a message with the item ID embedded in the content
-        $content = "Hello, I'm interested in your item: {$item['title']} ({$item['price']} MAD). [item_id=$item_id]";
-        
         try {
             $pdo->beginTransaction();
             

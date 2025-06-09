@@ -60,39 +60,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_users'])) {
         exit;
     }
     $logged_in_user_id = $_SESSION['user_id'];
+    $filter = $_GET['filter'] ?? 'all';
     
-    // Get users with unread message count
-    $stmt = $pdo->prepare("
-        SELECT 
-            u.id, 
-            u.username, 
-            u.profile_pic,
-            COUNT(CASE WHEN m.is_read = FALSE AND m.receiver_id = :user_id THEN 1 END) as unread_count,
-            (SELECT COUNT(*) FROM messages WHERE sender_id = u.id AND receiver_id = :user_id) as messages_received,
-            (SELECT content FROM messages 
-             WHERE (sender_id = u.id AND receiver_id = :user_id) 
-             OR (sender_id = :user_id AND receiver_id = u.id)
-             ORDER BY created_at DESC LIMIT 1) as last_message,
-            (SELECT created_at FROM messages 
-             WHERE (sender_id = u.id AND receiver_id = :user_id) 
-             OR (sender_id = :user_id AND receiver_id = u.id)
-             ORDER BY created_at DESC LIMIT 1) as last_message_time,
-            (SELECT sender_id FROM messages 
-             WHERE (sender_id = u.id AND receiver_id = :user_id) 
-             OR (sender_id = :user_id AND receiver_id = u.id)
-             ORDER BY created_at DESC LIMIT 1) as last_message_sender
-        FROM users u
-        LEFT JOIN messages m ON (m.sender_id = u.id AND m.receiver_id = :user_id)
-        WHERE u.id != :user_id
-        GROUP BY u.id
-    ");
-    $stmt->execute(['user_id' => $logged_in_user_id]);
-    $users = $stmt->fetchAll();
-    
-    if (!$users) {
-        echo json_encode([]);
-        exit;
+    // Base query to get users with their message counts and last message info
+    $sql = "SELECT 
+        u.id, 
+        u.username, 
+        u.profile_pic,
+        u.user_type,
+        u.user_tag,
+        u.bio,
+        u.gender,
+        u.created_at,
+        COUNT(DISTINCT m.id) as messages_received,
+        (
+            SELECT COUNT(*) 
+            FROM messages 
+            WHERE receiver_id = :user_id 
+            AND sender_id = u.id 
+            AND is_read = 0
+        ) as unread_count,
+        (
+            SELECT content 
+            FROM messages 
+            WHERE (sender_id = u.id AND receiver_id = :user_id) 
+            OR (sender_id = :user_id AND receiver_id = u.id)
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ) as last_message,
+        (
+            SELECT sender_id 
+            FROM messages 
+            WHERE (sender_id = u.id AND receiver_id = :user_id) 
+            OR (sender_id = :user_id AND receiver_id = u.id)
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ) as last_message_sender,
+        (
+            SELECT MAX(created_at)
+            FROM messages 
+            WHERE (sender_id = u.id AND receiver_id = :user_id) 
+            OR (sender_id = :user_id AND receiver_id = u.id)
+        ) as last_message_time
+    FROM users u
+    LEFT JOIN messages m ON (m.sender_id = :user_id AND m.receiver_id = u.id) OR (m.sender_id = u.id AND m.receiver_id = :user_id)
+    WHERE u.id != :user_id
+    GROUP BY u.id";
+
+    // Add filter conditions
+    switch ($filter) {
+        case 'newest':
+            $sql .= " ORDER BY u.created_at DESC";
+            break;
+        case 'oldest':
+            $sql .= " ORDER BY u.created_at ASC";
+            break;
+        case 'latest_messages':
+            $sql .= " ORDER BY CASE WHEN last_message_time IS NULL THEN 0 ELSE 1 END DESC, last_message_time DESC, u.username ASC";
+            break;
+        default: // 'all'
+            $sql .= " ORDER BY u.username ASC";
     }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['user_id' => $_SESSION['user_id']]);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    header('Content-Type: application/json');
     echo json_encode($users);
     exit;
 }
@@ -723,6 +757,33 @@ if (isset($_GET['to'])) {
             font-weight: 500;
             color: #333;
         }
+
+        .user-filter {
+            margin: 15px 0;
+            padding: 0 10px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            border-color: #3e8e41;
+            box-shadow: 0 0 0 2px rgba(62, 142, 65, 0.1);
+            outline: none;
+        }
+
+        .filter-select:hover {
+            border-color: #3e8e41;
+        }
     </style>
 </head>
 <body>
@@ -769,6 +830,14 @@ if (isset($_GET['to'])) {
         <!-- Left Section (Contacts) -->
         <div class="left-section">
             <h1>Community </h1>
+            <div class="user-filter">
+                <select id="userFilter" class="filter-select">
+                    <option value="all">All Users</option>
+                    <option value="newest">Newest Users</option>
+                    <option value="oldest">Oldest Users</option>
+                    <option value="latest_messages">Latest Messages</option>
+                </select>
+            </div>
             <div class="contact-list" id="contactList">
                 <!-- Contacts will be loaded dynamically -->
             </div>
@@ -856,15 +925,19 @@ if (isset($_GET['to'])) {
 
     // Select a contact to chat with
     function selectContact(user) {
+        if (!user || !user.id) return;
+        
         currentContactId = user.id;
         document.querySelectorAll('.contact').forEach(c => c.classList.remove('active'));
         const selectedContact = document.querySelector(`.contact[data-user-id="${user.id}"]`);
-        selectedContact.classList.add('active');
-        
-        // Remove unread badge when chat is selected
-        const unreadBadge = selectedContact.querySelector('.unread-badge');
-        if (unreadBadge) {
-            unreadBadge.remove();
+        if (selectedContact) {
+            selectedContact.classList.add('active');
+            
+            // Remove unread badge when chat is selected
+            const unreadBadge = selectedContact.querySelector('.unread-badge');
+            if (unreadBadge) {
+                unreadBadge.remove();
+            }
         }
         
         chatHeaderEl.innerHTML = `<h2>${escapeHtml(user.username)}</h2>`;
@@ -1130,6 +1203,52 @@ if (isset($_GET['to'])) {
 
     // Update notification count every 30 seconds
     setInterval(updateNotificationCount, 30000);
+
+    // Add this to your existing JavaScript
+    document.getElementById('userFilter').addEventListener('change', function() {
+        const filter = this.value;
+        fetchUsers(filter);
+    });
+
+    function fetchUsers(filter = 'all') {
+        fetch(`message.php?fetch_users=1&filter=${filter}`)
+            .then(response => response.json())
+            .then(users => {
+                const contactList = document.querySelector('.contact-list');
+                contactList.innerHTML = '';
+                
+                if (users.length === 0) {
+                    contactList.innerHTML = '<p class="no-contacts">No contacts found</p>';
+                    return;
+                }
+                
+                users.forEach(user => {
+                    const contact = document.createElement('div');
+                    contact.className = 'contact';
+                    contact.dataset.userId = user.id;
+                    
+                    const lastMessage = user.last_message || 'Start a new chat!';
+                    const unreadCount = user.unread_count > 0 ? `<span class="unread-badge">${user.unread_count}</span>` : '';
+                    
+                    contact.innerHTML = `
+                        <img src="${user.profile_pic || 'Images/profile.jpg'}" alt="${user.username}">
+                        <div class="contact-info">
+                            <h3>${escapeHtml(user.username)} ${unreadCount}</h3>
+                            <p>${escapeHtml(lastMessage)}</p>
+                        </div>
+                    `;
+                    
+                    contact.addEventListener('click', () => selectContact(user));
+                    contactList.appendChild(contact);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    }
+
+    // Call fetchUsers when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchUsers();
+    });
     </script>
 </body>
 </html>

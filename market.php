@@ -1030,9 +1030,9 @@ $current_username = $user['username'];
         .then(response => {
             if (response.success) {
                 if (response.message === 'Message already sent') {
-                    showPopup('Seller already notified about your interest in this item.');
+                    showPopup('Seller already notified about your interest.');
                 } else {
-                    showPopup('Seller has been notified about your interest in this item.');
+                    showPopup('Seller has been notified about your interest.');
                 }
             } else {
                 showPopup('Failed to notify seller: ' + (response.error || 'Unknown error'), false);

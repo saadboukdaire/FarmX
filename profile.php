@@ -28,10 +28,12 @@ try {
 }
 
 // Fetch user data
-$userId = $_SESSION['user_id']; // Use 'user_id' instead of 'id'
+$profileId = isset($_GET['id']) ? $_GET['id'] : $_SESSION['user_id']; // Get profile ID from URL or use logged-in user's ID
+$isOwnProfile = $profileId == $_SESSION['user_id']; // Check if viewing own profile
+
 $sql = "SELECT username, email, phone, profile_pic, bio, user_type, user_tag, gender, created_at FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
+$stmt->bind_param("i", $profileId);
 $stmt->execute();
 $stmt->bind_result($username, $email, $phone, $profilePic, $bio, $userType, $userTag, $gender, $createdAt);
 $stmt->fetch();
@@ -45,13 +47,13 @@ $sql = "SELECT p.*,
         WHERE p.user_id = ? 
         ORDER BY p.created_at DESC";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
+$stmt->bind_param("i", $profileId);
 $stmt->execute();
 $posts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Handle post deletion if requested
-if (isset($_POST['delete_post'])) {
+// Only allow post deletion if it's the user's own profile
+if ($isOwnProfile && isset($_POST['delete_post'])) {
     $postId = $_POST['post_id'];
     
     // First, delete associated likes and comments
@@ -65,26 +67,13 @@ if (isset($_POST['delete_post'])) {
     
     // Then delete the post
     $stmt = $conn->prepare("DELETE FROM posts WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("ii", $postId, $userId);
+    $stmt->bind_param("ii", $postId, $profileId);
     $stmt->execute();
     
     // Refresh the page
-    header("Location: profile.php");
+    header("Location: profile.php" . ($isOwnProfile ? "" : "?id=" . $profileId));
     exit();
 }
-
-// Fetch user's posts (your existing query)
-$sql = "SELECT p.*, 
-        (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count,
-        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
-        FROM posts p 
-        WHERE p.user_id = ? 
-        ORDER BY p.created_at DESC";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$posts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
 
 $conn->close();
 ?>
@@ -592,6 +581,53 @@ $conn->close();
     display: inline;
 }
 
+/* New styles for buttons in post footer */
+.post-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.view-in-feed-btn {
+    background-color: #3e8e41;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-in-feed-btn:hover {
+    background-color: #2d682f;
+    transform: translateY(-2px);
+}
+
+.delete-post-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-post-btn:hover {
+    background-color: #cc0000;
+    transform: translateY(-2px);
+}
+
         /* Add these styles to your existing CSS */
         .user-tag {
             font-size: 16px;
@@ -656,7 +692,7 @@ $conn->close();
         <!-- Profile Header -->
         <div class="profile-header">
             <!-- Add a timestamp to the image URL to force browser refresh -->
-            <img id="profile-picture" src="<?php echo isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture">
+            <img id="profile-picture" src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture">
             <h1 id="profile-name"><?php echo htmlspecialchars($username ?? ''); ?></h1>
             <p class="user-tag"><?php echo htmlspecialchars($userTag ?? ''); ?></p>
         </div>
@@ -704,33 +740,49 @@ $conn->close();
             <?php foreach ($posts as $post): ?>
                 <div class="post">
                     <div class="post-header">
-                        <img id="profile-picture" src="<?php echo isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                        <img src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
                         <div class="post-info">
                             <h3><?php echo htmlspecialchars($username ?? ''); ?></h3>
                             <span class="post-date"><?php echo date('F j, Y', strtotime($post['created_at'])); ?></span>
                         </div>
                         <!-- Add edit and delete buttons -->
                         <div class="post-actions">
-                            <a href="edit_post.php?id=<?php echo $post['id']; ?>" class="edit-post" title="Edit Post">
-                                <i class='bx bx-edit'></i>
-                            </a>
-                            <form method="POST" class="delete-form">
+                            <?php if ($isOwnProfile): ?>
+                            <form method="POST" class="delete-post-form" onsubmit="return confirm('Are you sure you want to delete this post?');">
                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                                <button type="submit" name="delete_post" class="delete-post" title="Delete Post" onclick="return confirm('Are you sure you want to delete this post?');">
+                                <button type="submit" name="delete_post" class="delete-post-btn">
                                     <i class='bx bx-trash'></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="post-content">
                         <?php echo nl2br(htmlspecialchars($post['content'])); ?>
                     </div>
                     <?php if (!empty($post['media_url'])): ?>
-                        <img src="<?php echo htmlspecialchars($post['media_url']); ?>" alt="Post Media" class="post-media">
+                        <?php
+                            $media_url = htmlspecialchars($post['media_url']);
+                            $extension = pathinfo($media_url, PATHINFO_EXTENSION);
+                            $video_extensions = ['mp4', 'webm', 'ogg', 'mov'];
+
+                            if (in_array(strtolower($extension), $video_extensions)) {
+                                echo '<video src="' . $media_url . '" class="post-media" controls></video>';
+                            } else {
+                                echo '<img src="' . $media_url . '" alt="Post Media" class="post-media">';
+                            }
+                        ?>
                     <?php endif; ?>
-                    <div class="post-stats">
-                        <span><i class='bx bx-heart'></i> <?php echo $post['like_count']; ?></span>
-                        <span><i class='bx bx-comment'></i> <?php echo $post['comment_count']; ?></span>
+                    <div class="post-footer-actions">
+                        <a href="main.php?post_id=<?php echo $post['id']; ?>" class="view-in-feed-btn">View in Feed</a>
+                        <?php if ($isOwnProfile): ?>
+                        <form method="POST" class="delete-post-form" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                            <button type="submit" name="delete_post" class="delete-post-btn">
+                                <i class='bx bx-trash'></i> Delete
+                            </button>
+                        </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -742,7 +794,9 @@ $conn->close();
         <div class="buttons-container">
             <!-- Edit Profile Button -->
             <div class="edit-profile-button">
+                <?php if ($isOwnProfile): ?>
                 <a href="edit_profile.php"><button>Edit Profile</button></a>
+                <?php endif; ?>
             </div>
 
             <!-- Logout Button -->

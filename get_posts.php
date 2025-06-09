@@ -23,11 +23,19 @@ $userId = $_SESSION['user_id'];
 // Fetch posts with likes, comments, and whether the current user has liked each post
 $sql = "
     SELECT 
-        p.*, 
+        p.*,
+        u.id as user_id,
+        u.user_type,
+        u.user_tag,
+        u.bio,
+        u.gender,
+        u.created_at as user_created_at,
+        COALESCE(p.profile_pic, u.profile_pic) as profile_pic,
         COUNT(DISTINCT l.id) AS likes, 
         COUNT(DISTINCT c.id) AS comments,
         EXISTS(SELECT 1 FROM likes WHERE user_id = ? AND post_id = p.id) AS is_liked
     FROM posts p
+    JOIN users u ON p.user_id = u.id
     LEFT JOIN likes l ON p.id = l.post_id
     LEFT JOIN comments c ON p.id = c.post_id
     GROUP BY p.id

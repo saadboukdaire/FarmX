@@ -16,22 +16,31 @@ if ($conn->connect_error) {
 // Handle post creation if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     // Get the active user's details
-    if (!isset($_SESSION['user_id']) || !isset($_SESSION['username']) || !isset($_SESSION['profile_pic'])) {
+    if (!isset($_SESSION['user_id'])) {
         die(json_encode(["status" => "error", "message" => "User not logged in."]));
     }
 
     $userId = $_SESSION['user_id'];
-    $username = $_SESSION['username'];
-    $profilePic = $_SESSION['profile_pic'];
+
+    // Get user's profile picture from the database
+    $userSql = "SELECT username, profile_pic FROM users WHERE id = ?";
+    $userStmt = $conn->prepare($userSql);
+    $userStmt->bind_param("i", $userId);
+    $userStmt->execute();
+    $userResult = $userStmt->get_result();
+    $userData = $userResult->fetch_assoc();
+    $userStmt->close();
 
     // Get post data
     $content = $_POST['content'];
     $mediaUrl = isset($_POST['media_url']) ? $_POST['media_url'] : '';
+    $username = $userData['username'];
+    $profilePic = $userData['profile_pic'] ?: 'Images/profile.jpg';
 
     // Insert post into the database
-    $sql = "INSERT INTO posts (user_id, username, profile_pic, content, media_url) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO posts (user_id, username, content, media_url, profile_pic) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("issss", $userId, $username, $profilePic, $content, $mediaUrl);
+    $stmt->bind_param("issss", $userId, $username, $content, $mediaUrl, $profilePic);
 
     if ($stmt->execute()) {
         echo json_encode(["status" => "success", "message" => "Post created successfully!"]);
@@ -774,6 +783,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             font-size: 12px;
             color: #666;
         }
+
+        .username-link {
+            color: #3e8e41;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .username-link:hover {
+            color: #2d682f;
+            text-decoration: underline;
+        }
+
+        .user-tag {
+            font-size: 0.9em;
+            color: #666;
+            margin-left: 8px;
+            font-style: italic;
+        }
+
+        .post-time {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -979,10 +1013,11 @@ function handleMediaUpload(event) {
                 const postHtml = `
                     <div class="post" id="post-${post.id}">
                         <div class="post-header">
-                            <img src="${post.profile_pic}" alt="Profile Picture" class="profile-pic">
+                            <img src="${post.profile_pic || 'Images/profile.jpg'}" alt="${post.username}'s Profile Picture" class="profile-pic" onerror="this.src='Images/profile.jpg'">
                             <div class="post-info">
-                                <h3>${post.username}</h3>
-                                <span>${new Date(post.created_at).toLocaleString()}</span>
+                                <h3><a href="profile.php?id=${post.user_id}" class="username-link">${post.username}</a></h3>
+                                <span class="user-tag">${post.user_tag || ''}</span>
+                                <span class="post-time">${new Date(post.created_at).toLocaleString()}</span>
                             </div>
                         </div>
                         <div class="post-content">
@@ -1002,25 +1037,25 @@ function handleMediaUpload(event) {
                         ` : ''}
                         <div class="post-footer">
                             <div class="post-reactions">
-                                <div class="reaction ${isLiked ? 'liked' : ''}" onclick="likePost(${post.id})">
-                                    <i class='bx bx-like'></i>
+                                <div class="reaction ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                                    <i class='bx ${isLiked ? 'bxs-heart' : 'bx-heart'}'></i>
                                     <span>${likes}</span>
                                 </div>
                                 <div class="reaction" onclick="toggleComments(${post.id})">
-                                    <i class='bx bx-message'></i>
+                                    <i class='bx bx-comment'></i>
                                     <span>${comments}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="comments-section" id="comments-${post.id}" style="display: none;">
                             <div class="comment-input">
-                                <input type="text" id="comment-input-${post.id}" placeholder="Add a comment...">
+                                <input type="text" placeholder="Write a comment..." onkeypress="handleCommentKeyPress(event, ${post.id})">
                                 <button onclick="addComment(${post.id})">
-                                    <i class='bx bx-send'></i> <!-- Send message icon -->
+                                    <i class='bx bx-send'></i>
                                 </button>
                             </div>
                             <div class="comments-list" id="comments-list-${post.id}">
-                                <!-- Comments will be dynamically loaded here -->
+                                <!-- Comments will be loaded here -->
                             </div>
                         </div>
                     </div>
@@ -1041,12 +1076,13 @@ function handleMediaUpload(event) {
                     }, 2000);
                 }
             }
-        });
+        })
+        .catch(error => console.error('Error loading posts:', error));
     }
 
  // Function to like/unlike a post
-function likePost(postId) {
-    const likeButton = document.querySelector(`.reaction[onclick="likePost(${postId})"]`);
+function toggleLike(postId) {
+    const likeButton = document.querySelector(`.reaction[onclick="toggleLike(${postId})"]`);
 
     fetch('like_post.php', {
         method: 'POST',
