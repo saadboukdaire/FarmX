@@ -392,6 +392,10 @@ try {
                     <i class='bx bxs-user'></i>
                     <span class="tooltip">Profile</span>
                 </a>
+                <a href="#" id="language-switch" title="Switch Language">
+                    <i class='bx bx-globe'></i>
+                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
+                </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
                     <span class="tooltip">Logout</span>
@@ -596,6 +600,26 @@ try {
 
         // Apply styles when page loads
         document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
+
+        document.getElementById('language-switch').addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
+            const newLang = currentLang === 'en' ? 'fr' : 'en';
+            
+            fetch('update_language.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'language=' + newLang
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+        });
     </script>
 </body>
 </html> 

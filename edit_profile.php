@@ -498,12 +498,16 @@ $conn->close();
             </div>
 
             <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender">
-                    <option value="">Select Gender</option>
-                    <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
-                    <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
-                </select>
+                <label for="gender">Gender:</label>
+                <?php if (!empty($gender)): ?>
+                    <input type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($gender); ?>" readonly>
+                <?php else: ?>
+                    <select id="gender" name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                <?php endif; ?>
             </div>
 
             <div class="form-group full-width">

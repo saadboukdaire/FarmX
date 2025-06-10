@@ -97,53 +97,61 @@ if (isset($_SESSION['registration_success'])) {
       background-position: center;
     }
     .wrapper {
-      width: 420px;
-      background-color: rgba(14, 14, 14, 0.699);
-      border: 2px solid rgba(255, 255, 255, .2);
+      width: 480px;
+      background: rgba(14, 14, 14, 0.85);
+      border: 2px solid rgba(255, 255, 255, .1);
       color: #fff;
-      border-radius: 12px;
-      padding: 30px 40px;
+      border-radius: 16px;
+      padding: 35px 45px;
       animation: fadeIn 0.8s ease-in-out;
     }
     .wrapper h1 {
-      font-size: 36px;
+      font-size: 28px;
       text-align: center;
+      margin-bottom: 15px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .wrapper .input-box {
       position: relative;
       width: 100%;
-      height: 50px;
-      margin: 30px 0;
+      height: 45px;
+      margin: 12px 0;
     }
     .input-box input {
       width: 100%;
       height: 100%;
-      background: transparent;
-      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
       outline: none;
-      border: 2px solid rgba(255, 255, 255, .2);
       border-radius: 40px;
-      font-size: 16px;
+      font-size: 15px;
       color: #fff;
-      padding: 20px 45px 20px 20px;
+      padding: 15px 45px 15px 20px;
+      transition: all 0.3s ease;
+    }
+    .input-box input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      background: rgba(255, 255, 255, 0.08);
     }
     .input-box input::placeholder {
-      color: #fff;
+      color: rgba(255, 255, 255, 0.5);
     }
     .input-box i {
       position: absolute;
-      right: 20px;
-      top: 30%;
-      transform: translate(-50%);
-      font-size: 20px;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
     }
-    .wrapper .remember-forgot {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14.5px;
-      margin: -15px 0 15px;
+    .input-box input:focus + i {
+      color: #4CAF50;
     }
-  
     .wrapper .btn {
       width: 100%;
       height: 45px;
@@ -156,6 +164,7 @@ if (isset($_SESSION['registration_success'])) {
       font-size: 16px;
       color: #fff;
       font-weight: 600;
+      margin: 15px 0;
       transition: all 0.3s ease;
     }
     .wrapper .btn:hover {
@@ -167,10 +176,9 @@ if (isset($_SESSION['registration_success'])) {
       transform: translateY(0);
     }
     .wrapper .register-link {
-      font-size: 14.5px;
+      font-size: 14px;
       text-align: center;
-      margin: 20px 0 15px;
-      color: #fff;
+      margin: 12px 0 5px;
     }
     .register-link p a {
       color: #4CAF50;
@@ -180,10 +188,12 @@ if (isset($_SESSION['registration_success'])) {
     }
     .register-link p a:hover {
       color: #45a049;
-      text-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+      text-decoration: underline;
     }
     img {
-      margin-left: 110px;
+      display: block;
+      margin: 0 auto 20px;
+      height: 100px;
     }
     @keyframes fadeIn {
       from {

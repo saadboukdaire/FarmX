@@ -914,6 +914,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         .success-alert .alert-content i {
             color: #4CAF50;
         }
+
+        /* Add these styles for comment timestamps */
+        .comment-time {
+            font-size: 12px;
+            color: #888;
+            margin-left: 8px;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .username-link {
+            color: #3e8e41;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .username-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Add loading animation styles */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3e8e41;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 10px;
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -957,6 +1019,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                     <i class='bx bxs-user'></i>
                     <span class="tooltip">Profile</span>
                 </a>
+                <a href="#" id="language-switch" title="Switch Language">
+                    <i class='bx bx-globe'></i>
+                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
+                </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
                     <span class="tooltip">Logout</span>
@@ -981,22 +1047,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             <!-- Post Creation -->
             <div class="post-creation">
                 <div class="post-input">
-                    <!-- Display the active user's profile picture -->
-                    <img id="profile-picture" src="<?php echo isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
-                    <input type="text" id="post-content" placeholder="Share farming updates, questions, or tips...">
+                    <img src="<?php echo $_SESSION['profile_pic'] ?? 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                    <input type="text" id="post-content" placeholder="What's on your mind?">
+                </div>
+                <div id="media-preview" style="display: none; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class='bx bxs-file' style="font-size: 24px; color: #3e8e41;"></i>
+                            <span id="media-name">Media attached</span>
+                        </div>
+                        <button onclick="removeMedia()" style="background: none; border: none; color: #ff4d4d; cursor: pointer;">
+                            <i class='bx bx-x' style="font-size: 24px;"></i>
+                        </button>
+                    </div>
+                    <div id="media-preview-content" style="margin-top: 10px; max-height: 200px; overflow: hidden; border-radius: 4px;">
+                        <!-- Preview will be inserted here -->
+                    </div>
                 </div>
                 <div class="post-actions">
                     <div class="post-type">
                         <div class="action-btn" onclick="openFilePicker('image')">
-                            <i class='bx bx-image'></i>
+                            <i class='bx bxs-image-add'></i>
                             <span>Photo</span>
                         </div>
                         <div class="action-btn" onclick="openFilePicker('video')">
-                            <i class='bx bx-video'></i>
+                            <i class='bx bxs-video-plus'></i>
                             <span>Video</span>
                         </div>
                     </div>
-                    <button class="post-btn" onclick="createPost()">Post Update</button>
+                    <button class="post-btn" onclick="createPost()">Post</button>
                 </div>
                 <!-- Hidden file input for media upload -->
                 <input type="file" id="media-upload" style="display: none;" onchange="handleMediaUpload(event)">
@@ -1031,9 +1110,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     function handleMediaUpload(event) {
         const file = event.target.files[0];
         if (file) {
-            // Upload the file to the server and get the URL
             const formData = new FormData();
             formData.append('file', file);
+
+            // Show loading state
+            const previewDiv = document.getElementById('media-preview');
+            const previewContent = document.getElementById('media-preview-content');
+            const mediaName = document.getElementById('media-name');
+            
+            previewDiv.style.display = 'block';
+            mediaName.textContent = file.name;
+            previewContent.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Uploading ${file.type.startsWith('image/') ? 'image' : 'video'}...</div>
+                </div>`;
 
             fetch('upload_media.php', {
                 method: 'POST',
@@ -1042,24 +1133,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Store the media URL for the post
                     window.mediaUrl = data.url;
+                    
+                    // Show preview based on file type
+                    if (file.type.startsWith('image/')) {
+                        previewContent.innerHTML = `<img src="${data.url}" style="max-width: 100%; max-height: 200px; object-fit: contain;">`;
+                    } else if (file.type.startsWith('video/')) {
+                        previewContent.innerHTML = `
+                            <video controls style="max-width: 100%; max-height: 200px;">
+                                <source src="${data.url}" type="${file.type}">
+                                Your browser does not support the video tag.
+                            </video>`;
+                    }
                 } else {
                     showAlert('Error uploading media: ' + data.message, 'error');
+                    removeMedia();
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error uploading media', 'error');
+                removeMedia();
             });
         }
     }
 
-   // Function to create a post
+    // Add function to remove media
+    function removeMedia() {
+        window.mediaUrl = '';
+        document.getElementById('media-upload').value = '';
+        document.getElementById('media-preview').style.display = 'none';
+        document.getElementById('media-preview-content').innerHTML = '';
+    }
+
+    // Update createPost function to clear media preview
 function createPost() {
     const content = document.getElementById('post-content').value.trim();
     const mediaUrl = window.mediaUrl || '';
 
-    // Validate that the post has either content or media
     if (!content && !mediaUrl) {
         showAlert('Post cannot be blank. Please add content or attach a photo/video.', 'error');
-        return; // Stop execution if both content and media are empty
+            return;
     }
 
     const formData = new FormData();
@@ -1073,12 +1187,8 @@ function createPost() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Clear the input fields
             document.getElementById('post-content').value = '';
-            window.mediaUrl = ''; // Reset media URL
-            document.getElementById('media-upload').value = ''; // Clear the file input
-
-            // Reload posts
+                removeMedia();
             loadPosts();
         } else {
             showAlert('Error creating post: ' + data.message, 'error');
@@ -1141,7 +1251,7 @@ function createPost() {
                         </div>
                         <div class="comments-section" id="comments-${post.id}" style="display: none;">
                             <div class="comment-input">
-                                <input type="text" placeholder="Write a comment..." onkeypress="handleCommentKeyPress(event, ${post.id})">
+                                <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." onkeypress="handleCommentKeyPress(event, ${post.id})">
                                 <button onclick="addComment(${post.id})">
                                     <i class='bx bx-send'></i>
                                 </button>
@@ -1207,7 +1317,8 @@ function toggleLike(postId) {
 }
 
 function addComment(postId) {
-    const content = document.getElementById(`comment-input-${postId}`).value.trim();
+    const commentInput = document.querySelector(`#comment-input-${postId}`);
+    const content = commentInput.value.trim();
 
     if (!content) {
         showAlert('Comment cannot be empty.', 'error');
@@ -1228,7 +1339,7 @@ function addComment(postId) {
     .then(data => {
         if (data.status === 'success') {
             loadComments(postId); // Reload comments after adding a new one
-            document.getElementById(`comment-input-${postId}`).value = ''; // Clear the input field
+            commentInput.value = ''; // Clear the input field
         } else {
             showAlert(data.message, 'error');
         }
@@ -1250,38 +1361,31 @@ function toggleComments(postId) {
 }
 
 function loadComments(postId) {
-    fetch(`add_comment.php?post_id=${postId}`)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server responded with status ${response.status}`);
-        }
-        return response.json();
-    })
+    fetch(`get_comments.php?post_id=${postId}`)
+    .then(response => response.json())
     .then(data => {
         const commentsList = document.getElementById(`comments-list-${postId}`);
-        commentsList.innerHTML = ''; // Clear existing comments
+        commentsList.innerHTML = '';
 
-        if (data.length === 0) {
-            commentsList.innerHTML = '<div class="comment">No comments yet.</div>';
-        } else {
             data.forEach(comment => {
-                // Add the new HTML structure for each comment
                 const commentHtml = `
                     <div class="comment">
-                        <img src="${comment.profile_pic}" alt="Profile Picture" class="comment-profile-pic">
+                    <img src="${comment.profile_pic || 'Images/profile.jpg'}" alt="${comment.username}'s Profile Picture" class="profile-pic" onerror="this.src='Images/profile.jpg'">
                         <div class="comment-content">
-                            <strong>${comment.username}</strong>
+                        <div class="comment-header">
+                            <a href="profile.php?id=${comment.user_id}" class="username-link">${comment.username}</a>
+                            <span class="comment-time">${new Date(comment.created_at).toLocaleString()}</span>
+                        </div>
                             <p>${comment.content}</p>
                         </div>
                     </div>
                 `;
                 commentsList.innerHTML += commentHtml;
             });
-        }
     })
     .catch(error => {
         console.error('Error loading comments:', error);
-        showAlert('An error occurred while loading comments: ' + error.message, 'error');
+        showAlert('An error occurred while loading comments.', 'error');
     });
 }
     // Load posts when the page loads
@@ -1529,6 +1633,33 @@ getLocation();
             }
         };
     }
+
+    // Add this function to handle Enter key press in comment input
+    function handleCommentKeyPress(event, postId) {
+        if (event.key === 'Enter') {
+            addComment(postId);
+        }
+    }
+
+    document.getElementById('language-switch').addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
+        const newLang = currentLang === 'en' ? 'fr' : 'en';
+        
+        fetch('update_language.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'language=' + newLang
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    });
 </script>
 </body>
 </html>

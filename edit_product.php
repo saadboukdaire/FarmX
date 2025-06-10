@@ -331,11 +331,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" placeholder="Search FarmX...">
                 <i class='bx bx-search-alt-2'></i>
             </div>
-            <div class="nav-links">
-                <a href="main.php">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php" class="activated">Marketplace</a>
-                <a href="profile.php">Profile</a>
+            <div class="right-nav">
+                <a href="main.php" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="#" id="language-switch" title="Switch Language">
+                    <i class='bx bx-globe'></i>
+                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
+                </a>
+                <a href="logout.php" title="Logout">
+                    <i class='bx bxs-log-out'></i>
+                    <span class="tooltip">Logout</span>
+                </a>
             </div>
         </div>
     </header>
@@ -391,5 +403,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
+
+    <script>
+    document.getElementById('language-switch').addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
+        const newLang = currentLang === 'en' ? 'fr' : 'en';
+        
+        fetch('update_language.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'language=' + newLang
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    });
+    </script>
 </body>
 </html> 

@@ -331,6 +331,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="market.php" class="activated">Marketplace</a>
                 <a href="profile.php">Profile</a>
             </div>
+            <div class="right-nav">
+                <a href="main.php" title="Home">
+                    <i class='bx bxs-home'></i>
+                    <span class="tooltip">Home</span>
+                </a>
+                <a href="message.php" title="Messages">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="tooltip">Messages</span>
+                </a>
+                <a href="#" id="language-switch" title="Switch Language">
         </div>
     </header>
 

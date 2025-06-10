@@ -244,32 +244,13 @@ $translations = new Translations($db);
     }
 
     .wrapper .btn:hover {
+      background: #45a049;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
 
     .wrapper .btn:active {
       transform: translateY(0);
-    }
-
-    .wrapper .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-      );
-      transition: 0.5s;
-    }
-
-    .wrapper .btn:hover::before {
-      left: 100%;
     }
 
     .wrapper .register-link {
@@ -517,10 +498,10 @@ $translations = new Translations($db);
         <label class="user-type-label" data-translate="gender_label">Gender (Optional):</label>
         <div class="radio-group">
           <input type="radio" id="male" name="gender" value="male">
-          <label for="male"><i class='bx bxs-male-sign'></i> Male</label>
+          <label for="male"><i class='bx bxs-male-sign'></i> <span data-translate="male_label">Male</span></label>
 
           <input type="radio" id="female" name="gender" value="female">
-          <label for="female"><i class='bx bxs-female-sign'></i> Female</label>
+          <label for="female"><i class='bx bxs-female-sign'></i> <span data-translate="female_label">Female</span></label>
         </div>
       </div>
 

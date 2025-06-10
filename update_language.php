@@ -1,17 +1,21 @@
 <?php
 session_start();
-require_once 'includes/translations.php';
-require_once 'database/db_connect.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['language'])) {
-    $lang = $_POST['language'];
-    if (in_array($lang, ['en', 'fr'])) {
-        $_SESSION['language'] = $lang;
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Invalid language']);
-    }
-} else {
-    echo json_encode(['success' => false, 'error' => 'Invalid request']);
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'User not logged in']);
+    exit;
 }
+
+// Check if language parameter is provided
+if (!isset($_POST['language']) || !in_array($_POST['language'], ['en', 'fr'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid language']);
+    exit;
+}
+
+// Update session language
+$_SESSION['language'] = $_POST['language'];
+
+// Return success response
+echo json_encode(['success' => true]);
 ?> 

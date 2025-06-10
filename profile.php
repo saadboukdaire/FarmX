@@ -604,6 +604,81 @@ $conn->close();
         .profile-header p {
             margin: 3px 0;
         }
+
+        /* Add this to your existing styles */
+        .edit-profile-btn, .view-in-feed-btn {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .edit-profile-btn:hover, .view-in-feed-btn:hover {
+            text-decoration: none;
+        }
+
+        /* Update the icon styles */
+        .edit-profile-btn i {
+            font-size: 32px;
+            color: #3e8e41;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .view-in-feed-btn i, .delete-post-btn i {
+            font-size: 28px;  /* Same size for both view post and trash icons */
+            color: #3e8e41;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .delete-post-btn i {
+            color: #ff4d4d;
+        }
+
+        .edit-profile-button {
+            margin-top: 10px;
+            background-color: rgba(62, 142, 65, 0.1);
+            padding: 10px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-profile-button:hover {
+            background-color: rgba(62, 142, 65, 0.2);
+        }
+
+        .edit-profile-btn, .view-in-feed-btn, .delete-post-btn {
+            text-decoration: none;
+            color: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .edit-profile-btn:hover i, .view-in-feed-btn:hover i {
+            color: #2d682f;
+            transform: scale(1.1);
+        }
+
+        .delete-post-btn:hover i {
+            color: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .edit-profile-btn:hover, .view-in-feed-btn:hover, .delete-post-btn:hover {
+            text-decoration: none;
+            background-color: rgba(62, 142, 65, 0.1);
+        }
+
+        .delete-post-btn:hover {
+            background-color: rgba(255, 77, 77, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -638,6 +713,10 @@ $conn->close();
                     <i class='bx bxs-user'></i>
                     <span class="tooltip">Profile</span>
                 </a>
+                <a href="#" id="language-switch" title="Switch Language">
+                    <i class='bx bx-globe'></i>
+                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
+                </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
                     <span class="tooltip">Logout</span>
@@ -657,7 +736,9 @@ $conn->close();
             <!-- Move edit profile button here -->
             <?php if ($isOwnProfile): ?>
             <div class="edit-profile-button">
-                <a href="edit_profile.php"><button title="Edit Profile"><i class='bx bx-edit'></i></button></a>
+                <a href="edit_profile.php" class="edit-profile-btn" title="Edit Profile">
+                    <i class='bx bxs-edit-alt'></i>
+                </a>
             </div>
             <?php endif; ?>
         </div>
@@ -732,7 +813,7 @@ $conn->close();
                             <i class='bx bx-show'></i>
                         </a>
                         <?php if ($isOwnProfile): ?>
-                        <form method="POST" class="delete-post-form" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                        <form method="POST" style="display: inline;">
                             <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
                             <button type="submit" name="delete_post" class="delete-post-btn" title="Delete Post">
                                 <i class='bx bx-trash'></i>
@@ -785,6 +866,26 @@ $conn->close();
 
         // Apply styles when page loads
         document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
+
+        document.getElementById('language-switch').addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
+            const newLang = currentLang === 'en' ? 'fr' : 'en';
+            
+            fetch('update_language.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'language=' + newLang
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+        });
     </script>
 </body>
 </html>
