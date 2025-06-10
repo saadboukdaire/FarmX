@@ -26,11 +26,56 @@ if ($conn->connect_error) {
 // Handle the form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_SESSION['user_id']; // Use the correct session variable
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
     $bio = $_POST['bio'] ?? ''; // Get bio from POST data, default to empty string if not set
     $gender = $_POST['gender'] ?? ''; // Get gender from POST data, default to empty string if not set
+
+    // Validation patterns
+    $usernamePattern = '/^[a-zA-Z0-9_]{3,20}$/';
+    $emailPattern = '/^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$/';
+    $phonePattern = '/^\+212[67][0-9]{8}$/';
+
+    // Validate input
+    $errors = [];
+
+    if (!preg_match($usernamePattern, $username)) {
+        $errors[] = "Username must be 3-20 characters long and can only contain letters, numbers, and underscores";
+    }
+
+    if (!preg_match($emailPattern, $email)) {
+        $errors[] = "Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)";
+    }
+
+    if (!preg_match($phonePattern, $phone)) {
+        $errors[] = "Please enter a valid Moroccan phone number starting with +212 followed by 6 or 7 and 8 digits";
+    }
+
+    // Check if username or email already exists (excluding current user)
+    $checkStmt = $conn->prepare("SELECT username, email FROM users WHERE (username = ? OR email = ?) AND id != ?");
+    $checkStmt->bind_param("ssi", $username, $email, $userId);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            if ($row['username'] === $username) {
+                $errors[] = "Username already exists";
+            }
+            if ($row['email'] === $email) {
+                $errors[] = "Email already exists";
+            }
+        }
+    }
+    $checkStmt->close();
+
+    // If there are validation errors, redirect back with error messages
+    if (!empty($errors)) {
+        $_SESSION['profile_errors'] = $errors;
+        header("Location: edit_profile.php");
+        exit();
+    }
 
     // Handle file upload
     if (isset($_FILES['profile-pic-upload']) && $_FILES['profile-pic-upload']['error'] === UPLOAD_ERR_OK) {

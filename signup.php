@@ -5,9 +5,14 @@ ini_set('display_errors', 1);
 
 // Start the session at the very top
 session_start();
+
+require_once 'includes/translations.php';
+require_once 'database/db_connect.php';
+
+$translations = new Translations($db);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $translations->getCurrentLanguage(); ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,139 +42,290 @@ session_start();
     @keyframes fadeInBody {
       from {
         opacity: 0;
+        transform: translateY(20px);
       }
       to {
         opacity: 1;
+        transform: translateY(0);
       }
     }
 
     .wrapper {
-      width: 420px;
-      background-color: rgba(14, 14, 14, 0.699);
-      border: 2px solid rgba(255, 255, 255, .2);
+      width: 480px;
+      background: rgba(14, 14, 14, 0.85);
+      border: 2px solid rgba(255, 255, 255, .1);
       color: #fff;
-      border-radius: 12px;
-      padding: 20px 30px;
-      position: relative;
-      margin: 20px auto;
+      border-radius: 16px;
+      padding: 35px 45px;
+      animation: fadeIn 0.8s ease-in-out;
     }
+
     .wrapper h1 {
       font-size: 28px;
       text-align: center;
       margin-bottom: 15px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
+
     .wrapper .input-box {
       position: relative;
       width: 100%;
       height: 45px;
-      margin: 15px 0;
+      margin: 12px 0;
     }
+
     .input-box input {
       width: 100%;
       height: 100%;
-      background: transparent;
-      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
       outline: none;
-      border: 2px solid rgba(255, 255, 255, .2);
       border-radius: 40px;
       font-size: 15px;
       color: #fff;
       padding: 15px 45px 15px 20px;
+      transition: all 0.3s ease;
     }
+
+    .input-box input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
     .input-box input::placeholder {
-      color: #fff;
+      color: rgba(255, 255, 255, 0.5);
     }
+
     .input-box i {
       position: absolute;
-      right: 20px;
-      top: 30%;
-      transform: translate(-50%);
-      font-size: 20px;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
     }
-    .input-box select {
+
+    .input-box input:focus + i {
+      color: #4CAF50;
+    }
+
+    .phone-input-group {
+      position: relative;
       width: 100%;
+      height: 45px;
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-prefix {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
+      border-radius: 40px;
+      color: #fff;
+      padding: 0 15px;
       height: 100%;
-      background: transparent;
-      border: none;
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      user-select: none;
+      min-width: 65px;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .phone-input {
+      flex: 1;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
       outline: none;
-      border: 2px solid rgba(255, 255, 255, .2);
       border-radius: 40px;
       font-size: 15px;
       color: #fff;
       padding: 15px 45px 15px 20px;
-      cursor: pointer;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
+      transition: all 0.3s ease;
     }
-    .input-box select option {
-      background-color: #1a1a1a;
+
+    .phone-input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .phone-input-group i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .phone-input:focus + i {
+      color: #4CAF50;
+    }
+
+    .user-type-selection {
+      margin: 12px 0;
       color: #fff;
-      padding: 10px;
     }
-    .input-box select:focus {
-      border-color: rgba(255, 255, 255, .5);
+
+    .user-type-selection.optional-field {
+      margin: 8px 0;
     }
-    .input-box select::-ms-expand {
+
+    .user-type-label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .radio-group input[type="radio"] {
       display: none;
     }
-    .wrapper .remember-forgot {
+
+    .radio-group label {
       display: flex;
-      justify-content: space-between;
-      font-size: 13.5px;
-      margin: 0 0 10px;
-      padding: 0 15px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
+      border-radius: 40px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-grow: 1;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.9);
     }
-    .remember-forgot label input {
-      accent-color: #fff;
-      margin-right: 3px;
+
+    .radio-group label:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
     }
-    .remember-forgot a {
-      color: #fff;
-      text-decoration: none;
+
+    .radio-group input[type="radio"]:checked + label {
+      background: rgba(76, 175, 80, 0.2);
+      border-color: #4CAF50;
+      color: #4CAF50;
+      font-weight: 600;
     }
-    .remember-forgot a:hover {
-      text-decoration: underline;
-    }
+
     .wrapper .btn {
       width: 100%;
-      height: 40px;
+      height: 45px;
       background: #4CAF50;
       border: none;
       outline: none;
       border-radius: 40px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
       cursor: pointer;
-      font-size: 15px;
+      font-size: 16px;
       color: #fff;
       font-weight: 600;
-      margin-top: 10px;
+      margin: 15px 0;
       transition: all 0.3s ease;
     }
+
     .wrapper .btn:hover {
-      background: #45a049;
-      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
+
     .wrapper .btn:active {
       transform: translateY(0);
-      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
     }
+
+    .wrapper .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .wrapper .btn:hover::before {
+      left: 100%;
+    }
+
     .wrapper .register-link {
-      font-size: 13.5px;
+      font-size: 14px;
       text-align: center;
-      margin: 15px 0 10px;
+      margin: 12px 0 5px;
     }
+
     .register-link p a {
       color: #4CAF50;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
     }
+
     .register-link p a:hover {
       color: #45a049;
-      text-decoration: none;
-      text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+      text-decoration: underline;
+    }
+
+    .password-strength {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-top: 5px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .password-strength-bar.weak {
+      background: #ff4444;
+    }
+
+    .password-strength-bar.medium {
+      background: #ffbb33;
+    }
+
+    .password-strength-bar.strong {
+      background: #4CAF50;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Enhanced Alert Modal Styles */
@@ -180,7 +336,8 @@ session_start();
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -193,12 +350,12 @@ session_start();
     }
 
     .alert-content {
-      background-color: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
       text-align: center;
-      max-width: 300px;
+      max-width: 350px;
       width: 90%;
       transform: scale(0.9);
       animation: scaleIn 0.3s ease forwards;
@@ -223,29 +380,29 @@ session_start();
 
     .alert-content p {
       font-size: 16px;
-      margin-bottom: 20px;
+      margin: 20px 0;
       color: #333;
-      line-height: 1.4;
+      line-height: 1.5;
       font-weight: 500;
     }
 
     .alert-content button {
-      padding: 10px 25px;
-      background: linear-gradient(135deg, #4CAF50, #45a049);
+      padding: 12px 30px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
       color: #fff;
       border: none;
-      border-radius: 20px;
+      border-radius: 25px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
     }
 
     .alert-content button:hover {
-      background: linear-gradient(135deg, #45a049, #4CAF50);
+      background: linear-gradient(45deg, #45a049, #4CAF50);
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
@@ -254,48 +411,9 @@ session_start();
       transform: translateY(0);
     }
 
-    /* Success Alert Specific Styles */
-    .success-alert .alert-content {
-      background-color: #f8f9fa;
-      border: 2px solid #4CAF50;
-    }
-
-    .success-alert .alert-content::before {
-      background: linear-gradient(90deg, #4CAF50, #45a049);
-    }
-
-    .success-alert .alert-content p {
-      color: #2e7d32;
-      font-weight: 500;
-    }
-
-    .success-alert .alert-content button {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-    }
-
-    /* Error Alert Specific Styles */
-    .error-alert .alert-content {
-      background-color: #f8f9fa;
-      border: 2px solid #f44336;
-    }
-
-    .error-alert .alert-content::before {
-      background: linear-gradient(90deg, #f44336, #d32f2f);
-    }
-
-    .error-alert .alert-content p {
-      color: #d32f2f;
-      font-weight: 500;
-    }
-
-    .error-alert .alert-content button {
-      background: linear-gradient(135deg, #f44336, #d32f2f);
-    }
-
-    /* Alert Icon Styles */
     .alert-content i {
-      font-size: 36px;
-      margin-bottom: 15px;
+      font-size: 48px;
+      margin-bottom: 20px;
       display: block;
     }
 
@@ -307,119 +425,108 @@ session_start();
       color: #f44336;
     }
 
-    /* User type selection styles */
-    .user-type-selection {
-      margin: 15px 0;
-      color: #fff;
-      padding: 0 15px;
+    /* Optional field styles */
+    .optional-field {
+      opacity: 0.8;
     }
 
-    .user-type-label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #fff;
-    }
-
-    .radio-group {
+    /* Language Switcher Styles */
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
       display: flex;
       gap: 10px;
-      justify-content: space-around;
-      width: 100%;
+      z-index: 1000;
     }
 
-    .radio-group input[type="radio"] {
-      display: none;
-    }
-
-    .radio-group label {
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid rgba(255, 255, 255, .1);
-      border-radius: 30px;
-      padding: 8px 20px;
-      font-size: 0.9rem;
+    .lang-btn {
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      color: #fff;
       cursor: pointer;
       transition: all 0.3s ease;
-      flex-grow: 1;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      color: #fff;
+      font-size: 14px;
+      backdrop-filter: blur(5px);
     }
 
-    .radio-group input[type="radio"]:checked + label {
-      background-color: rgba(76, 175, 80, 0.3);
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .lang-btn.active {
+      background: #4CAF50;
       border-color: #4CAF50;
-      font-weight: 600;
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .radio-group label:hover {
-      background-color: rgba(255, 255, 255, .15);
-      color: #fff;
-    }
-
-    .radio-group input[type="radio"]:checked + label:hover {
-      background-color: rgba(76, 175, 80, 0.45);
-      color: #fff;
     }
   </style>
 </head>
 <body>
+  <!-- Language Switcher -->
+  <div class="language-switcher">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="fr">FR</button>
+  </div>
+
   <div class="wrapper">
     <form id="signupForm" action="signup.php" method="POST">
-      <h1>Create an account</h1>
+      <h1 data-translate="create_account">Create Account</h1>
       <div class="input-box">
-        <input type="text" name="username" id="username" placeholder="Username" required>
+        <input type="text" name="username" id="username" data-translate="username_placeholder" placeholder="Username" required>
         <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
-        <input type="email" name="email" id="email" placeholder="E-mail" required>
+        <input type="email" name="email" id="email" data-translate="email_placeholder" placeholder="E-mail" required
+               pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$"
+               title="Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)">
         <i class='bx bxs-envelope'></i>
       </div>
-      <div class="input-box">
-        <input type="tel" id="phone" name="phone" placeholder="Phone Number" maxlength="10" required>
+      <div class="phone-input-group">
+        <span class="phone-prefix">+212</span>
+        <input type="tel" id="phone" name="phone" class="phone-input" data-translate="phone_placeholder" placeholder="6XXXXXXXX or 7XXXXXXXX" 
+               pattern="^[67][0-9]{8}$"
+               title="Please enter a valid Moroccan phone number starting with 6 or 7"
+               required>
         <i class='bx bxs-phone'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="password" id="password" placeholder="Password" required>
+        <input type="password" name="password" id="password" data-translate="password_placeholder" placeholder="Password" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" required>
+        <input type="password" name="confirm_password" id="confirm_password" data-translate="confirm_password_placeholder" placeholder="Confirm password" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
 
       <!-- User type selection -->
       <div class="user-type-selection">
-        <label class="user-type-label">Account Type:</label>
+        <label class="user-type-label" data-translate="account_type_label">Account Type:</label>
         <div class="radio-group">
           <input type="radio" id="farmer" name="user_type" value="farmer" required>
-          <label for="farmer"> Farmer</label>
+          <label for="farmer" data-translate="farmer_label"> Farmer</label>
 
           <input type="radio" id="user" name="user_type" value="user" required>
-          <label for="user"> Consumer</label>
+          <label for="user" data-translate="consumer_label"> Consumer</label>
         </div>
       </div>
 
       <!-- Gender selection -->
-      <div class="user-type-selection">
-        <label class="user-type-label">Gender (Optional):</label>
+      <div class="user-type-selection optional-field">
+        <label class="user-type-label" data-translate="gender_label">Gender (Optional):</label>
         <div class="radio-group">
           <input type="radio" id="male" name="gender" value="male">
-          <label for="male">Male</label>
+          <label for="male"><i class='bx bxs-male-sign'></i> Male</label>
 
           <input type="radio" id="female" name="gender" value="female">
-          <label for="female">Female</label>
+          <label for="female"><i class='bx bxs-female-sign'></i> Female</label>
         </div>
       </div>
 
-      <button type="submit" class="btn">Register</button>
+      <button type="submit" class="btn" data-translate="register">Register</button>
       <div class="register-link">
-        <p>Have an account? <a href="index.php">Login</a></p>
+        <p><span data-translate="have_account">Already have an account?</span> <a href="index.php" data-translate="login">Login</a></p>
       </div>
     </form>
   </div>
@@ -434,6 +541,57 @@ session_start();
   </div>
 
   <script>
+    // Translations from PHP
+    const translations = {
+      en: <?php echo json_encode($translations->getAllTranslations('en')); ?>,
+      fr: <?php echo json_encode($translations->getAllTranslations('fr')); ?>
+    };
+
+    // Language Switcher
+    const langButtons = document.querySelectorAll('.lang-btn');
+    let currentLang = localStorage.getItem('language') || '<?php echo $translations->getCurrentLanguage(); ?>';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('language', lang);
+      
+      // Update active button
+      langButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      // Update all translatable elements
+      document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.dataset.translate;
+        if (translations[lang][key]) {
+          if (element.tagName === 'INPUT') {
+            element.placeholder = translations[lang][key];
+          } else {
+            element.textContent = translations[lang][key];
+          }
+        }
+      });
+
+      // Send AJAX request to update session
+      fetch('update_language.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'language=' + lang
+      });
+    }
+
+    // Initialize language
+    setLanguage(currentLang);
+
+    // Add click handlers to language buttons
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
     // Function to show custom alert
     function showAlert(message, type = 'error') {
       const alertModal = document.getElementById("customAlert");
@@ -465,7 +623,18 @@ session_start();
 
     // Function to validate phone number input
     function validatePhoneInput(input) {
+      // Remove any non-digit characters
       input.value = input.value.replace(/\D/g, '');
+      
+      // Ensure it starts with 6 or 7
+      if (input.value.length > 0 && !/^[67]/.test(input.value)) {
+        input.value = input.value.substring(1);
+      }
+      
+      // Limit to 9 digits (6/7 + 8 digits)
+      if (input.value.length > 9) {
+        input.value = input.value.slice(0, 9);
+      }
     }
 
     // Add event listener to phone input
@@ -506,18 +675,17 @@ session_start();
         return;
       }
 
-      // Validate email domain
-      const validDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com"];
-      const emailDomain = email.split("@")[1];
-      if (!validDomains.includes(emailDomain)) {
-        showAlert("Please use a valid email address from: gmail.com, yahoo.com, outlook.com, hotmail.com, or icloud.com", 'error');
+      // Email validation
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$/;
+      if (!emailPattern.test(email)) {
+        showAlert("Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)", 'error');
         return;
       }
 
-      // Validate phone number
-      const phoneRegex = /^0\d{9}$/;
-      if (!phoneRegex.test(phone)) {
-        showAlert("Phone number must be 10 digits and start with 0", 'error');
+      // Phone validation
+      const phonePattern = /^[67][0-9]{8}$/;
+      if (!phonePattern.test(phone)) {
+        showAlert("Please enter a valid Moroccan phone number starting with 6 or 7 followed by 8 digits", 'error');
         return;
       }
 
@@ -533,8 +701,35 @@ session_start();
         return;
       }
 
+      // Add +212 prefix to phone number before submitting
+      document.getElementById('phone').value = '+212' + phone;
+
       // If all validations pass, submit the form
       this.submit();
+    });
+
+    document.getElementById('password').addEventListener('input', function(e) {
+      const password = e.target.value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      const errorMessage = document.getElementById('password-error');
+      
+      if (confirmPassword && password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match';
+      } else {
+        errorMessage.textContent = '';
+      }
+    });
+
+    document.getElementById('confirm_password').addEventListener('input', function(e) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = e.target.value;
+      const errorMessage = document.getElementById('password-error');
+      
+      if (password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match';
+      } else {
+        errorMessage.textContent = '';
+      }
     });
   </script>
 

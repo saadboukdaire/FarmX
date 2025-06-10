@@ -808,9 +808,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             color: #888;
             margin-top: 2px;
         }
+
+        /* Add custom alert styles */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        .success-alert .alert-content::before {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
+
+        .alert-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .alert-content button {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff4d4d, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-alert .alert-content button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
+        }
+
+        .success-alert .alert-content button:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .alert-content button:active {
+            transform: translateY(0);
+        }
+
+        .alert-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            color: #ff4d4d;
+        }
+
+        .success-alert .alert-content i {
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
+    <!-- Add custom alert modal -->
+    <div id="customAlert" class="custom-alert">
+        <div class="alert-content">
+            <i class='bx bxs-error-circle'></i>
+            <p id="alertMessage"></p>
+            <button id="alertCloseButton">OK</button>
+        </div>
+    </div>
+
     <header>
         <div class="header-content">
             <div class="logo">
@@ -930,7 +1045,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                     // Store the media URL for the post
                     window.mediaUrl = data.url;
                 } else {
-                    alert('Error uploading media: ' + data.message);
+                    showAlert('Error uploading media: ' + data.message, 'error');
                 }
             });
         }
@@ -943,7 +1058,7 @@ function createPost() {
 
     // Validate that the post has either content or media
     if (!content && !mediaUrl) {
-        alert('Post cannot be blank. Please add content or attach a photo/video.');
+        showAlert('Post cannot be blank. Please add content or attach a photo/video.', 'error');
         return; // Stop execution if both content and media are empty
     }
 
@@ -966,32 +1081,9 @@ function createPost() {
             // Reload posts
             loadPosts();
         } else {
-            alert('Error creating post: ' + data.message);
+            showAlert('Error creating post: ' + data.message, 'error');
         }
     });
-}
-// Function to handle media upload
-function handleMediaUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        // Upload the file to the server and get the URL
-        const formData = new FormData();
-        formData.append('file', file);
-
-        fetch('upload_media.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Store the media URL for the post
-                window.mediaUrl = data.url;
-            } else {
-                alert('Error uploading media: ' + data.message);
-            }
-        });
-    }
 }
 
     // Function to load posts
@@ -1077,7 +1169,10 @@ function handleMediaUpload(event) {
                 }
             }
         })
-        .catch(error => console.error('Error loading posts:', error));
+        .catch(error => {
+            console.error('Error loading posts:', error);
+            showAlert('An error occurred while loading posts.', 'error');
+        });
     }
 
  // Function to like/unlike a post
@@ -1102,12 +1197,12 @@ function toggleLike(postId) {
             // Reload posts to update like count
             loadPosts();
         } else {
-            alert(data.message);
+            showAlert(data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while processing your request.');
+        showAlert('An error occurred while processing your request.', 'error');
     });
 }
 
@@ -1115,7 +1210,7 @@ function addComment(postId) {
     const content = document.getElementById(`comment-input-${postId}`).value.trim();
 
     if (!content) {
-        alert('Comment cannot be empty.');
+        showAlert('Comment cannot be empty.', 'error');
         return;
     }
 
@@ -1135,12 +1230,12 @@ function addComment(postId) {
             loadComments(postId); // Reload comments after adding a new one
             document.getElementById(`comment-input-${postId}`).value = ''; // Clear the input field
         } else {
-            alert(data.message);
+            showAlert(data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while processing your request.');
+        showAlert('An error occurred while processing your request.', 'error');
     });
 }
 // Function to toggle comments visibility
@@ -1186,7 +1281,7 @@ function loadComments(postId) {
     })
     .catch(error => {
         console.error('Error loading comments:', error);
-        alert('An error occurred while loading comments: ' + error.message);
+        showAlert('An error occurred while loading comments: ' + error.message, 'error');
     });
 }
     // Load posts when the page loads
@@ -1232,7 +1327,7 @@ function fetchWeather(latitude, longitude) {
         })
         .catch(error => {
             console.error('Error fetching weather data:', error);
-            document.getElementById('weather-info').innerHTML = '<p>Failed to load weather data.</p>';
+            showAlert('Failed to load weather data.', 'error');
         });
 }
 
@@ -1247,11 +1342,11 @@ function getLocation() {
             },
             error => {
                 console.error('Error getting location:', error);
-                document.getElementById('weather-info').innerHTML = '<p>Unable to fetch location.</p>';
+                showAlert('Unable to fetch location.', 'error');
             }
         );
     } else {
-        document.getElementById('weather-info').innerHTML = '<p>Geolocation is not supported by your browser.</p>';
+        showAlert('Geolocation is not supported by your browser.', 'error');
     }
 }
 
@@ -1405,6 +1500,35 @@ getLocation();
 
     // Update notification count every 30 seconds
     setInterval(updateNotificationCount, 30000);
+
+    // Add showAlert function
+    function showAlert(message, type = 'error') {
+        const alertModal = document.getElementById("customAlert");
+        const alertMessage = document.getElementById("alertMessage");
+        const alertIcon = alertModal.querySelector('i');
+        
+        // Remove existing classes
+        alertModal.classList.remove('success-alert', 'error-alert');
+        // Add appropriate class
+        alertModal.classList.add(type + '-alert');
+        
+        // Update icon based on type
+        alertIcon.className = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+        
+        alertMessage.textContent = message;
+        alertModal.style.display = "flex";
+
+        const closeButton = document.getElementById("alertCloseButton");
+        closeButton.onclick = function() {
+            alertModal.style.display = "none";
+        };
+
+        alertModal.onclick = function(event) {
+            if (event.target === alertModal) {
+                alertModal.style.display = "none";
+            }
+        };
+    }
 </script>
 </body>
 </html>

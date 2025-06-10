@@ -292,6 +292,34 @@ $conn->close();
         .profile-header {
             text-align: center;
             margin-bottom: 35px;
+            position: relative; /* Add this for absolute positioning of edit button */
+        }
+
+        .edit-profile-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .edit-profile-button button {
+            background-color: #3e8e41;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .edit-profile-button button:hover {
+            background-color: #2d682f;
+            transform: scale(1.1);
         }
 
         .profile-header img {
@@ -371,69 +399,6 @@ $conn->close();
 
         .profile-section .info .join-date {
             color: #666;
-        }
-
-        /* Buttons Container */
-        .buttons-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            margin: 25px 0;
-        }
-
-       /* Button Styles with Animations */
-.edit-profile-button button, .logout-button a {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-flex; /* Ensure consistent alignment */
-    align-items: center; /* Center text vertically */
-    justify-content: center; /* Center text horizontally */
-    height: 40px; /* Set a fixed height for both buttons */
-}
-
-.edit-profile-button button {
-    background-color: #3e8e41;
-    color: white;
-}
-
-.edit-profile-button button:hover {
-    background-color: #2d682f;
-    transform: translateY(-2px); /* Add hover animation */
-}
-
-.logout-button a {
-    background-color: #ff4d4d;
-    color: white;
-}
-
-.logout-button a:hover {
-    background-color: #cc0000;
-    transform: translateY(-2px); /* Add hover animation */
-}
-
-        /* Bio Section */
-        .bio-section {
-            margin: 30px 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #3e8e41;
-        }
-
-        .bio-section h2 {
-            margin-bottom: 15px;
-        }
-
-        .bio-section p {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.5;
         }
 
         /* Posts Section */
@@ -585,47 +550,41 @@ $conn->close();
 .post-footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 15px;
     margin-top: 15px;
     padding-top: 10px;
     border-top: 1px solid #eee;
 }
 
-.view-in-feed-btn {
-    background-color: #3e8e41;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.view-in-feed-btn, .delete-post-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #666;
 }
 
-.view-in-feed-btn:hover {
-    background-color: #2d682f;
-    transform: translateY(-2px);
+.view-in-feed-btn {
+    color: #3e8e41;
 }
 
 .delete-post-btn {
-    background-color: #ff4d4d;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: #ff4d4d;
+}
+
+.view-in-feed-btn:hover {
+    color: #2d682f;
+    transform: scale(1.1);
 }
 
 .delete-post-btn:hover {
-    background-color: #cc0000;
-    transform: translateY(-2px);
+    color: #cc0000;
+    transform: scale(1.1);
 }
 
         /* Add these styles to your existing CSS */
@@ -695,6 +654,12 @@ $conn->close();
             <img id="profile-picture" src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture">
             <h1 id="profile-name"><?php echo htmlspecialchars($username ?? ''); ?></h1>
             <p class="user-tag"><?php echo htmlspecialchars($userTag ?? ''); ?></p>
+            <!-- Move edit profile button here -->
+            <?php if ($isOwnProfile): ?>
+            <div class="edit-profile-button">
+                <a href="edit_profile.php"><button title="Edit Profile"><i class='bx bx-edit'></i></button></a>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Bio Section -->
@@ -720,7 +685,7 @@ $conn->close();
             </div>
             <div class="info">
                 <i class='bx bx-phone'></i>
-                <span id="profile-phone"><?php echo htmlspecialchars($phone ?? ''); ?></span>
+                <span id="profile-phone"><?php echo '0' . substr(htmlspecialchars($phone ?? ''), -8); ?></span>
             </div>
             <?php if (!empty($gender)): ?>
             <div class="info">
@@ -745,17 +710,6 @@ $conn->close();
                             <h3><?php echo htmlspecialchars($username ?? ''); ?></h3>
                             <span class="post-date"><?php echo date('F j, Y', strtotime($post['created_at'])); ?></span>
                         </div>
-                        <!-- Add edit and delete buttons -->
-                        <div class="post-actions">
-                            <?php if ($isOwnProfile): ?>
-                            <form method="POST" class="delete-post-form" onsubmit="return confirm('Are you sure you want to delete this post?');">
-                                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                                <button type="submit" name="delete_post" class="delete-post-btn">
-                                    <i class='bx bx-trash'></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
-                        </div>
                     </div>
                     <div class="post-content">
                         <?php echo nl2br(htmlspecialchars($post['content'])); ?>
@@ -774,12 +728,14 @@ $conn->close();
                         ?>
                     <?php endif; ?>
                     <div class="post-footer-actions">
-                        <a href="main.php?post_id=<?php echo $post['id']; ?>" class="view-in-feed-btn">View in Feed</a>
+                        <a href="main.php?post_id=<?php echo $post['id']; ?>" class="view-in-feed-btn" title="View in Feed">
+                            <i class='bx bx-show'></i>
+                        </a>
                         <?php if ($isOwnProfile): ?>
                         <form method="POST" class="delete-post-form" onsubmit="return confirm('Are you sure you want to delete this post?');">
                             <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                            <button type="submit" name="delete_post" class="delete-post-btn">
-                                <i class='bx bx-trash'></i> Delete
+                            <button type="submit" name="delete_post" class="delete-post-btn" title="Delete Post">
+                                <i class='bx bx-trash'></i>
                             </button>
                         </form>
                         <?php endif; ?>
@@ -788,21 +744,6 @@ $conn->close();
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-</div>
-
-        <!-- Buttons Container -->
-        <div class="buttons-container">
-            <!-- Edit Profile Button -->
-            <div class="edit-profile-button">
-                <?php if ($isOwnProfile): ?>
-                <a href="edit_profile.php"><button>Edit Profile</button></a>
-                <?php endif; ?>
-            </div>
-
-            <!-- Logout Button -->
-            <div class="logout-button">
-                <a href="logout.php">Logout</a>
-            </div>
         </div>
     </div>
 

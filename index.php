@@ -1,5 +1,9 @@
 <?php
 session_start();
+require_once 'includes/translations.php';
+require_once 'database/db_connect.php';
+
+$translations = new Translations($db);
 
 // Database connection
 $servername = "localhost";
@@ -69,7 +73,7 @@ if (isset($_SESSION['registration_success'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $translations->getCurrentLanguage(); ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -166,6 +170,7 @@ if (isset($_SESSION['registration_success'])) {
       font-size: 14.5px;
       text-align: center;
       margin: 20px 0 15px;
+      color: #fff;
     }
     .register-link p a {
       color: #4CAF50;
@@ -191,6 +196,38 @@ if (isset($_SESSION['registration_success'])) {
       }
     }
 
+    /* Language Switcher Styles */
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .lang-btn {
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      backdrop-filter: blur(5px);
+    }
+
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .lang-btn.active {
+      background: #4CAF50;
+      border-color: #4CAF50;
+    }
+
     /* Enhanced Alert Modal Styles */
     .custom-alert {
       display: none;
@@ -204,11 +241,6 @@ if (isset($_SESSION['registration_success'])) {
       align-items: center;
       z-index: 1000;
       animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
 
     .alert-content {
@@ -328,21 +360,27 @@ if (isset($_SESSION['registration_success'])) {
   </style>
 </head>
 <body>
+  <!-- Language Switcher -->
+  <div class="language-switcher">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="fr">FR</button>
+  </div>
+
   <div class="wrapper">
     <form action="" method="POST">
       <img src="Images/logoinv.png" height="100px">
-      <h1>Welcome back!</h1>
+      <h1 data-translate="welcome">Welcome back!</h1>
       <div class="input-box">
-        <input type="text" name="username_or_email" placeholder="Username or Email" required>
+        <input type="text" name="username_or_email" data-translate="username_placeholder" placeholder="Username or Email" required>
         <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="password" data-translate="password_placeholder" placeholder="Password" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
-      <button type="submit" class="btn">Login</button>
+      <button type="submit" class="btn" data-translate="login">Login</button>
       <div class="register-link">
-        <p>Don't have an account? <a href="signup.php">Register</a></p>
+        <p><span data-translate="no_account">Don't have an account?</span> <a href="signup.php" data-translate="register">Register</a></p>
       </div>
     </form>
   </div>
@@ -352,11 +390,62 @@ if (isset($_SESSION['registration_success'])) {
     <div class="alert-content">
       <i class='bx bxs-check-circle'></i>
       <p id="alertMessage"></p>
-      <button id="alertCloseButton">OK</button>
+      <button id="alertCloseButton" data-translate="ok">OK</button>
     </div>
   </div>
 
   <script>
+    // Translations from PHP
+    const translations = {
+      en: <?php echo json_encode($translations->getAllTranslations('en')); ?>,
+      fr: <?php echo json_encode($translations->getAllTranslations('fr')); ?>
+    };
+
+    // Language Switcher
+    const langButtons = document.querySelectorAll('.lang-btn');
+    let currentLang = localStorage.getItem('language') || '<?php echo $translations->getCurrentLanguage(); ?>';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('language', lang);
+      
+      // Update active button
+      langButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      // Update all translatable elements
+      document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.dataset.translate;
+        if (translations[lang][key]) {
+          if (element.tagName === 'INPUT') {
+            element.placeholder = translations[lang][key];
+          } else {
+            element.textContent = translations[lang][key];
+          }
+        }
+      });
+
+      // Send AJAX request to update session
+      fetch('update_language.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'language=' + lang
+      });
+    }
+
+    // Initialize language
+    setLanguage(currentLang);
+
+    // Add click handlers to language buttons
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
     // Function to show custom alert
     function showAlert(message, type = 'error') {
       const alertModal = document.getElementById("customAlert");

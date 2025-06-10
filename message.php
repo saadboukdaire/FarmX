@@ -64,9 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_users'])) {
     
     // Base query to get users with their message counts and last message info
     $sql = "SELECT 
-        u.id, 
-        u.username, 
-        u.profile_pic,
+            u.id, 
+            u.username, 
+            u.profile_pic,
         u.user_type,
         u.user_tag,
         u.bio,
@@ -83,28 +83,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_users'])) {
         (
             SELECT content 
             FROM messages 
-            WHERE (sender_id = u.id AND receiver_id = :user_id) 
-            OR (sender_id = :user_id AND receiver_id = u.id)
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
             ORDER BY created_at DESC 
             LIMIT 1
         ) as last_message,
         (
             SELECT sender_id 
             FROM messages 
-            WHERE (sender_id = u.id AND receiver_id = :user_id) 
-            OR (sender_id = :user_id AND receiver_id = u.id)
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
             ORDER BY created_at DESC 
             LIMIT 1
         ) as last_message_sender,
         (
             SELECT MAX(created_at)
             FROM messages 
-            WHERE (sender_id = u.id AND receiver_id = :user_id) 
-            OR (sender_id = :user_id AND receiver_id = u.id)
+             WHERE (sender_id = u.id AND receiver_id = :user_id) 
+             OR (sender_id = :user_id AND receiver_id = u.id)
         ) as last_message_time
-    FROM users u
+        FROM users u
     LEFT JOIN messages m ON (m.sender_id = :user_id AND m.receiver_id = u.id) OR (m.sender_id = u.id AND m.receiver_id = :user_id)
-    WHERE u.id != :user_id
+        WHERE u.id != :user_id
     GROUP BY u.id";
 
     // Add filter conditions
@@ -784,9 +784,124 @@ if (isset($_GET['to'])) {
         .filter-select:hover {
             border-color: #3e8e41;
         }
+
+        /* Add custom alert styles */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        .success-alert .alert-content::before {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
+
+        .alert-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .alert-content button {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff4d4d, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-alert .alert-content button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
+        }
+
+        .success-alert .alert-content button:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .alert-content button:active {
+            transform: translateY(0);
+        }
+
+        .alert-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            color: #ff4d4d;
+        }
+
+        .success-alert .alert-content i {
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
+    <!-- Add custom alert modal -->
+    <div id="customAlert" class="custom-alert">
+        <div class="alert-content">
+            <i class='bx bxs-error-circle'></i>
+            <p id="alertMessage"></p>
+            <button id="alertCloseButton">OK</button>
+        </div>
+    </div>
+
     <header>
         <div class="header-content">
             <div class="logo">
@@ -931,12 +1046,12 @@ if (isset($_GET['to'])) {
         document.querySelectorAll('.contact').forEach(c => c.classList.remove('active'));
         const selectedContact = document.querySelector(`.contact[data-user-id="${user.id}"]`);
         if (selectedContact) {
-            selectedContact.classList.add('active');
-            
-            // Remove unread badge when chat is selected
-            const unreadBadge = selectedContact.querySelector('.unread-badge');
-            if (unreadBadge) {
-                unreadBadge.remove();
+        selectedContact.classList.add('active');
+        
+        // Remove unread badge when chat is selected
+        const unreadBadge = selectedContact.querySelector('.unread-badge');
+        if (unreadBadge) {
+            unreadBadge.remove();
             }
         }
         
@@ -1041,12 +1156,12 @@ if (isset($_GET['to'])) {
             body: formData
         })
         .then(res => res.json())
-        .then(response => {
-            if (response.success) {
+        .then(data => {
+            if (data.status === 'success') {
                 inputEl.value = '';
                 loadMessages();
             } else {
-                alert('Failed to send message');
+                showAlert('Failed to send message', 'error');
             }
         });
     }
@@ -1249,6 +1364,35 @@ if (isset($_GET['to'])) {
     document.addEventListener('DOMContentLoaded', () => {
         fetchUsers();
     });
+
+    // Add showAlert function
+    function showAlert(message, type = 'error') {
+        const alertModal = document.getElementById("customAlert");
+        const alertMessage = document.getElementById("alertMessage");
+        const alertIcon = alertModal.querySelector('i');
+        
+        // Remove existing classes
+        alertModal.classList.remove('success-alert', 'error-alert');
+        // Add appropriate class
+        alertModal.classList.add(type + '-alert');
+        
+        // Update icon based on type
+        alertIcon.className = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+        
+        alertMessage.textContent = message;
+        alertModal.style.display = "flex";
+
+        const closeButton = document.getElementById("alertCloseButton");
+        closeButton.onclick = function() {
+            alertModal.style.display = "none";
+        };
+
+        alertModal.onclick = function(event) {
+            if (event.target === alertModal) {
+                alertModal.style.display = "none";
+            }
+        };
+    }
     </script>
 </body>
 </html>
