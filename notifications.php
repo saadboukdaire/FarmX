@@ -69,7 +69,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -232,6 +232,7 @@ try {
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            display: none;
         }
 
         .container {
@@ -372,49 +373,37 @@ try {
             <div class="nav-links">
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
-                    <span class="tooltip">Messages</span>
                 </a>
                 <a href="main.php" title="Home">
                     <i class='bx bxs-home'></i>
-                    <span class="tooltip">Home</span>
                 </a>
                 <a href="market.php" title="Marketplace">
                     <i class='bx bxs-store'></i>
-                    <span class="tooltip">Marketplace</span>
                 </a>
             </div>
             <div class="right-nav">
-                <a href="notifications.php" class="notification-container" title="Notifications">
-                    <i class='bx bx-bell notification-icon'></i>
-                    <span class="tooltip">Notifications</span>
-                </a>
+                <div class="notification-container">
+                    <a href="notifications.php" class="activated" title="Notifications">
+                        <i class='bx bx-bell notification-icon'></i>
+                        <span class="notification-badge"></span>
+                    </a>
+                </div>
                 <a href="profile.php" title="Profile">
                     <i class='bx bxs-user'></i>
-                    <span class="tooltip">Profile</span>
-                </a>
-                <a href="#" id="language-switch" title="Switch Language">
-                    <i class='bx bx-globe'></i>
-                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
                 </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
-                    <span class="tooltip">Logout</span>
                 </a>
             </div>
         </div>
     </header>
 
+    <?php if (!empty($notifications)): ?>
     <div class="container">
         <div class="notifications-header">
             <h2>Notifications</h2>
         </div>
 
-        <?php if (empty($notifications)): ?>
-            <div class="no-notifications">
-                <i class='bx bx-bell'></i>
-                <p>No notifications yet</p>
-            </div>
-        <?php else: ?>
             <?php if (!empty($groupedNotifications['today'])): ?>
                 <div class="notification-group">
                     <div class="notification-group-header">Today</div>
@@ -432,7 +421,7 @@ try {
                                     <?php if ($notification['type'] === 'message'): ?>
                                         <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                        <?php htmlspecialchars($notification['content']); ?>
                                     <?php endif; ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
@@ -463,7 +452,7 @@ try {
                                     <?php if ($notification['type'] === 'message'): ?>
                                         <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                        <?php htmlspecialchars($notification['content']); ?>
                                     <?php endif; ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
@@ -494,7 +483,7 @@ try {
                                     <?php if ($notification['type'] === 'message'): ?>
                                         <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                        <?php htmlspecialchars($notification['content']); ?>
                                     <?php endif; ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
@@ -512,24 +501,24 @@ try {
                 <div class="notification-group">
                     <div class="notification-group-header">This Month</div>
                     <?php foreach ($groupedNotifications['this_month'] as $notification): ?>
-                <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                    <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                         alt="Profile" 
-                         class="notification-avatar">
-                    <div class="notification-content">
-                        <div class="notification-header">
-                            <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                            <span class="notification-time"><?php echo date('M j, g:i a', strtotime($notification['created_at'])); ?></span>
-                        </div>
-                        <div class="notification-text">
+                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
+                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
+                                 alt="Profile" 
+                                 class="notification-avatar">
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
+                                    <span class="notification-time"><?php echo date('M j, g:i a', strtotime($notification['created_at'])); ?></span>
+                                </div>
+                                <div class="notification-text">
                                     <?php if ($notification['type'] === 'message'): ?>
                                         <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                        <?php htmlspecialchars($notification['content']); ?>
                                     <?php endif; ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                            <div class="notification-preview">
+                                    <div class="notification-preview">
                                         <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
                                     </div>
                                 <?php endif; ?>
@@ -556,21 +545,28 @@ try {
                                     <?php if ($notification['type'] === 'message'): ?>
                                         <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars($notification['content']); ?>
+                                        <?php htmlspecialchars($notification['content']); ?>
                                     <?php endif; ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                            <div class="notification-preview">
-                                <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-preview">
+                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-        <?php endif; ?>
     </div>
+    <?php else: ?>
+        <div class="container">
+            <div class="no-notifications">
+                <i class='bx bx-bell'></i>
+                <p>No notifications yet</p>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <script>
         function handleNotificationClick(notification) {
@@ -601,25 +597,20 @@ try {
         // Apply styles when page loads
         document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
 
-        document.getElementById('language-switch').addEventListener('click', function(e) {
-            e.preventDefault();
-            const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
-            const newLang = currentLang === 'en' ? 'fr' : 'en';
-            
-            fetch('update_language.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'language=' + newLang
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                }
-            });
-        });
+        document.getElementById('popupOverlay').addEventListener('click', closePopup);
+
+        function updateNotificationCount() {
+            fetch('get_notification_count.php')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.style.display = data.count > 0 ? 'flex' : 'none';
+                    }
+                })
+                .catch(error => console.error('Error updating notification count:', error));
+        }
     </script>
 </body>
 </html> 

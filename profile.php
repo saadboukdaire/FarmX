@@ -167,28 +167,6 @@ $conn->close();
             background-color: white;
         }
 
-        .tooltip {
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover .tooltip {
-            opacity: 1;
-            visibility: visible;
-            bottom: -35px;
-        }
-
         .right-nav {
             display: flex;
             gap: 12px;
@@ -224,12 +202,6 @@ $conn->close();
             transform: translateY(-2px);
         }
 
-        .right-nav a:hover .tooltip {
-            opacity: 1;
-            visibility: visible;
-            bottom: -35px;
-        }
-
         .notification-container {
             position: relative;
             margin-left: 20px;
@@ -254,28 +226,32 @@ $conn->close();
 
         .notification-badge {
             position: absolute;
-            top: 0;
-            right: 0;
-            background-color: #ff4444;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4d4d;
             color: white;
             border-radius: 50%;
-            padding: 2px 6px;
+            width: 20px;
+            height: 20px;
             font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             display: none;
         }
 
-        .notification-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-            display: none;
-            z-index: 1000;
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         /* Simplified Profile Container */
@@ -692,34 +668,26 @@ $conn->close();
             <div class="nav-links">
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
-                    <span class="tooltip">Messages</span>
                 </a>
                 <a href="main.php" title="Home">
                     <i class='bx bxs-home'></i>
-                    <span class="tooltip">Home</span>
                 </a>
                 <a href="market.php" title="Marketplace">
                     <i class='bx bxs-store'></i>
-                    <span class="tooltip">Marketplace</span>
                 </a>
             </div>
             <div class="right-nav">
-                <a href="notifications.php" class="notification-container" title="Notifications">
-                    <i class='bx bx-bell notification-icon'></i>
-                    <span class="notification-badge">0</span>
-                    <span class="tooltip">Notifications</span>
-                </a>
-                <a href="profile.php" title="Profile">
+                <div class="notification-container">
+                    <a href="notifications.php" title="Notifications">
+                        <i class='bx bx-bell notification-icon'></i>
+                        <span class="notification-badge">0</span>
+                    </a>
+                </div>
+                <a href="profile.php" class="activated" title="Profile">
                     <i class='bx bxs-user'></i>
-                    <span class="tooltip">Profile</span>
-                </a>
-                <a href="#" id="language-switch" title="Switch Language">
-                    <i class='bx bx-globe'></i>
-                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
                 </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
-                    <span class="tooltip">Logout</span>
                 </a>
             </div>
         </div>
@@ -867,25 +835,7 @@ $conn->close();
         // Apply styles when page loads
         document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
 
-        document.getElementById('language-switch').addEventListener('click', function(e) {
-            e.preventDefault();
-            const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
-            const newLang = currentLang === 'en' ? 'fr' : 'en';
-            
-            fetch('update_language.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'language=' + newLang
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                }
-            });
-        });
+        document.getElementById('popupOverlay').addEventListener('click', closePopup);
     </script>
 </body>
 </html>

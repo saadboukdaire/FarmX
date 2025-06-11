@@ -92,48 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #333;
         }
 
-        header {
-            background-color: #3e8e41;
-            color: white;
-            padding: 8px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-links {
-            display: flex;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #3e8e41;
-            background-color: white;
-        }
-
         .add-container {
             max-width: 800px;
             margin: 20px auto;
@@ -320,30 +278,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l'avenir, récoltez le succès">    
-            </div>
-            <div class="nav-links">
-                <a href="main.php">Home</a>
-                <a href="message.php">Messages</a>
-                <a href="market.php" class="activated">Marketplace</a>
-                <a href="profile.php">Profile</a>
-            </div>
-            <div class="right-nav">
-                <a href="main.php" title="Home">
-                    <i class='bx bxs-home'></i>
-                    <span class="tooltip">Home</span>
-                </a>
-                <a href="message.php" title="Messages">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="tooltip">Messages</span>
-                </a>
-                <a href="#" id="language-switch" title="Switch Language">
-        </div>
-    </header>
-
     <div class="add-container">
         <a href="market.php" class="back-button">
             <i class='bx bx-arrow-back'></i> Back to Marketplace

@@ -98,7 +98,7 @@ $user = $stmt->fetch();
 $current_username = $user['username'];
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -838,15 +838,12 @@ $current_username = $user['username'];
             <div class="nav-links">
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
-                    <span class="tooltip">Messages</span>
                 </a>
                 <a href="main.php" title="Home">
                     <i class='bx bxs-home'></i>
-                    <span class="tooltip">Home</span>
                 </a>
                 <a href="market.php" class="activated" title="Marketplace">
                     <i class='bx bxs-store'></i>
-                    <span class="tooltip">Marketplace</span>
                 </a>
             </div>
             <div class="right-nav">
@@ -854,20 +851,13 @@ $current_username = $user['username'];
                     <a href="notifications.php" title="Notifications">
                         <i class='bx bx-bell notification-icon'></i>
                         <span class="notification-badge">0</span>
-                        <span class="tooltip">Notifications</span>
                     </a>
                 </div>
                 <a href="profile.php" title="Profile">
                     <i class='bx bxs-user'></i>
-                    <span class="tooltip">Profile</span>
-                </a>
-                <a href="#" id="language-switch" title="Switch Language">
-                    <i class='bx bx-globe'></i>
-                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
                 </a>
                 <a href="logout.php" title="Logout">
                     <i class='bx bx-log-out'></i>
-                    <span class="tooltip">Logout</span>
                 </a>
             </div>
         </div>
@@ -1121,25 +1111,7 @@ $current_username = $user['username'];
         }
     });
 
-    document.getElementById('language-switch').addEventListener('click', function(e) {
-        e.preventDefault();
-        const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
-        const newLang = currentLang === 'en' ? 'fr' : 'en';
-        
-        fetch('update_language.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'language=' + newLang
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            }
-        });
-    });
+    document.getElementById('popupOverlay').addEventListener('click', closePopup);
 </script>
 </body>
 </html>

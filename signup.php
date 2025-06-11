@@ -6,13 +6,11 @@ ini_set('display_errors', 1);
 // Start the session at the very top
 session_start();
 
-require_once 'includes/translations.php';
 require_once 'database/db_connect.php';
 
-$translations = new Translations($db);
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $translations->getCurrentLanguage(); ?>">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -410,47 +408,9 @@ $translations = new Translations($db);
     .optional-field {
       opacity: 0.8;
     }
-
-    /* Language Switcher Styles */
-    .language-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .lang-btn {
-      padding: 8px 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 14px;
-      backdrop-filter: blur(5px);
-    }
-
-    .lang-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .lang-btn.active {
-      background: #4CAF50;
-      border-color: #4CAF50;
-    }
   </style>
 </head>
 <body>
-  <!-- Language Switcher -->
-  <div class="language-switcher">
-    <button class="lang-btn active" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="fr">FR</button>
-  </div>
-
   <div class="wrapper">
     <form id="signupForm" action="signup.php" method="POST">
       <h1 data-translate="create_account">Create Account</h1>
@@ -522,57 +482,6 @@ $translations = new Translations($db);
   </div>
 
   <script>
-    // Translations from PHP
-    const translations = {
-      en: <?php echo json_encode($translations->getAllTranslations('en')); ?>,
-      fr: <?php echo json_encode($translations->getAllTranslations('fr')); ?>
-    };
-
-    // Language Switcher
-    const langButtons = document.querySelectorAll('.lang-btn');
-    let currentLang = localStorage.getItem('language') || '<?php echo $translations->getCurrentLanguage(); ?>';
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('language', lang);
-      
-      // Update active button
-      langButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-      });
-
-      // Update all translatable elements
-      document.querySelectorAll('[data-translate]').forEach(element => {
-        const key = element.dataset.translate;
-        if (translations[lang][key]) {
-          if (element.tagName === 'INPUT') {
-            element.placeholder = translations[lang][key];
-          } else {
-            element.textContent = translations[lang][key];
-          }
-        }
-      });
-
-      // Send AJAX request to update session
-      fetch('update_language.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'language=' + lang
-      });
-    }
-
-    // Initialize language
-    setLanguage(currentLang);
-
-    // Add click handlers to language buttons
-    langButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        setLanguage(btn.dataset.lang);
-      });
-    });
-
     // Function to show custom alert
     function showAlert(message, type = 'error') {
       const alertModal = document.getElementById("customAlert");

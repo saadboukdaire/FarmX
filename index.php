@@ -1,9 +1,6 @@
 <?php
 session_start();
-require_once 'includes/translations.php';
 require_once 'database/db_connect.php';
-
-$translations = new Translations($db);
 
 // Database connection
 $servername = "localhost";
@@ -73,7 +70,7 @@ if (isset($_SESSION['registration_success'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $translations->getCurrentLanguage(); ?>">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -206,38 +203,6 @@ if (isset($_SESSION['registration_success'])) {
       }
     }
 
-    /* Language Switcher Styles */
-    .language-switcher {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .lang-btn {
-      padding: 8px 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 14px;
-      backdrop-filter: blur(5px);
-    }
-
-    .lang-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .lang-btn.active {
-      background: #4CAF50;
-      border-color: #4CAF50;
-    }
-
     /* Enhanced Alert Modal Styles */
     .custom-alert {
       display: none;
@@ -284,218 +249,165 @@ if (isset($_SESSION['registration_success'])) {
 
     .alert-content p {
       font-size: 18px;
-      margin-bottom: 25px;
       color: #333;
-      line-height: 1.6;
-      font-weight: 500;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .alert-content .icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    .alert-content .bx-check-circle {
+      color: #4CAF50;
+    }
+
+    .alert-content .bx-error-circle {
+      color: #f44336;
     }
 
     .alert-content button {
-      padding: 12px 35px;
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: #fff;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 25px;
       border: none;
-      border-radius: 25px;
+      border-radius: 30px;
       cursor: pointer;
       font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     .alert-content button:hover {
-      background: linear-gradient(135deg, #45a049, #4CAF50);
+      background-color: #45a049;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
 
     .alert-content button:active {
       transform: translateY(0);
     }
 
-    /* Success Alert Specific Styles */
-    .success-alert .alert-content {
-      background-color: #f8f9fa;
-      border: 2px solid #4CAF50;
+    .custom-alert.show {
+      display: flex;
     }
 
-    .success-alert .alert-content::before {
+    .custom-alert.success .alert-content::before {
       background: linear-gradient(90deg, #4CAF50, #45a049);
     }
 
-    .success-alert .alert-content p {
-      color: #2e7d32;
-      font-weight: 500;
-    }
-
-    .success-alert .alert-content button {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-    }
-
-    /* Error Alert Specific Styles */
-    .error-alert .alert-content {
-      background-color: #f8f9fa;
-      border: 2px solid #f44336;
-    }
-
-    .error-alert .alert-content::before {
+    .custom-alert.error .alert-content::before {
       background: linear-gradient(90deg, #f44336, #d32f2f);
     }
 
-    .error-alert .alert-content p {
-      color: #d32f2f;
-      font-weight: 500;
-    }
-
-    .error-alert .alert-content button {
-      background: linear-gradient(135deg, #f44336, #d32f2f);
-    }
-
-    /* Alert Icon Styles */
-    .alert-content i {
-      font-size: 48px;
-      margin-bottom: 20px;
-      display: block;
-    }
-
-    .success-alert .alert-content i {
+    .custom-alert.success .icon {
       color: #4CAF50;
     }
 
-    .error-alert .alert-content i {
+    .custom-alert.error .icon {
       color: #f44336;
     }
+
+    /* Login Error Message Styles */
+    .error-message {
+      color: #ff6347; /* Tomato */
+      background-color: rgba(255, 99, 71, 0.1);
+      border: 1px solid #ff6347;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   </style>
 </head>
 <body>
-  <!-- Language Switcher -->
-  <div class="language-switcher">
-    <button class="lang-btn active" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="fr">FR</button>
+  <div class="custom-alert" id="customAlertBox">
+    <div class="alert-content">
+      <i class="icon bx" id="alertIcon"></i>
+      <p id="customAlertMessage"></p>
+      <button id="alertCloseButton">OK</button>
+    </div>
   </div>
 
   <div class="wrapper">
     <form action="" method="POST">
       <img src="Images/logoinv.png" height="100px">
-      <h1 data-translate="welcome">Welcome back!</h1>
+      <h1>Welcome back!</h1>
       <div class="input-box">
-        <input type="text" name="username_or_email" data-translate="username_placeholder" placeholder="Username or Email" required>
+        <input type="text" name="username_or_email" placeholder="Username or Email" required>
         <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="password" data-translate="password_placeholder" placeholder="Password" required>
+        <input type="password" name="password" placeholder="Password" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
-      <button type="submit" class="btn" data-translate="login">Login</button>
+      <button type="submit" class="btn">Login</button>
       <div class="register-link">
-        <p><span data-translate="no_account">Don't have an account?</span> <a href="signup.php" data-translate="register">Register</a></p>
+        <p><span>Don't have an account?</span> <a href="signup.php">Register</a></p>
       </div>
     </form>
   </div>
 
-  <!-- Custom Alert Modal -->
-  <div id="customAlert" class="custom-alert">
-    <div class="alert-content">
-      <i class='bx bxs-check-circle'></i>
-      <p id="alertMessage"></p>
-      <button id="alertCloseButton" data-translate="ok">OK</button>
-    </div>
-  </div>
-
   <script>
-    // Translations from PHP
-    const translations = {
-      en: <?php echo json_encode($translations->getAllTranslations('en')); ?>,
-      fr: <?php echo json_encode($translations->getAllTranslations('fr')); ?>
-    };
+    document.addEventListener("DOMContentLoaded", function() {
+        <?php if (!empty($success_message)): ?>
+            showCustomAlert("<?php echo $success_message; ?>", true);
+        <?php endif; ?>
 
-    // Language Switcher
-    const langButtons = document.querySelectorAll('.lang-btn');
-    let currentLang = localStorage.getItem('language') || '<?php echo $translations->getCurrentLanguage(); ?>';
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('language', lang);
-      
-      // Update active button
-      langButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-      });
-
-      // Update all translatable elements
-      document.querySelectorAll('[data-translate]').forEach(element => {
-        const key = element.dataset.translate;
-        if (translations[lang][key]) {
-          if (element.tagName === 'INPUT') {
-            element.placeholder = translations[lang][key];
-          } else {
-            element.textContent = translations[lang][key];
-          }
+        // Automatically hide success message after 5 seconds
+        if (<?php echo json_encode(!empty($success_message)); ?>) {
+            setTimeout(function() {
+                hideCustomAlert();
+            }, 5000);
         }
-      });
-
-      // Send AJAX request to update session
-      fetch('update_language.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'language=' + lang
-      });
-    }
-
-    // Initialize language
-    setLanguage(currentLang);
-
-    // Add click handlers to language buttons
-    langButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        setLanguage(btn.dataset.lang);
-      });
     });
 
-    // Function to show custom alert
-    function showAlert(message, type = 'error') {
-      const alertModal = document.getElementById("customAlert");
-      const alertMessage = document.getElementById("alertMessage");
-      const alertIcon = alertModal.querySelector('i');
-      
-      // Remove existing classes
-      alertModal.classList.remove('success-alert', 'error-alert');
-      // Add appropriate class
-      alertModal.classList.add(type + '-alert');
-      
-      // Update icon based on type
-      alertIcon.className = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
-      
-      alertMessage.textContent = message;
-      alertModal.style.display = "flex";
-
-      const closeButton = document.getElementById("alertCloseButton");
-      closeButton.onclick = function() {
-        alertModal.style.display = "none";
-      };
-
-      alertModal.onclick = function(event) {
-        if (event.target === alertModal) {
-          alertModal.style.display = "none";
+    function showCustomAlert(message, isSuccess) {
+        var alertBox = document.getElementById("customAlertBox");
+        var alertMessage = document.getElementById("customAlertMessage");
+        alertMessage.innerHTML = message;
+        if (isSuccess) {
+            alertBox.classList.remove('error');
+            alertBox.classList.add('success');
+        } else {
+            alertBox.classList.remove('success');
+            alertBox.classList.add('error');
         }
-      };
+        alertBox.style.display = "flex";
+        setTimeout(function() {
+            alertBox.classList.add('show');
+        }, 10);
     }
 
-    // Show alerts on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      <?php if (!empty($success_message)): ?>
-        showAlert(<?php echo json_encode($success_message); ?>, 'success');
-      <?php endif; ?>
-      
-      <?php if (isset($_SESSION['login_error'])): ?>
-        showAlert(<?php echo json_encode($_SESSION['login_error']); ?>, 'error');
+    function hideCustomAlert() {
+        var alertBox = document.getElementById("customAlertBox");
+        alertBox.classList.remove('show');
+        setTimeout(function() {
+            alertBox.style.display = "none";
+        }, 300); // Match CSS transition duration
+    }
+
+    // Hide error message after 5 seconds if it exists
+    <?php if (isset($_SESSION['login_error'])): ?>
+        document.addEventListener("DOMContentLoaded", function() {
+            showCustomAlert("<?php echo htmlspecialchars($_SESSION['login_error']); ?>", false);
+            setTimeout(hideCustomAlert, 5000);
+        });
         <?php unset($_SESSION['login_error']); ?>
-      <?php endif; ?>
-    });
+    <?php endif; ?>
   </script>
 </body>
 </html>
