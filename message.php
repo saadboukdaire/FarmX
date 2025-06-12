@@ -45,7 +45,7 @@ if (isset($_GET['to']) && isset($_GET['item_id'])) {
         $item = $stmt->fetch();
         
         if ($item) {
-            $content = "Hello, I'm interested in your item: {$item['title']} ({$item['price']} MAD). [item_id=$item_id]";
+            $content = "Bonjour, je suis intéressé par votre article : {$item['title']} ({$item['price']} MAD). [item_id=$item_id]";
             $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content) VALUES (?, ?, ?)");
             $stmt->execute([$buyer_id, $seller_id, $content]);
         }
@@ -56,7 +56,7 @@ if (isset($_GET['to']) && isset($_GET['item_id'])) {
 // Handle fetch users request
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_users'])) {
     if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['error' => 'Not logged in']);
+        echo json_encode(['error' => 'Non connecté']);
         exit;
     }
     $logged_in_user_id = $_SESSION['user_id'];
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_messages'])) {
 
     if (!$contact_id) {
         http_response_code(400);
-        echo json_encode(['error' => 'Missing contact id']);
+        echo json_encode(['error' => 'ID du contact manquant']);
         exit;
     }
 
@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_messages'])) {
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to fetch messages']);
+        echo json_encode(['error' => 'Échec de la récupération des messages']);
     }
     exit;
 }
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
 
     if (!$receiver_id || trim($content) === '') {
         http_response_code(400);
-        echo json_encode(['error' => 'Invalid input']);
+        echo json_encode(['error' => 'Entrée invalide']);
         exit;
     }
 
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
         $message_id = $pdo->lastInsertId();
 
         // Create notification
-        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content, message_id) VALUES (?, ?, 'message', 'sent you a message', ?)");
+        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content, message_id) VALUES (?, ?, 'message', 'vous a envoyé un message', ?)");
         $stmt->execute([$receiver_id, $logged_in_user_id, $message_id]);
 
         $pdo->commit();
@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to send message: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Échec de l\'envoi du message : ' . $e->getMessage()]);
     }
     exit;
 }
@@ -913,10 +913,10 @@ if (isset($_GET['to'])) {
                 <a href="message.php" class="activated" title="Messages">
                     <i class='bx bxs-message-dots'></i>
                 </a>
-                <a href="main.php" title="Home">
+                <a href="main.php" title="Accueil">
                     <i class='bx bxs-home'></i>
                 </a>
-                <a href="market.php" title="Marketplace">
+                <a href="market.php" title="Marché">
                     <i class='bx bxs-store'></i>
                 </a>
             </div>
@@ -927,10 +927,10 @@ if (isset($_GET['to'])) {
                         <span class="notification-badge">0</span>
                     </a>
                 </div>
-                <a href="profile.php" title="Profile">
+                <a href="profile.php" title="Profil">
                     <i class='bx bxs-user'></i>
                 </a>
-                <a href="logout.php" title="Logout">
+                <a href="logout.php" title="Déconnexion">
                     <i class='bx bx-log-out'></i>
                 </a>
             </div>
@@ -940,13 +940,13 @@ if (isset($_GET['to'])) {
     <div class="layout-container">
         <!-- Left Section (Contacts) -->
         <div class="left-section">
-            <h1>Community </h1>
+            <h1>Communauté </h1>
             <div class="user-filter">
                 <select id="userFilter" class="filter-select">
-                    <option value="all">All Users</option>
-                    <option value="newest">Newest Users</option>
-                    <option value="oldest">Oldest Users</option>
-                    <option value="latest_messages">Latest Messages</option>
+                    <option value="all">Tous les utilisateurs</option>
+                    <option value="newest">Nouveaux utilisateurs</option>
+                    <option value="oldest">Anciens utilisateurs</option>
+                    <option value="latest_messages">Derniers messages</option>
                 </select>
             </div>
             <div class="contact-list" id="contactList">
@@ -957,14 +957,14 @@ if (isset($_GET['to'])) {
         <!-- Middle Section (Chat Area) -->
         <div class="middle-section">
             <div class="chat-header" id="chatHeader">
-                <h2>Select a contact to chat</h2>
+                <h2>Sélectionnez un contact pour discuter</h2>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will appear here -->
             </div>
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type a message..." disabled>
-                <button id="sendButton" disabled>Send</button>
+                <input type="text" id="messageInput" placeholder="Écrire un message..." disabled>
+                <button id="sendButton" disabled>Envoyer</button>
             </div>
         </div>
     </div>
@@ -983,7 +983,7 @@ if (isset($_GET['to'])) {
     
     <?php if ($item_details && $recipient): ?>
     // Pre-fill message with item details
-    const preFilledMessage = `Hello, I'm interested in your item: ${<?php echo json_encode($item_details['title']); ?>} (${<?php echo json_encode(number_format($item_details['price'], 2)); ?>} MAD). Could you please provide more details?`;
+    const preFilledMessage = `Bonjour, je suis intéressé par votre article : ${<?php echo json_encode($item_details['title']); ?>} (${<?php echo json_encode(number_format($item_details['price'], 2)); ?>} MAD). Pourriez-vous me fournir plus d'informations sur cet article ?`;
     <?php endif; ?>
 
     let lastMessageCount = 0; // Add this variable to track message count
@@ -999,7 +999,7 @@ if (isset($_GET['to'])) {
                 return;
             }
             if (!users.length) {
-                contactListEl.innerHTML = '<div style="padding:10px;">No users found.</div>';
+                contactListEl.innerHTML = '<div style="padding:10px;">Aucun utilisateur trouvé.</div>';
                 return;
             }
             users.forEach(user => {
@@ -1010,9 +1010,9 @@ if (isset($_GET['to'])) {
                     <img src="${user.profile_pic ? user.profile_pic + '?t=' + Date.now() : 'Images/profile.jpg'}" alt="Profile">
                     <div class="contact-info">
                         <h3>${escapeHtml(user.username)}${user.unread_count > 0 ? ` <span class="unread-badge">${user.unread_count}</span>` : ''}</h3>
-                        <p>${user.messages_received === 0 ? 'Start a new chat!' : 
+                        <p>${user.messages_received === 0 ? 'Démarrer une nouvelle discussion !':
                             (user.last_message_sender == loggedInUserId ? 
-                                `You: ${escapeHtml(user.last_message)}` : 
+                                `Vous: ${escapeHtml(user.last_message)}` : 
                                 escapeHtml(user.last_message))}</p>
                     </div>
                 `;
@@ -1076,7 +1076,7 @@ if (isset($_GET['to'])) {
                 const username = chatHeaderEl.querySelector('h2').textContent;
                 chatMessagesEl.innerHTML = `
                     <div class="welcome-message">
-                        Start a new conversation with <strong>${escapeHtml(username)}</strong>!
+                        Démarrez une nouvelle conversation avec <strong>${escapeHtml(username)}</strong> !
                     </div>`;
             } else {
                 messages.forEach(msg => {
@@ -1113,7 +1113,7 @@ if (isset($_GET['to'])) {
         yesterday.setDate(yesterday.getDate() - 1);
         
         // Format time as HH:MM AM/PM
-        const timeStr = date.toLocaleTimeString('en-US', { 
+        const timeStr = date.toLocaleTimeString('fr-FR', { 
             hour: 'numeric', 
             minute: '2-digit',
             hour12: true 
@@ -1126,15 +1126,15 @@ if (isset($_GET['to'])) {
         
         // Check if message is from yesterday
         if (date.toDateString() === yesterday.toDateString()) {
-            return `Yesterday at ${timeStr}`;
+            return `Hier à ${timeStr}`;
         }
         
         // For older messages, show full date and time
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString('fr-FR', {
             month: 'long',
             day: 'numeric',
             year: 'numeric'
-        }) + ` at ${timeStr}`;
+        }) + ` à ${timeStr}`;
     }
 
     // Send a message
@@ -1153,11 +1153,13 @@ if (isset($_GET['to'])) {
         })
         .then(res => res.json())
         .then(data => {
-            if (data.status === 'success') {
+            console.log('Server response:', data); // Log the server response
+            if (data.success === true) { // Changed condition to check for 'success' key
                 inputEl.value = '';
                 loadMessages();
+                updateNotificationCount(); // Call to update notification count
             } else {
-                showAlert('Failed to send message', 'error');
+                showAlert(data.error || 'Échec de l\'envoi du message', 'error'); // Display specific error if available
             }
         });
     }
@@ -1194,7 +1196,7 @@ if (isset($_GET['to'])) {
     document.addEventListener('DOMContentLoaded', function() {
         <?php if ($item_details): ?>
         // Pre-fill message with item details
-        const messageContent = `Hello,\n\nI'm interested in your item "${<?php echo json_encode($item_details['title']); ?>"}.\n\nItem Details:\n- Price: ${<?php echo json_encode(number_format($item_details['price'], 2)); ?>} MAD\n- Description: ${<?php echo json_encode($item_details['description']); ?>}\n\nCould you please provide more information about this item?`;
+        const messageContent = `Bonjour,\n\nJe suis intéressé par votre article "${<?php echo json_encode($item_details['title']); ?>"}.\n\nDétails de l'article:\n- Prix: ${<?php echo json_encode(number_format($item_details['price'], 2)); ?>} MAD\n- Description: ${<?php echo json_encode($item_details['description']); ?>}\n\nPourriez-vous me fournir plus d'informations sur cet article ?`;
         
         // Set the message content
         const messageInput = document.querySelector('.message-input');

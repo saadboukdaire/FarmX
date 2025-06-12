@@ -77,8 +77,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Handle file upload
-    if (isset($_FILES['profile-pic-upload']) && $_FILES['profile-pic-upload']['error'] === UPLOAD_ERR_OK) {
+    $profilePicUrl = null; // Default to null, will be updated if a new pic is uploaded or removed
+    $shouldUpdateProfilePic = false; // Flag to indicate if profile_pic column needs updating
+
+    // Handle file upload or removal
+    if (isset($_POST['remove_profile_pic']) && $_POST['remove_profile_pic'] === '1') {
+        // User explicitly wants to remove the profile picture or reset to default
+        $profilePicUrl = 'Images/profile.jpg'; // Set to default path
+        $shouldUpdateProfilePic = true;
+
+        // Optionally, delete the old profile picture file from the server if it's not the default
+        // First, fetch the current profile_pic path from the database
+        $currentProfilePicSql = "SELECT profile_pic FROM users WHERE id = ?";
+        $currentProfilePicStmt = $conn->prepare($currentProfilePicSql);
+        $currentProfilePicStmt->bind_param("i", $userId);
+        $currentProfilePicStmt->execute();
+        $currentProfilePicStmt->bind_result($oldProfilePic);
+        $currentProfilePicStmt->fetch();
+        $currentProfilePicStmt->close();
+
+        if ($oldProfilePic && $oldProfilePic !== 'Images/profile.jpg' && file_exists($oldProfilePic)) {
+            unlink($oldProfilePic); // Delete the old file
+        }
+
+    } else if (isset($_FILES['profile-pic-upload']) && $_FILES['profile-pic-upload']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/profile_pictures/'; // Updated path to profile pictures subfolder
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true); // Create the uploads directory if it doesn't exist
@@ -96,52 +118,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES['profile-pic-upload']['tmp_name'], $uploadFile)) {
                 // Store the relative path in the database
                 $profilePicUrl = $uploadFile; // Relative path for web access
+                $shouldUpdateProfilePic = true;
 
-                // Update the profile picture in the users table
-                $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, profile_pic = ?, bio = ?, gender = ? WHERE id = ?");
-                $stmt->bind_param("ssssssi", $username, $email, $phone, $profilePicUrl, $bio, $gender, $userId);
+                // Optionally, delete the old profile picture file from the server if it's not the default
+                $currentProfilePicSql = "SELECT profile_pic FROM users WHERE id = ?";
+                $currentProfilePicStmt = $conn->prepare($currentProfilePicSql);
+                $currentProfilePicStmt->bind_param("i", $userId);
+                $currentProfilePicStmt->execute();
+                $currentProfilePicStmt->bind_result($oldProfilePic);
+                $currentProfilePicStmt->fetch();
+                $currentProfilePicStmt->close();
 
-                if ($stmt->execute()) {
-                    // Update the profile picture in all the user's posts
-                    $updatePostsStmt = $conn->prepare("UPDATE posts SET profile_pic = ? WHERE user_id = ?");
-                    $updatePostsStmt->bind_param("si", $profilePicUrl, $userId);
-                    $updatePostsStmt->execute();
-                    $updatePostsStmt->close();
-
-                    // Update the session variable with the new profile picture URL
-                    $_SESSION['profile_pic'] = $profilePicUrl;
-
-                    // Redirect to profile.php after successful update
-                    header("Location: profile.php");
-                    exit();
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Database update failed']);
+                if ($oldProfilePic && $oldProfilePic !== 'Images/profile.jpg' && file_exists($oldProfilePic)) {
+                    unlink($oldProfilePic); // Delete the old file
                 }
-
-                $stmt->close();
             } else {
-                echo json_encode(['success' => false, 'message' => 'File upload failed']);
-                exit;
+                $errors[] = "File upload failed";
+                // Handle the error, perhaps redirect with an error message
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid file type or size']);
-            exit;
+            $errors[] = "Invalid file type or size";
+            // Handle the error
         }
-    } else {
-        // No new file uploaded, update other fields
-        $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, phone = ?, bio = ?, gender = ? WHERE id = ?");
-        $stmt->bind_param("sssssi", $username, $email, $phone, $bio, $gender, $userId);
 
-        if ($stmt->execute()) {
-            // Redirect to profile.php after successful update
-            header("Location: profile.php");
+        if (!empty($errors)) {
+            $_SESSION['profile_errors'] = $errors;
+            header("Location: edit_profile.php");
             exit();
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Database update failed']);
         }
-
-        $stmt->close();
     }
+
+    // Construct the SQL update query dynamically
+    $sqlFields = ['username = ?', 'email = ?', 'phone = ?', 'bio = ?', 'gender = ?'];
+    $bindTypes = "sssss";
+    $bindParams = [&$username, &$email, &$phone, &$bio, &$gender];
+
+    if ($shouldUpdateProfilePic) {
+        $sqlFields[] = 'profile_pic = ?';
+        $bindTypes .= "s";
+        $bindParams[] = &$profilePicUrl;
+    }
+
+    $sql = "UPDATE users SET " . implode(", ", $sqlFields) . " WHERE id = ?";
+    $bindTypes .= "i";
+    $bindParams[] = &$userId;
+
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
+
+    // Bind parameters dynamically
+    call_user_func_array([$stmt, 'bind_param'], array_merge([$bindTypes], $bindParams));
+
+    if ($stmt->execute()) {
+        // Update the session variable with the new profile picture URL if it was changed
+        if ($shouldUpdateProfilePic) {
+            $_SESSION['profile_pic'] = $profilePicUrl;
+
+            // Update the profile picture in all the user's posts only if profile_pic was changed
+            $updatePostsStmt = $conn->prepare("UPDATE posts SET profile_pic = ? WHERE user_id = ?");
+            $updatePostsStmt->bind_param("si", $profilePicUrl, $userId);
+            $updatePostsStmt->execute();
+            $updatePostsStmt->close();
+        }
+        header("Location: profile.php");
+        exit();
+    } else {
+        $errors[] = "Database update failed: " . $stmt->error; // Add more specific error
+        $_SESSION['profile_errors'] = $errors;
+        header("Location: edit_profile.php");
+        exit();
+    }
+
+    $stmt->close();
 }
 
 $conn->close();

@@ -42,7 +42,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Edit Profile</title>
+    <title>FarmX - Modifier le Profil</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -66,27 +66,28 @@ $conn->close();
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            padding: 15px;
-            overflow: hidden;
+            min-height: 90vh;
+            padding: 10px;
+            font-size: 15px;
+            position: relative;
         }
 
         /* Edit Profile Container */
         .profile-container {
-            max-width: 800px;
+            max-width: 950px;
             width: 100%;
-            padding: 20px;
+            padding: 20px 40px;
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 15px;
         }
 
         .profile-container h2 {
             grid-column: 1 / -1;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             border-bottom: 2px solid #3e8e41;
             text-align: center;
             color: white;
@@ -98,7 +99,7 @@ $conn->close();
             padding: 12px 0;
             background: linear-gradient(to right, #3e8e41, #2d682f);
             border-radius: 8px;
-            display: inline-block;
+            display: block;
             width: 100%;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -107,13 +108,13 @@ $conn->close();
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 10px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
         }
 
         .form-group.full-width {
@@ -121,24 +122,14 @@ $conn->close();
         }
 
         .profile-container textarea {
-            min-height: 80px;
-        }
-
-        .profile-container button[type="submit"],
-        .back-button {
-            grid-column: 1 / -1;
-            margin-top: 5px;
-        }
-
-        .back-button {
-            margin-top: 0;
+            min-height: 60px;
         }
 
         .profile-container label {
             font-size: 14px;
             color: #333;
             font-weight: 500;
-            margin-bottom: 3px;
+            margin-bottom: 0px;
         }
 
         .profile-container input[type="email"],
@@ -146,7 +137,7 @@ $conn->close();
         .profile-container input[type="text"],
         .profile-container input[type="file"] {
             width: 100%;
-            padding: 10px;
+            padding: 7px 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 14px;
@@ -163,71 +154,191 @@ $conn->close();
         }
 
         .profile-container button[type="submit"] {
-            padding: 10px 20px;
+            padding: 12px 25px;
             background-color: #3e8e41;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .profile-container button[type="submit"]:hover {
             background-color: #2d682f;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
         }
 
-        /* Back Button Styles */
-        .back-button {
-            width: 100%;
-            text-align: center;
+        /* New: Form Actions Layout */
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            grid-column: 1 / -1;
         }
 
-        .back-button a {
-            display: block;
-            width: 100%;
-            padding: 10px 20px;
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .form-actions button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 25px;
+            border-radius: 12px;
             font-size: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
-        .back-button a:hover {
-            background-color: #cc0000;
+        .form-actions button[type="submit"] {
+            background: linear-gradient(45deg, #4CAF50, #3e8e41);
+            border: none;
+        }
+
+        .form-actions button[type="submit"]:hover {
+            background: linear-gradient(45deg, #3e8e41, #2d682f);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* New: Back to Profile Link */
+        .back-to-profile-link {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4CAF50, #3e8e41);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .back-to-profile-link:hover {
+            background: linear-gradient(45deg, #3e8e41, #2d682f);
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-to-profile-link i {
+            font-size: 18px;
+        }
+
+        .form-actions .delete-account-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF4D4D);
+            border: none;
+        }
+
+        .form-actions .delete-account-btn:hover {
+            background: linear-gradient(45deg, #FF4D4D, #E60000);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         /* File Input Customization */
-        .profile-container input[type="file"] {
-            padding: 8px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            cursor: pointer;
+        .profile-pic-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
         }
 
-        .profile-container input[type="file"]::file-selector-button {
-            padding: 6px 12px;
-            background-color: #3e8e41;
+        .custom-file-upload {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #4CAF50, #3e8e41);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-file-upload i {
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        .custom-file-upload:hover {
+            background: linear-gradient(45deg, #3e8e41, #2d682f);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: #666;
+            flex-grow: 1;
+        }
+
+        .profile-pic-preview-wrapper {
+            position: relative;
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #3e8e41;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin-top: 10px;
+        }
+
+        .profile-pic-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .remove-profile-pic-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #ff4d4d;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 13px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .profile-container input[type="file"]::file-selector-button:hover {
-            background-color: #2d682f;
+        .remove-profile-pic-btn:hover {
+            background-color: #cc0000;
+            transform: scale(1.15);
         }
 
-        /* Bio Textarea Styles */
         .profile-container textarea {
             width: 100%;
             padding: 10px;
@@ -266,20 +377,125 @@ $conn->close();
 
         /* Character Count Styles */
         .char-count {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
             text-align: right;
-            margin-top: 3px;
+            margin-top: 2px;
         }
 
         @media (max-width: 768px) {
+            body {
+                font-size: 13px;
+                padding: 5px;
+            }
             .profile-container {
                 grid-template-columns: 1fr;
-                max-width: 450px;
+                max-width: 550px;
+                padding: 15px;
+                gap: 10px;
             }
 
             .profile-container form {
                 grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-actions button,
+            .form-actions .back-button-link {
+                min-width: unset;
+                width: 100%;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .back-to-profile-link {
+                top: 25px;
+                left: 10px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .back-to-profile-link i {
+                font-size: 17px;
+            }
+
+            .profile-container h2 {
+                padding: 8px 0;
+                font-size: 20px;
+            }
+
+            .custom-file-upload {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .custom-file-upload i {
+                font-size: 15px;
+            }
+
+            .profile-pic-preview-wrapper {
+                width: 120px;
+                height: 80px;
+            }
+
+            .remove-profile-pic-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 16px;
+            }
+
+            .phone-input-group {
+                gap: 5px;
+            }
+
+            .phone-prefix {
+                padding: 8px;
+                min-width: 50px;
+                font-size: 13px;
+            }
+
+            .phone-input {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .alert-content {
+                padding: 25px;
+            }
+
+            .alert-content p {
+                font-size: 15px;
+            }
+
+            .alert-content button {
+                padding: 10px 25px;
+                font-size: 15px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal-content h3 {
+                font-size: 18px;
+            }
+
+            .modal-content p {
+                font-size: 15px;
+            }
+
+            .modal-buttons button {
+                padding: 10px 25px;
+                font-size: 15px;
+            }
+
+            .password-modal input[type="password"] {
+                padding: 8px;
+                font-size: 15px;
             }
         }
 
@@ -340,7 +556,7 @@ $conn->close();
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
-                font-size: 14px;
+            font-size: 14px;
             color: #333;
             padding: 10px;
             transition: all 0.3s ease;
@@ -377,12 +593,12 @@ $conn->close();
         }
 
         .alert-content {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
             text-align: center;
-            max-width: 350px;
+            max-width: 400px;
             width: 90%;
             transform: scale(0.9);
             animation: scaleIn 0.3s ease forwards;
@@ -396,7 +612,7 @@ $conn->close();
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 6px;
             background: linear-gradient(90deg, #ff4d4d, #cc0000);
         }
 
@@ -414,24 +630,24 @@ $conn->close();
         }
 
         .alert-content button {
-            padding: 12px 30px;
+            padding: 14px 35px;
             background: linear-gradient(45deg, #ff4d4d, #cc0000);
             color: #fff;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            box-shadow: 0 5px 18px rgba(255, 77, 77, 0.4);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .alert-content button:hover {
             background: linear-gradient(45deg, #cc0000, #ff4d4d);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 77, 77, 0.5);
         }
 
         .alert-content button:active {
@@ -448,15 +664,148 @@ $conn->close();
         .error-alert .alert-content i {
             color: #ff4d4d;
         }
+
+        /* Custom Alert Modals */
+        .confirm-modal, .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-buttons .confirm-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF4D4D);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(255, 77, 77, 0.4);
+        }
+
+        .modal-buttons .confirm-btn:hover {
+            background: linear-gradient(45deg, #FF4D4D, #E60000);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 77, 77, 0.5);
+        }
+
+        .modal-buttons .cancel-btn {
+            background: linear-gradient(45deg, #b0b0b0, #9e9e9e);
+            color: #fff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-buttons .cancel-btn:hover {
+            background: linear-gradient(45deg, #9e9e9e, #8a8a8a);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .password-modal input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .password-modal input[type="password"]:focus {
+            border-color: #3e8e41;
+            box-shadow: 0 0 5px rgba(62, 142, 65, 0.3);
+        }
+
+        .password-modal .error-message {
+            color: #ff4d4d;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Overrides for custom alert to ensure it appears above modals */
+        .custom-alert {
+            z-index: 1002;
+        }
     </style>
 </head>
 <body>
+    <!-- Back to Profile Link -->
+    <a href="profile.php" class="back-to-profile-link">
+        <i class='bx bx-arrow-back'></i>
+        Retourner au profil
+    </a>
+
     <!-- Edit Profile Form -->
     <div class="profile-container">
-        <h2>Edit Profile</h2>
+        <h2>Modifier le Profil</h2>
         <?php if (isset($_SESSION['profile_errors']) && !empty($_SESSION['profile_errors'])): ?>
             <div class="server-error">
-                <strong>Please fix the following errors:</strong>
+                <strong>Veuillez corriger les erreurs suivantes:</strong>
                 <ul>
                     <?php foreach ($_SESSION['profile_errors'] as $error): ?>
                         <li><?php echo htmlspecialchars($error); ?></li>
@@ -467,66 +816,78 @@ $conn->close();
         <?php endif; ?>
         <form action="update_profile.php" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="username">Username:</label>
+                <label for="username">Nom d'utilisateur:</label>
                 <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" required 
                        pattern="^[a-zA-Z0-9_]{3,20}$" 
-                       title="Username must be 3-20 characters long and can only contain letters, numbers, and underscores">
-                <div class="error-message" id="username-error">Username must be 3-20 characters long and can only contain letters, numbers, and underscores</div>
+                       title="Le nom d'utilisateur doit comporter entre 3 et 20 caractères et ne peut contenir que des lettres, des chiffres et des underscores">
+                <div class="error-message" id="username-error">Le nom d'utilisateur doit comporter entre 3 et 20 caractères et ne peut contenir que des lettres, des chiffres et des underscores</div>
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required
                        pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$"
-                       title="Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)">
-                <div class="error-message" id="email-error">Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)</div>
+                       title="Veuillez entrer une adresse email valide avec un domaine pris en charge (gmail.com, yahoo.com, hotmail.com, outlook.com, ou icloud.com)">
+                <div class="error-message" id="email-error">Veuillez entrer une adresse email valide avec un domaine pris en charge (gmail.com, yahoo.com, hotmail.com, outlook.com, ou icloud.com)</div>
             </div>
 
             <div class="form-group">
-                <label for="phone">Phone Number:</label>
+                <label for="phone">Numéro de téléphone:</label>
                 <div class="phone-input-group">
                     <span class="phone-prefix">+212</span>
                     <input type="tel" id="phone" name="phone" class="phone-input" 
-                           placeholder="6XXXXXXXX or 7XXXXXXXX" 
+                           placeholder="6XXXXXXXX ou 7XXXXXXXX" 
                            value="<?php echo substr(htmlspecialchars($phone), -9); ?>" 
                            maxlength="9" 
                            pattern="^[67][0-9]{8}$"
-                           title="Please enter a valid Moroccan phone number starting with 6 or 7"
+                           title="Veuillez entrer un numéro de téléphone marocain valide commençant par 6 ou 7"
                            oninput="validatePhoneInput(this)">
             </div>
-                <div class="error-message" id="phone-error">Please enter a valid Moroccan phone number starting with 6 or 7</div>
+                <div class="error-message" id="phone-error">Veuillez entrer un numéro de téléphone marocain valide commençant par 6 ou 7</div>
             </div>
 
             <div class="form-group">
-                <label for="gender">Gender:</label>
+                <label for="gender">Sexe:</label>
                 <?php if (!empty($gender)): ?>
                     <input type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($gender); ?>" readonly>
                 <?php else: ?>
                     <select id="gender" name="gender">
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="">Sélectionnez le sexe</option>
+                        <option value="Male">Masculin</option>
+                        <option value="Female">Féminin</option>
                     </select>
                 <?php endif; ?>
             </div>
 
             <div class="form-group full-width">
-                <label for="profile-pic-upload">Profile Picture:</label>
-                <input type="file" id="profile-pic-upload" name="profile-pic-upload">
+                <label for="profile-pic-upload">Photo de profil:</label>
+                <div class="profile-pic-upload-container">
+                    <input type="file" id="profile-pic-upload" name="profile-pic-upload" accept="image/*" style="display: none;">
+                    <label for="profile-pic-upload" class="custom-file-upload">
+                        <i class='bx bx-upload'></i> Choisir un fichier
+                    </label>
+                    <span id="file-name" class="file-name">Aucun fichier choisi</span>
+                    <div class="profile-pic-preview-wrapper">
+                        <img id="profile-pic-preview" src="" alt="Aperçu de la photo de profil" class="profile-pic-preview" style="display: none;">
+                        <button type="button" id="remove-profile-pic" class="remove-profile-pic-btn" title="Supprimer la photo de profil" style="display: none;">
+                            <i class='bx bx-x'></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="remove-profile-pic-hidden" name="remove_profile_pic" value="0">
+                </div>
             </div>
 
             <div class="form-group full-width">
                 <label for="bio">Bio:</label>
-                <textarea id="bio" name="bio" maxlength="500" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio ?? ''); ?></textarea>
-                <div class="char-count"><span id="bio-char-count">0</span>/500 characters</div>
+                <textarea id="bio" name="bio" maxlength="500" placeholder="Parlez-nous de vous..."><?php echo htmlspecialchars($bio ?? ''); ?></textarea>
+                <div class="char-count"><span id="bio-char-count">0</span>/500 caractères</div>
             </div>
 
-            <button type="submit">Save Changes</button>
+            <div class="form-actions">
+                <button type="submit">Enregistrer les modifications</button>
+                <button type="button" id="delete-account-btn" class="delete-account-btn">Supprimer le compte</button>
+            </div>
         </form>
-        <!-- Back Button -->
-        <div class="back-button">
-            <a href="profile.php">Back to Profile</a>
-        </div>
     </div>
 
     <!-- Custom Alert Modal -->
@@ -535,6 +896,31 @@ $conn->close();
             <i class='bx bxs-error-circle'></i>
             <p id="alertMessage"></p>
             <button id="alertCloseButton">OK</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmDeleteModal" class="confirm-modal">
+        <div class="modal-content">
+            <h3>Confirmer la suppression du compte</h3>
+            <p>Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible.</p>
+            <div class="modal-buttons">
+                <button type="button" class="confirm-btn" id="confirm-delete-btn">Supprimer</button>
+                <button type="button" class="cancel-btn" id="cancel-delete-btn">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <h3>Veuillez entrer votre mot de passe</h3>
+            <input type="password" id="delete-password" placeholder="Votre mot de passe">
+            <div class="error-message" id="password-error"></div>
+            <div class="modal-buttons">
+                <button type="button" class="confirm-btn" id="submit-password-btn">Confirmer</button>
+                <button type="button" class="cancel-btn" id="cancel-password-btn">Annuler</button>
+            </div>
         </div>
     </div>
 
@@ -648,7 +1034,7 @@ $conn->close();
             const isPhoneValid = validatePhone();
             
             if (!isUsernameValid || !isEmailValid || !isPhoneValid) {
-                showAlert("Please fix the errors in the form before submitting.");
+                showAlert("Veuillez corriger les erreurs dans le formulaire avant de soumettre.");
                 return;
             }
             // Prepend '+212' to phone input value before submitting
@@ -672,7 +1058,7 @@ $conn->close();
             
             // Limit to 9 digits (6/7 + 8 digits)
             if (input.value.length > 9) {
-                input.value = input.value.slice(0, 9);
+                input.value.slice(0, 9);
             }
 
             // Validate the input
@@ -705,6 +1091,126 @@ $conn->close();
             if (phoneInput) {
                 validatePhoneInput(phoneInput);
             }
+
+            // Profile Picture Upload UI Logic
+            const profilePicUpload = document.getElementById('profile-pic-upload');
+            const fileNameSpan = document.getElementById('file-name');
+            const profilePicPreview = document.getElementById('profile-pic-preview');
+            const removeProfilePicBtn = document.getElementById('remove-profile-pic');
+            const removeProfilePicHidden = document.getElementById('remove-profile-pic-hidden');
+            const defaultProfilePicPath = 'Images/profile.jpg'; // Define default path
+
+            // Set initial preview if profilePic exists from PHP
+            const initialProfilePic = "<?php echo htmlspecialchars($profilePic); ?>";
+            if (initialProfilePic && initialProfilePic !== defaultProfilePicPath) { // Check if it's not the default path
+                profilePicPreview.src = initialProfilePic + '?t=' + new Date().getTime(); // Add timestamp to bypass cache
+                profilePicPreview.style.display = 'block';
+                removeProfilePicBtn.style.display = 'flex'; // Use flex for center alignment
+                fileNameSpan.textContent = 'Fichier actuel';
+            } else {
+                // If no initial profile pic or it's the default, show default
+                profilePicPreview.src = defaultProfilePicPath;
+                profilePicPreview.style.display = 'block';
+                removeProfilePicBtn.style.display = 'none'; // Hide remove button for default
+            }
+
+            profilePicUpload.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profilePicPreview.src = e.target.result;
+                        profilePicPreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+
+                    fileNameSpan.textContent = this.files[0].name;
+                    removeProfilePicBtn.style.display = 'flex'; // Show remove button
+                    removeProfilePicHidden.value = '0'; // Indicate not removing current pic
+                } else {
+                    // If file input is cleared without selecting a new file
+                    profilePicPreview.src = defaultProfilePicPath;
+                    profilePicPreview.style.display = 'block';
+                    fileNameSpan.textContent = 'Aucun fichier choisi';
+                    removeProfilePicBtn.style.display = 'none'; // Hide remove button
+                    removeProfilePicHidden.value = '1'; // Indicate removing current pic
+                }
+            });
+
+            removeProfilePicBtn.addEventListener('click', function() {
+                profilePicUpload.value = ''; // Clear the file input
+                profilePicPreview.src = defaultProfilePicPath;
+                profilePicPreview.style.display = 'block';
+                fileNameSpan.textContent = 'Aucun fichier choisi';
+                removeProfilePicBtn.style.display = 'none';
+                removeProfilePicHidden.value = '1'; // Signal to PHP to remove the picture
+            });
+
+            // Account Deletion Modals Logic
+            const deleteAccountBtn = document.getElementById('delete-account-btn');
+            const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const passwordModal = document.getElementById('passwordModal');
+            const deletePasswordInput = document.getElementById('delete-password');
+            const passwordError = document.getElementById('password-error');
+            const submitPasswordBtn = document.getElementById('submit-password-btn');
+            const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+
+            deleteAccountBtn.addEventListener('click', function() {
+                confirmDeleteModal.style.display = 'flex';
+            });
+
+            cancelDeleteBtn.addEventListener('click', function() {
+                confirmDeleteModal.style.display = 'none';
+            });
+
+            confirmDeleteBtn.addEventListener('click', function() {
+                confirmDeleteModal.style.display = 'none';
+                passwordModal.style.display = 'flex';
+                deletePasswordInput.value = ''; // Clear password input
+                passwordError.style.display = 'none'; // Hide any previous errors
+            });
+
+            cancelPasswordBtn.addEventListener('click', function() {
+                passwordModal.style.display = 'none';
+            });
+
+            submitPasswordBtn.addEventListener('click', function() {
+                const password = deletePasswordInput.value;
+                if (password.length === 0) {
+                    passwordError.textContent = 'Veuillez entrer votre mot de passe.';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+
+                // Send password to server for verification and account deletion
+                fetch('delete_account.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `password=${encodeURIComponent(password)}`,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Account deleted successfully
+                        passwordModal.style.display = 'none';
+                        // Use localStorage to pass success message to index.php
+                        localStorage.setItem('accountDeleted', 'Votre compte a été supprimé avec succès.');
+                        window.location.href = 'index.php';
+                    } else {
+                        // Password incorrect or other error
+                        passwordError.textContent = data.message || 'Erreur lors de la suppression du compte.';
+                        passwordError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    passwordError.textContent = 'Une erreur est survenue lors de la communication avec le serveur.';
+                    passwordError.style.display = 'block';
+                });
+            });
         });
     </script>
 </body>

@@ -48,11 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         } else {
             // Password is incorrect
-            $_SESSION['login_error'] = "Incorrect password.";
+            $_SESSION['login_error'] = "Nom d'utilisateur ou mot de passe incorrects.";
         }
     } else {
         // User not found
-        $_SESSION['login_error'] = "Username or email not found.";
+        $_SESSION['login_error'] = "Nom d'utilisateur ou mot de passe incorrects.";
     }
 
     $stmt->close();
@@ -60,14 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 
-// Store registration success message if it exists
-$success_message = '';
-if (isset($_SESSION['registration_success'])) {
-    $username = isset($_SESSION['registered_username']) ? $_SESSION['registered_username'] : '';
-    $success_message = "Welcome " . htmlspecialchars($username) . "! Your account has been created successfully. You can now log in with your credentials.";
-    unset($_SESSION['registration_success']);
-    unset($_SESSION['registered_username']);
-}
 ?>
 <!DOCTYPE html>
 <html>
@@ -101,6 +93,7 @@ if (isset($_SESSION['registration_success'])) {
       border-radius: 16px;
       padding: 35px 45px;
       animation: fadeIn 0.8s ease-in-out;
+      transform: translateX(5px);
     }
     .wrapper h1 {
       font-size: 28px;
@@ -186,11 +179,13 @@ if (isset($_SESSION['registration_success'])) {
     .register-link p a:hover {
       color: #45a049;
       text-decoration: underline;
+      text-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
     }
     img {
       display: block;
       margin: 0 auto 20px;
       height: 100px;
+      transform: translateX(10px);
     }
     @keyframes fadeIn {
       from {
@@ -212,6 +207,7 @@ if (isset($_SESSION['registration_success'])) {
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -249,165 +245,153 @@ if (isset($_SESSION['registration_success'])) {
 
     .alert-content p {
       font-size: 18px;
+      margin: 20px 0;
       color: #333;
-      margin-bottom: 20px;
       line-height: 1.5;
     }
 
-    .alert-content .icon {
-      font-size: 50px;
-      margin-bottom: 15px;
-    }
-
-    .alert-content .bx-check-circle {
-      color: #4CAF50;
-    }
-
-    .alert-content .bx-error-circle {
-      color: #f44336;
-    }
-
     .alert-content button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px 25px;
+      padding: 12px 30px;
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: #fff;
       border: none;
-      border-radius: 30px;
+      border-radius: 25px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .alert-content button:hover {
-      background-color: #45a049;
+      background: linear-gradient(45deg, #45a049, #4CAF50);
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
 
     .alert-content button:active {
       transform: translateY(0);
     }
 
-    .custom-alert.show {
-      display: flex;
+    .alert-content i {
+      font-size: 50px;
+      margin-bottom: 20px;
+      display: block;
     }
 
-    .custom-alert.success .alert-content::before {
-      background: linear-gradient(90deg, #4CAF50, #45a049);
+    /* New: Success Alert Style */
+    .success-alert .alert-content::before {
+      background: linear-gradient(90deg, #4CAF50, #45a049); /* Green gradient for success */
     }
 
-    .custom-alert.error .alert-content::before {
-      background: linear-gradient(90deg, #f44336, #d32f2f);
+    .success-alert .alert-content i {
+      color: #4CAF50; /* Green icon */
     }
 
-    .custom-alert.success .icon {
-      color: #4CAF50;
+    .success-alert .alert-content button {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     }
 
-    .custom-alert.error .icon {
-      color: #f44336;
-    }
-
-    /* Login Error Message Styles */
-    .error-message {
-      color: #ff6347; /* Tomato */
-      background-color: rgba(255, 99, 71, 0.1);
-      border: 1px solid #ff6347;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 14px;
-      text-align: center;
-      animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .success-alert .alert-content button:hover {
+      background: linear-gradient(45deg, #45a049, #4CAF50);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
     }
 
   </style>
 </head>
 <body>
-  <div class="custom-alert" id="customAlertBox">
+  <div class="wrapper">
+    <?php /* if (isset($_SESSION['login_error'])): ?>
+      <div style="color: red; text-align: center; margin-bottom: 10px;"><?= htmlspecialchars($_SESSION['login_error']); ?></div>
+      <?php unset($_SESSION['login_error']); ?>
+    <?php endif; */ ?>
+  
+      <form action="index.php" method="POST">
+        <img src="Images/logoinv.png" alt="Logo">
+        <h1>Login</h1>
+        <div class="input-box">
+          <input type="text" name="username_or_email" placeholder="Nom d'utilisateur ou E-mail" required>
+          <i class='bx bxs-user'></i>
+        </div>
+        <div class="input-box">
+          <input type="password" name="password" placeholder="Mot de passe" required>
+          <i class='bx bxs-lock-alt'></i>
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+        <div class="register-link">
+          <p>Vous n'avez pas de compte ? <a href="signup.php">S'inscrire</a></p>
+        </div>
+      </form>
+    </div>
+
+  <!-- Custom Alert Modal -->
+  <div id="customAlert" class="custom-alert">
     <div class="alert-content">
-      <i class="icon bx" id="alertIcon"></i>
-      <p id="customAlertMessage"></p>
+      <i class='bx bxs-error-circle'></i> <!-- Default to error icon -->
+      <p id="alertMessage"></p>
       <button id="alertCloseButton">OK</button>
     </div>
   </div>
 
-  <div class="wrapper">
-    <form action="" method="POST">
-      <img src="Images/logoinv.png" height="100px">
-      <h1>Welcome back!</h1>
-      <div class="input-box">
-        <input type="text" name="username_or_email" placeholder="Username or Email" required>
-        <i class='bx bxs-user'></i>
-      </div>
-      <div class="input-box">
-        <input type="password" name="password" placeholder="Password" required>
-        <i class='bx bxs-lock-alt'></i>
-      </div>
-      <button type="submit" class="btn">Login</button>
-      <div class="register-link">
-        <p><span>Don't have an account?</span> <a href="signup.php">Register</a></p>
-      </div>
-    </form>
-  </div>
-
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        <?php if (!empty($success_message)): ?>
-            showCustomAlert("<?php echo $success_message; ?>", true);
-        <?php endif; ?>
+    // Function to show custom alert
+    function showAlert(message, type = 'error') {
+      const alertModal = document.getElementById("customAlert");
+      const alertMessage = document.getElementById("alertMessage");
+      const alertIcon = alertModal.querySelector('i');
+      
+      // Remove existing classes
+      alertModal.classList.remove('success-alert', 'error-alert');
+      // Add appropriate class
+      alertModal.classList.add(type + '-alert');
+      
+      // Update icon based on type
+      alertIcon.className = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+      
+      alertMessage.textContent = message;
+      alertModal.style.display = "flex";
 
-        // Automatically hide success message after 5 seconds
-        if (<?php echo json_encode(!empty($success_message)); ?>) {
-            setTimeout(function() {
-                hideCustomAlert();
-            }, 5000);
-        }
-    });
+      const closeButton = document.getElementById("alertCloseButton");
+      closeButton.onclick = function() {
+        alertModal.style.display = "none";
+      };
 
-    function showCustomAlert(message, isSuccess) {
-        var alertBox = document.getElementById("customAlertBox");
-        var alertMessage = document.getElementById("customAlertMessage");
-        alertMessage.innerHTML = message;
-        if (isSuccess) {
-            alertBox.classList.remove('error');
-            alertBox.classList.add('success');
-        } else {
-            alertBox.classList.remove('success');
-            alertBox.classList.add('error');
+      alertModal.onclick = function(event) {
+        if (event.target === alertModal) {
+          alertModal.style.display = "none";
         }
-        alertBox.style.display = "flex";
-        setTimeout(function() {
-            alertBox.classList.add('show');
-        }, 10);
+      };
     }
 
-    function hideCustomAlert() {
-        var alertBox = document.getElementById("customAlertBox");
-        alertBox.classList.remove('show');
-        setTimeout(function() {
-            alertBox.style.display = "none";
-        }, 300); // Match CSS transition duration
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOMContentLoaded fired in index.php');
+      <?php
+      if (isset($_SESSION['registration_success'])) {
+          $username = isset($_SESSION['registered_username']) ? $_SESSION['registered_username'] : '';
+          $success_message = "Bienvenue " . htmlspecialchars($username) . "! Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter avec vos identifiants.";
+          echo "console.log('Attempting to show success alert with message: ' + " . json_encode($success_message) . ");";
+          echo "showAlert(" . json_encode($success_message) . ", 'success');";
+          unset($_SESSION['registration_success']);
+          unset($_SESSION['registered_username']);
+      }
+      ?>
 
-    // Hide error message after 5 seconds if it exists
-    <?php if (isset($_SESSION['login_error'])): ?>
-        document.addEventListener("DOMContentLoaded", function() {
-            showCustomAlert("<?php echo htmlspecialchars($_SESSION['login_error']); ?>", false);
-            setTimeout(hideCustomAlert, 5000);
-        });
+      <?php if (isset($_SESSION['login_error'])): ?>
+        showAlert(<?= json_encode($_SESSION['login_error']); ?>, 'error');
         <?php unset($_SESSION['login_error']); ?>
-    <?php endif; ?>
+      <?php endif; ?>
+
+      // Check for account deletion success message from localStorage
+      const accountDeletedMessage = localStorage.getItem('accountDeleted');
+      if (accountDeletedMessage) {
+        showAlert(accountDeletedMessage, 'success');
+        localStorage.removeItem('accountDeleted'); // Clear the message after displaying
+      }
+    });
   </script>
 </body>
 </html>

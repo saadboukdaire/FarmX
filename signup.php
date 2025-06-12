@@ -54,14 +54,14 @@ require_once 'database/db_connect.php';
       border: 2px solid rgba(255, 255, 255, .1);
       color: #fff;
       border-radius: 16px;
-      padding: 35px 45px;
+      padding: 25px 45px;
       animation: fadeIn 0.8s ease-in-out;
     }
 
     .wrapper h1 {
       font-size: 28px;
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 40px;
       background: linear-gradient(45deg, #4CAF50, #45a049);
       -webkit-background-clip: text;
       background-clip: text;
@@ -72,7 +72,7 @@ require_once 'database/db_connect.php';
       position: relative;
       width: 100%;
       height: 45px;
-      margin: 12px 0;
+      margin: 8px 0;
     }
 
     .input-box input {
@@ -116,7 +116,7 @@ require_once 'database/db_connect.php';
       position: relative;
       width: 100%;
       height: 45px;
-      margin: 15px 0;
+      margin: 10px 0;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -172,7 +172,7 @@ require_once 'database/db_connect.php';
     }
 
     .user-type-selection {
-      margin: 12px 0;
+      margin: 8px 0;
       color: #fff;
     }
 
@@ -237,7 +237,7 @@ require_once 'database/db_connect.php';
       font-size: 16px;
       color: #fff;
       font-weight: 600;
-      margin: 15px 0;
+      margin: 5px 0;
       transition: all 0.3s ease;
     }
 
@@ -249,23 +249,63 @@ require_once 'database/db_connect.php';
 
     .wrapper .btn:active {
       transform: translateY(0);
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
     }
 
     .wrapper .register-link {
       font-size: 14px;
       text-align: center;
-      margin: 12px 0 5px;
+      margin-top: 20px;
     }
 
     .register-link p a {
       color: #4CAF50;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.3s ease;
     }
 
     .register-link p a:hover {
-      color: #45a049;
+      text-decoration: underline;
+      text-shadow: 0 0 8px rgba(76, 175, 80, 0.8);
+    }
+
+    /* Added styles for terms checkbox */
+    .terms-conditions {
+      display: flex;
+      align-items: center;
+      margin: 15px 0 5px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, .1);
+      border-radius: 40px;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .terms-conditions:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .terms-conditions input[type="checkbox"] {
+      margin-right: 10px;
+      accent-color: #4CAF50;
+    }
+
+    .terms-conditions label {
+      color: #fff;
+      user-select: none;
+    }
+
+    .terms-conditions label a {
+      color: #4CAF50;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .terms-conditions label a:hover {
+      color: #6dcf71;
       text-decoration: underline;
     }
 
@@ -315,8 +355,8 @@ require_once 'database/db_connect.php';
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
+      /* background-color: rgba(0, 0, 0, 0.8); */
+      /* backdrop-filter: blur(5px); */
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -412,62 +452,69 @@ require_once 'database/db_connect.php';
 </head>
 <body>
   <div class="wrapper">
-    <form id="signupForm" action="signup.php" method="POST">
-      <h1 data-translate="create_account">Create Account</h1>
+    <?php if (isset($error_message)): ?>
+      <div style="color: red; text-align: center; margin-bottom: 10px;"><?php echo $error_message; ?></div>
+    <?php endif; ?>
+    <form action="" method="post" id="signupForm">
+      <h1 data-translate="create_account">Créer un compte</h1>
       <div class="input-box">
-        <input type="text" name="username" id="username" data-translate="username_placeholder" placeholder="Username" required>
+        <input type="text" name="username" id="username" data-translate="username_placeholder" placeholder="Nom d'utilisateur" required>
         <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
         <input type="email" name="email" id="email" data-translate="email_placeholder" placeholder="E-mail" required
                pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$"
-               title="Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)">
+               title="Veuillez entrer une adresse e-mail valide avec un domaine pris en charge (gmail.com, yahoo.com, hotmail.com, outlook.com, ou icloud.com)">
         <i class='bx bxs-envelope'></i>
       </div>
       <div class="phone-input-group">
         <span class="phone-prefix">+212</span>
-        <input type="tel" id="phone" name="phone" class="phone-input" data-translate="phone_placeholder" placeholder="6XXXXXXXX or 7XXXXXXXX" 
+        <input type="tel" id="phone" name="phone" class="phone-input" data-translate="phone_placeholder" placeholder="6XXXXXXXX ou 7XXXXXXXX" 
                pattern="^[67][0-9]{8}$"
-               title="Please enter a valid Moroccan phone number starting with 6 or 7"
+               title="Veuillez entrer un numéro de téléphone marocain valide commençant par 6 ou 7"
                required>
         <i class='bx bxs-phone'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="password" id="password" data-translate="password_placeholder" placeholder="Password" required>
+        <input type="password" name="password" id="password" data-translate="password_placeholder" placeholder="Mot de passe" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
       <div class="input-box">
-        <input type="password" name="confirm_password" id="confirm_password" data-translate="confirm_password_placeholder" placeholder="Confirm password" required>
+        <input type="password" name="confirm_password" id="confirm_password" data-translate="confirm_password_placeholder" placeholder="Confirmer le mot de passe" required>
         <i class='bx bxs-lock-alt'></i>
       </div>
 
       <!-- User type selection -->
       <div class="user-type-selection">
-        <label class="user-type-label" data-translate="account_type_label">Account Type:</label>
+        <label class="user-type-label">Type de compte :</label>
         <div class="radio-group">
-          <input type="radio" id="farmer" name="user_type" value="farmer" required>
-          <label for="farmer" data-translate="farmer_label"> Farmer</label>
-
-          <input type="radio" id="user" name="user_type" value="user" required>
-          <label for="user" data-translate="consumer_label"> Consumer</label>
+          <input type="radio" id="farmer" name="user_type" value="farmer">
+          <label for="farmer">Agriculteur</label>
+          <input type="radio" id="delivery_person" name="user_type" value="consommateur">
+          <label for="delivery_person">Consommateur</label>
         </div>
       </div>
 
       <!-- Gender selection -->
       <div class="user-type-selection optional-field">
-        <label class="user-type-label" data-translate="gender_label">Gender (Optional):</label>
+        <label class="user-type-label" data-translate="gender_label">Sexe (Facultatif) :</label>
         <div class="radio-group">
           <input type="radio" id="male" name="gender" value="male">
-          <label for="male"><i class='bx bxs-male-sign'></i> <span data-translate="male_label">Male</span></label>
+          <label for="male"><i class='bx bxs-male-sign'></i> <span data-translate="male_label">Homme</span></label>
 
           <input type="radio" id="female" name="gender" value="female">
-          <label for="female"><i class='bx bxs-female-sign'></i> <span data-translate="female_label">Female</span></label>
+          <label for="female"><i class='bx bxs-female-sign'></i> <span data-translate="female_label">Femme</span></label>
         </div>
       </div>
 
-      <button type="submit" class="btn" data-translate="register">Register</button>
+      <div class="terms-conditions">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">J'accepte la <a href="politique_de_confidentialite.php" id="termsLink">Politique de Confidentialité</a></label>
+      </div>
+
+      <button type="submit" class="btn" data-translate="register">S'inscrire</button>
       <div class="register-link">
-        <p><span data-translate="have_account">Already have an account?</span> <a href="index.php" data-translate="login">Login</a></p>
+        <p><span data-translate="have_account">Vous avez déjà un compte ?</span> <a href="index.php" data-translate="login">Se connecter</a></p>
       </div>
     </form>
   </div>
@@ -554,40 +601,40 @@ require_once 'database/db_connect.php';
 
       // Validate user type selection
       if (!userType) {
-        showAlert("Please select an account type (Farmer or Regular User)", 'error');
+        showAlert("Veuillez sélectionner un type de compte (Agriculteur ou Consommateur). Si vous êtes un agriculteur, choisissez 'Agriculteur'; si vous êtes un utilisateur normal, choisissez 'Consommateur'.", 'error');
         return;
       }
 
       // Validate username (only letters, numbers, and common characters)
       const usernameRegex = /^[a-zA-Z0-9._-]+$/;
       if (!usernameRegex.test(username)) {
-        showAlert("Username can only contain:\n• Letters (a-z, A-Z)\n• Numbers (0-9)\n• Dots (.)\n• Underscores (_)\n• Hyphens (-)", 'error');
+        showAlert("Le nom d'utilisateur ne peut contenir que:\n• Lettres (a-z, A-Z)\n• Chiffres (0-9)\n• Points (.)\n• Tirets bas (_)\n• Tirets (-)", 'error');
         return;
       }
 
       // Email validation
       const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|icloud\.com)$/;
       if (!emailPattern.test(email)) {
-        showAlert("Please enter a valid email address with a supported domain (gmail.com, yahoo.com, hotmail.com, outlook.com, or icloud.com)", 'error');
+        showAlert("Veuillez entrer une adresse e-mail valide avec un domaine pris en charge (gmail.com, yahoo.com, hotmail.com, outlook.com, ou icloud.com)", 'error');
         return;
       }
 
       // Phone validation
       const phonePattern = /^[67][0-9]{8}$/;
       if (!phonePattern.test(phone)) {
-        showAlert("Please enter a valid Moroccan phone number starting with 6 or 7 followed by 8 digits", 'error');
+        showAlert("Veuillez entrer un numéro de téléphone marocain valide commençant par 6 ou 7 suivi de 8 chiffres", 'error');
         return;
       }
 
       // Validate password length
       if (password.length < 8) {
-        showAlert("Password must be at least 8 characters long", 'error');
+        showAlert("Le mot de passe doit contenir au moins 8 caractères", 'error');
         return;
       }
 
       // Validate password match
       if (password !== confirmPassword) {
-        showAlert("Passwords do not match", 'error');
+        showAlert("Les mots de passe ne correspondent pas", 'error');
         return;
       }
 
@@ -621,6 +668,20 @@ require_once 'database/db_connect.php';
         errorMessage.textContent = '';
       }
     });
+
+    // Translate button text if translation.js is available
+    if (typeof setInitialLanguage === 'function') {
+      setInitialLanguage();
+    }
+
+    // Handle click on terms and conditions link
+    const termsLink = document.getElementById('termsLink');
+    if (termsLink) {
+      termsLink.addEventListener('click', function(e) {
+        // No need for preventDefault or alert here, as the link will now navigate to the new page.
+        // The browser will handle the navigation to 'politique_de_confidentialite.php'
+      });
+    }
   </script>
 
   <?php
@@ -650,13 +711,13 @@ require_once 'database/db_connect.php';
     $user_type = $_POST['user_type'] ?? '';
 
     // Basic server-side validation for user type
-    if (!in_array($user_type, ['farmer', 'user'])) {
-      echo "<script>showAlert('Invalid account type selected', 'error');</script>";
+    if (!in_array($user_type, ['farmer', 'consommateur'])) {
+      echo "<script>showAlert('Type de compte invalide sélectionné', 'error');</script>";
       exit();
     }
 
     // Set user tag based on user type
-    $user_tag = ($user_type === 'farmer') ? 'FarmX Producer' : 'FarmX Member';
+    $user_tag = ($user_type === 'farmer') ? 'Producteur FarmX' : 'Membre FarmX';
 
     // Check for duplicate username
     $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
@@ -664,7 +725,7 @@ require_once 'database/db_connect.php';
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
-      echo "<script>showAlert('Username already exists', 'error');</script>";
+      echo "<script>showAlert('Nom d\'utilisateur déjà existant', 'error');</script>";
       exit();
     }
     $stmt->close();
@@ -675,7 +736,7 @@ require_once 'database/db_connect.php';
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
-      echo "<script>showAlert('Email already exists', 'error');</script>";
+      echo "<script>showAlert('L\'e-mail existe déjà', 'error');</script>";
       exit();
     }
     $stmt->close();
@@ -686,7 +747,7 @@ require_once 'database/db_connect.php';
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
-      echo "<script>showAlert('Phone number already exists', 'error');</script>";
+      echo "<script>showAlert('Le numéro de téléphone existe déjà', 'error');</script>";
       exit();
     }
     $stmt->close();
@@ -706,7 +767,7 @@ require_once 'database/db_connect.php';
       $_SESSION['user_tag'] = $user_tag;
       echo "<script>window.location.href = 'index.php';</script>";
     } else {
-      echo "<script>showAlert('Error creating account: " . $stmt->error . "', 'error');</script>";
+      echo "<script>showAlert('Erreur lors de la création du compte : " . $stmt->error . "', 'error');</script>";
     }
 
     $stmt->close();

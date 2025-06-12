@@ -471,13 +471,6 @@ $current_username = $user['username'];
             gap: 5px;
         }
 
-        .product-info .price::before {
-            content: 'MAD';
-            font-size: 14px;
-            color: #666;
-            font-weight: normal;
-        }
-
         .product-info .category {
             font-size: 14px;
             color: #555;
@@ -893,26 +886,26 @@ $current_username = $user['username'];
         <div class="search-filter-section">
             <form id="searchForm" method="GET" class="search-filter-form">
                 <div class="marketplace-filter-search-bar">
-                    <input type="text" id="searchInput" name="search" placeholder="Search products..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" id="searchInput" name="search" placeholder="Rechercher des produits..." value="<?php echo htmlspecialchars($search); ?>">
                     <i class='bx bx-search-alt-2'></i>
                 </div>
                 <div class="filter-section">
                     <select id="categoryFilter" name="category">
-                        <option value="">All Categories</option>
-                        <option value="vegetables" <?php echo $category === 'vegetables' ? 'selected' : ''; ?>>Vegetables</option>
+                        <option value="">Toutes catégories</option>
+                        <option value="vegetables" <?php echo $category === 'vegetables' ? 'selected' : ''; ?>>Légumes</option>
                         <option value="fruits" <?php echo $category === 'fruits' ? 'selected' : ''; ?>>Fruits</option>
-                        <option value="dairy" <?php echo $category === 'dairy' ? 'selected' : ''; ?>>Dairy Products</option>
-                        <option value="meat" <?php echo $category === 'meat' ? 'selected' : ''; ?>>Meat & Poultry</option>
-                        <option value="honey" <?php echo $category === 'honey' ? 'selected' : ''; ?>>Honey & Bee Products</option>
-                        <option value="grains" <?php echo $category === 'grains' ? 'selected' : ''; ?>>Grains & Cereals</option>
-                        <option value="other" <?php echo $category === 'other' ? 'selected' : ''; ?>>Other</option>
+                        <option value="dairy" <?php echo $category === 'dairy' ? 'selected' : ''; ?>>Produits Laitiers</option>
+                        <option value="meat" <?php echo $category === 'meat' ? 'selected' : ''; ?>>Viande & Volaille</option>
+                        <option value="honey" <?php echo $category === 'honey' ? 'selected' : ''; ?>>Miel & Produits Apicoles</option>
+                        <option value="grains" <?php echo $category === 'grains' ? 'selected' : ''; ?>>Céréales</option>
+                        <option value="other" <?php echo $category === 'other' ? 'selected' : ''; ?>>Autre</option>
                     </select>
                     <button type="submit" class="search-button">
-                        <i class='bx bx-search'></i> Search
+                        <i class='bx bx-search'></i> Rechercher
                     </button>
-                    <?php if (isset($_SESSION['user_tag']) && $_SESSION['user_tag'] === 'FarmX Producer'): ?>
+                    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer'): ?>
                     <button type="button" onclick="window.location.href='add_product.php'" class="add-product-btn">
-                        <i class='bx bx-plus'></i> Add Product
+                        <i class='bx bx-plus'></i> Ajouter Produit
                     </button>
                     <?php endif; ?>
                 </div>
@@ -931,34 +924,34 @@ $current_username = $user['username'];
         <!-- Product List -->
         <div class="product-grid">
             <?php if (empty($products)): ?>
-                <p>No products available yet. Be the first to list something!</p>
+                <p>Aucun produit disponible pour le moment. Soyez le premier à ajouter un produit !</p>
             <?php else: ?>
                 <?php foreach ($products as $product): ?>
                     <div class="product-card" data-category="<?php echo htmlspecialchars($product['category']); ?>" data-product-id="<?php echo $product['id']; ?>">
                         <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                         <div class="product-info">
                             <h3><?php echo htmlspecialchars($product['title']); ?></h3>
-                            <p class="price">$<?php echo number_format($product['price'], 2); ?></p>
-                            <p class="category">Category: <?php echo htmlspecialchars(ucfirst($product['category'])); ?></p>
+                            <p class="price"><?php echo number_format($product['price'], 2); ?> MAD</p>
+                            <p class="category">Catégorie: <?php echo htmlspecialchars(ucfirst($product['category'])); ?></p>
                             <p class="description"><?php echo htmlspecialchars($product['description']); ?></p>
-                            <p class="seller">Seller: <?php echo htmlspecialchars($product['username']); ?></p>
-                            <p class="posted-time">Posted: <?php echo date('Y-m-d H:i', strtotime($product['created_at'])); ?></p>
+                            <p class="seller">Vendeur: <?php echo htmlspecialchars($product['username']); ?></p>
+                            <p class="posted-time">Publié: <?php echo date('Y-m-d H:i', strtotime($product['created_at'])); ?></p>
                             <?php if ($product['seller_id'] == $_SESSION['user_id']): ?>
                                 <div class="product-actions">
                                     <button onclick="editProduct(<?php echo $product['id']; ?>)" class="edit-btn">
-                                        <i class='bx bx-edit'></i> Edit Product
+                                        <i class='bx bx-edit'></i> Modifier Produit
                                     </button>
                                     <button onclick="deleteProduct(<?php echo $product['id']; ?>)" class="delete-btn">
-                                        <i class='bx bx-trash'></i> Delete Product
+                                        <i class='bx bx-trash'></i> Supprimer Produit
                                     </button>
                                 </div>
                             <?php else: ?>
                                 <div class="product-actions">
                                     <a href="view_item.php?id=<?php echo $product['id']; ?>" class="view-btn">
-                                        <i class='bx bx-show'></i> View Details
+                                        <i class='bx bx-show'></i> Voir Détails
                                     </a>
                                     <button onclick="contactSeller(<?php echo $product['seller_id']; ?>, <?php echo $product['id']; ?>)" class="contact-btn">
-                                        <i class='bx bx-message-square-dots'></i> Contact
+                                        <i class='bx bx-message-square-dots'></i> Contacter
                                     </button>
                                 </div>
                             <?php endif; ?>
@@ -1024,16 +1017,16 @@ $current_username = $user['username'];
         .then(response => {
             if (response.success) {
                 if (response.message === 'Message already sent') {
-                    showPopup('Seller already notified about your interest.');
+                    showPopup('Vendeur déjà informé de votre intérêt.');
                 } else {
-                    showPopup('Seller has been notified about your interest.');
+                    showPopup('Le vendeur a été informé de votre intérêt.');
                 }
             } else {
-                showPopup('Failed to notify seller: ' + (response.error || 'Unknown error'), false);
+                showPopup('Échec de l\'information du vendeur: ' + (response.error || 'Erreur inconnue'), false);
             }
         })
         .catch(error => {
-            showPopup('Error notifying seller: ' + error.message, false);
+            showPopup('Une erreur s\'est produite lors de l\'information du vendeur: ' + error.message, false);
         });
     }
     
@@ -1058,19 +1051,19 @@ $current_username = $user['username'];
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showPopup('Item removed successfully!');
+                    showPopup('Article supprimé avec succès !');
                     // Remove the product card from the DOM
                     const productCard = document.querySelector(`.product-card[data-category][data-product-id="${productId}"]`);
                     if (productCard) {
                         productCard.remove();
                     }
                 } else {
-                    showPopup(data.message || 'Failed to delete product', false);
+                    showPopup(data.message || 'Échec de la suppression du produit', false);
                 }
                 closeDeleteModal();
             })
             .catch(error => {
-                showPopup('An error occurred while deleting the product', false);
+                showPopup('Une erreur s\'est produite lors de la suppression du produit', false);
                 closeDeleteModal();
             });
         };

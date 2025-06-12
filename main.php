@@ -10,14 +10,14 @@ $dbname = "farmx";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die(json_encode(["status" => "error", "message" => "Connection failed: " . $conn->connect_error]));
+    die(json_encode(["status" => "error", "message" => "Échec de la connexion : " . $conn->connect_error]));
 }
 
 // Handle post creation if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     // Get the active user's details
     if (!isset($_SESSION['user_id'])) {
-        die(json_encode(["status" => "error", "message" => "User not logged in."]));
+        die(json_encode(["status" => "error", "message" => "Utilisateur non connecté."]));
     }
 
     $userId = $_SESSION['user_id'];
@@ -43,9 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     $stmt->bind_param("issss", $userId, $username, $content, $mediaUrl, $profilePic);
 
     if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "Post created successfully!"]);
+        echo json_encode(["status" => "success", "message" => "Publication créée avec succès !"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Error creating post: " . $stmt->error]);
+        echo json_encode(["status" => "error", "message" => "Erreur lors de la création de la publication : " . $stmt->error]);
     }
 
     $stmt->close();
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Agricultural Social Network</title>
+    <title>FarmX - Réseau Social Agricole</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -999,10 +999,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
                 </a>
-                <a href="main.php" class="activated" title="Home">
+                <a href="main.php" class="activated" title="Accueil">
                     <i class='bx bxs-home'></i>
                 </a>
-                <a href="market.php" title="Marketplace">
+                <a href="market.php" title="Marché">
                     <i class='bx bxs-store'></i>
                 </a>
             </div>
@@ -1013,10 +1013,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                         <span class="notification-badge">0</span>
                     </a>
                 </div>
-                <a href="profile.php" title="Profile">
+                <a href="profile.php" title="Profil">
                     <i class='bx bxs-user'></i>
                 </a>
-                <a href="logout.php" title="Logout">
+                <a href="logout.php" title="Déconnexion">
                     <i class='bx bx-log-out'></i>
                 </a>
             </div>
@@ -1027,10 +1027,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     <div class="left-section">
             <!-- Mini Calendar -->
             <div class="mini-calendar">
-                <h3>Calendar</h3>
+                <h3>Calendrier</h3>
                 <div id="calendar"></div>
                 <div class="season-display">
-                    <strong>Season:</strong> <span id="season"></span>
+                    <strong>Saison actuelle :</strong> <span id="current-season"></span>
                 </div>
             </div>
         </div>
@@ -1039,14 +1039,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             <!-- Post Creation -->
             <div class="post-creation">
                 <div class="post-input">
-                    <img src="<?php echo $_SESSION['profile_pic'] ?? 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
-                    <input type="text" id="post-content" placeholder="What's on your mind?">
+                    <img src="<?php echo $_SESSION['profile_pic'] ?? 'Images/profile.jpg'; ?>" alt="Photo de profil" class="profile-pic">
+                    <input type="text" id="post-content" placeholder="Quoi de neuf, <?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?> ?">
                 </div>
                 <div id="media-preview" style="display: none; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <i class='bx bxs-file' style="font-size: 24px; color: #3e8e41;"></i>
-                            <span id="media-name">Media attached</span>
+                            <span id="media-name">Média joint</span>
                         </div>
                         <button onclick="removeMedia()" style="background: none; border: none; color: #ff4d4d; cursor: pointer;">
                             <i class='bx bx-x' style="font-size: 24px;"></i>
@@ -1064,10 +1064,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                         </div>
                         <div class="action-btn" onclick="openFilePicker('video')">
                             <i class='bx bxs-video-plus'></i>
-                            <span>Video</span>
+                            <span>Vidéo</span>
                         </div>
                     </div>
-                    <button class="post-btn" onclick="createPost()">Post</button>
+                    <button class="post-btn" onclick="createPost()">Publier</button>
                 </div>
                 <!-- Hidden file input for media upload -->
                 <input type="file" id="media-upload" style="display: none;" onchange="handleMediaUpload(event)">
@@ -1082,9 +1082,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         <div class="right-section">
     <!-- Weather Widget -->
     <div class="weather-widget">
-        <h3>Weather</h3>
+        <h3>Météo actuelle</h3>
         <div id="weather-info">
-            <p>Loading weather data...</p>
+            <p>Chargement des données météo...</p>
         </div>
     </div>
 </div>
@@ -1115,7 +1115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             previewContent.innerHTML = `
                 <div class="loading-container">
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Uploading ${file.type.startsWith('image/') ? 'image' : 'video'}...</div>
+                    <div class="loading-text">Chargement de ${file.type.startsWith('image/') ? 'l\'image' : 'la vidéo'}...</div>
                 </div>`;
 
             fetch('upload_media.php', {
@@ -1134,17 +1134,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                         previewContent.innerHTML = `
                             <video controls style="max-width: 100%; max-height: 200px;">
                                 <source src="${data.url}" type="${file.type}">
-                                Your browser does not support the video tag.
+                                Votre navigateur ne supporte pas la balise vidéo.
                             </video>`;
                     }
                 } else {
-                    showAlert('Error uploading media: ' + data.message, 'error');
+                    showAlert('Échec du téléchargement du média : ' + data.message, 'error');
                     removeMedia();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('Error uploading media', 'error');
+                showAlert('Erreur lors du téléchargement du média', 'error');
                 removeMedia();
             });
         }
@@ -1159,34 +1159,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     }
 
     // Update createPost function to clear media preview
-function createPost() {
-    const content = document.getElementById('post-content').value.trim();
-    const mediaUrl = window.mediaUrl || '';
+    function createPost() {
+        const content = document.getElementById('post-content').value.trim();
+        const mediaUrl = window.mediaUrl || '';
 
-    if (!content && !mediaUrl) {
-        showAlert('Post cannot be blank. Please add content or attach a photo/video.', 'error');
+        if (!content && !mediaUrl) {
+            showAlert('Le contenu de la publication ou le média ne peut pas être vide.', 'error');
             return;
-    }
-
-    const formData = new FormData();
-    formData.append('content', content);
-    formData.append('media_url', mediaUrl);
-
-    fetch('main.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            document.getElementById('post-content').value = '';
-                removeMedia();
-            loadPosts();
-        } else {
-            showAlert('Error creating post: ' + data.message, 'error');
         }
-    });
-}
+
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('media_url', mediaUrl);
+
+        fetch('main.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('post-content').value = '';
+                removeMedia();
+                loadPosts();
+            } else {
+                showAlert('Erreur lors de la création de la publication : ' + data.message, 'error');
+            }
+        });
+    }
 
     // Function to load posts
     function loadPosts() {
@@ -1207,7 +1207,7 @@ function createPost() {
                 const postHtml = `
                     <div class="post" id="post-${post.id}">
                         <div class="post-header">
-                            <img src="${post.profile_pic || 'Images/profile.jpg'}" alt="${post.username}'s Profile Picture" class="profile-pic" onerror="this.src='Images/profile.jpg'">
+                            <img src="${post.profile_pic || 'Images/profile.jpg'}" alt="Photo de profil de ${post.username}" class="profile-pic" onerror="this.src='Images/profile.jpg'">
                             <div class="post-info">
                                 <h3><a href="profile.php?id=${post.user_id}" class="username-link">${post.username}</a></h3>
                                 <span class="user-tag">${post.user_tag || ''}</span>
@@ -1222,10 +1222,10 @@ function createPost() {
                                 ${post.media_url.endsWith('.mp4') ? `
                                     <video controls>
                                         <source src="${post.media_url}" type="video/mp4">
-                                        Your browser does not support the video tag.
+                                        Votre navigateur ne supporte pas la balise vidéo.
                                     </video>
                                 ` : `
-                                    <img src="${post.media_url}" alt="Post Media">
+                                    <img src="${post.media_url}" alt="Média de publication">
                                 `}
                             </div>
                         ` : ''}
@@ -1243,7 +1243,7 @@ function createPost() {
                         </div>
                         <div class="comments-section" id="comments-${post.id}" style="display: none;">
                             <div class="comment-input">
-                                <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." onkeypress="handleCommentKeyPress(event, ${post.id})">
+                                <input type="text" id="comment-input-${post.id}" placeholder="Écrire un commentaire..." onkeypress="handleCommentKeyPress(event, ${post.id})">
                                 <button onclick="addComment(${post.id})">
                                     <i class='bx bx-send'></i>
                                 </button>
@@ -1273,96 +1273,97 @@ function createPost() {
         })
         .catch(error => {
             console.error('Error loading posts:', error);
-            showAlert('An error occurred while loading posts.', 'error');
+            showAlert('Une erreur est survenue lors du chargement des publications.', 'error');
         });
     }
 
- // Function to like/unlike a post
-function toggleLike(postId) {
-    const likeButton = document.querySelector(`.reaction[onclick="toggleLike(${postId})"]`);
+    // Function to like/unlike a post
+    function toggleLike(postId) {
+        const likeButton = document.querySelector(`.reaction[onclick="toggleLike(${postId})"]`);
 
-    fetch('like_post.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            post_id: postId
+        fetch('like_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // Toggle liked state
-            likeButton.classList.toggle('liked');
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Toggle liked state
+                likeButton.classList.toggle('liked');
 
-            // Reload posts to update like count
-            loadPosts();
-        } else {
-            showAlert(data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('An error occurred while processing your request.', 'error');
-    });
-}
-
-function addComment(postId) {
-    const commentInput = document.querySelector(`#comment-input-${postId}`);
-    const content = commentInput.value.trim();
-
-    if (!content) {
-        showAlert('Comment cannot be empty.', 'error');
-        return;
+                // Reload posts to update like count
+                loadPosts();
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Une erreur est survenue lors du traitement de votre requête.', 'error');
+        });
     }
 
-    fetch('add_comment.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            post_id: postId,
-            content: content
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            loadComments(postId); // Reload comments after adding a new one
-            commentInput.value = ''; // Clear the input field
-        } else {
-            showAlert(data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('An error occurred while processing your request.', 'error');
-    });
-}
-// Function to toggle comments visibility
-function toggleComments(postId) {
-    const commentsSection = document.getElementById(`comments-${postId}`);
-    if (commentsSection.style.display === 'none') {
-        commentsSection.style.display = 'block';
-        loadComments(postId); // Load comments when the section is shown
-    } else {
-        commentsSection.style.display = 'none';
-    }
-}
+    function addComment(postId) {
+        const commentInput = document.querySelector(`#comment-input-${postId}`);
+        const content = commentInput.value.trim();
 
-function loadComments(postId) {
-    fetch(`get_comments.php?post_id=${postId}`)
-    .then(response => response.json())
-    .then(data => {
-        const commentsList = document.getElementById(`comments-list-${postId}`);
-        commentsList.innerHTML = '';
+        if (!content) {
+            showAlert('Le commentaire ne peut pas être vide.', 'error');
+            return;
+        }
+
+        fetch('add_comment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                content: content
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                loadComments(postId); // Reload comments after adding a new one
+                commentInput.value = ''; // Clear the input field
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Une erreur est survenue lors du traitement de votre requête.', 'error');
+        });
+    }
+
+    // Function to toggle comments visibility
+    function toggleComments(postId) {
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        if (commentsSection.style.display === 'none') {
+            commentsSection.style.display = 'block';
+            loadComments(postId); // Load comments when the section is shown
+        } else {
+            commentsSection.style.display = 'none';
+        }
+    }
+
+    function loadComments(postId) {
+        fetch(`get_comments.php?post_id=${postId}`)
+        .then(response => response.json())
+        .then(data => {
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+            commentsList.innerHTML = '';
 
             data.forEach(comment => {
                 const commentHtml = `
                     <div class="comment">
-                    <img src="${comment.profile_pic || 'Images/profile.jpg'}" alt="${comment.username}'s Profile Picture" class="profile-pic" onerror="this.src='Images/profile.jpg'">
+                    <img src="${comment.profile_pic || 'Images/profile.jpg'}" alt="Photo de profil de ${comment.username}" class="profile-pic" onerror="this.src='Images/profile.jpg'">
                         <div class="comment-content">
                         <div class="comment-header">
                             <a href="profile.php?id=${comment.user_id}" class="username-link">${comment.username}</a>
@@ -1374,129 +1375,130 @@ function loadComments(postId) {
                 `;
                 commentsList.innerHTML += commentHtml;
             });
-    })
-    .catch(error => {
-        console.error('Error loading comments:', error);
-        showAlert('An error occurred while loading comments.', 'error');
-    });
-}
+        })
+        .catch(error => {
+            console.error('Error loading comments:', error);
+            showAlert('Une erreur est survenue lors du chargement des commentaires.', 'error');
+        });
+    }
+
     // Load posts when the page loads
     document.addEventListener('DOMContentLoaded', loadPosts);
 
     // Function to fetch weather data
-function fetchWeather(latitude, longitude) {
-    const apiKey = '6b1952abec10b0d047487e7b84568617'; // Replace with your API key
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+    function fetchWeather(latitude, longitude) {
+        const apiKey = '6b1952abec10b0d047487e7b84568617'; // Replace with your API key
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            const weatherInfo = document.getElementById('weather-info');
-            const weatherIcon = data.weather[0].icon; // Weather icon code
-            const temperature = data.main.temp; // Temperature in Celsius
-            const humidity = data.main.humidity; // Humidity percentage
-            const windSpeed = data.wind.speed; // Wind speed in m/s
-            const weatherDescription = data.weather[0].description; // Weather description
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const weatherInfo = document.getElementById('weather-info');
+                const weatherIcon = data.weather[0].icon; // Weather icon code
+                const temperature = data.main.temp; // Temperature in Celsius
+                const humidity = data.main.humidity; // Humidity percentage
+                const windSpeed = data.wind.speed; // Wind speed in m/s
+                const weatherDescription = data.weather[0].description; // Weather description
 
-            // Determine if the weather is good or bad for farming
-            let weatherStatus = '';
-            let statusClass = 'weather-status';
-            if (weatherDescription.includes('rain') || weatherDescription.includes('storm')) {
-                weatherStatus = 'Bad for farming 🌧️';
-                statusClass += ' bad-weather';
-            } else if (temperature > 30 || temperature < 10) {
-                weatherStatus = 'Bad for farming 🌡️';
-                statusClass += ' bad-weather';
-            } else {
-                weatherStatus = 'Good for farming 🌞';
-            }
+                // Determine if the weather is good or bad for farming
+                let weatherStatus = '';
+                let statusClass = 'weather-status';
+                if (weatherDescription.includes('rain') || weatherDescription.includes('storm')) {
+                    weatherStatus = 'Mauvais pour l\'agriculture 🌧️';
+                    statusClass += ' bad-weather';
+                } else if (temperature > 30 || temperature < 10) {
+                    weatherStatus = 'Mauvais pour l\'agriculture 🌡️';
+                    statusClass += ' bad-weather';
+                } else {
+                    weatherStatus = 'Bon pour l\'agriculture 🌞';
+                }
 
-            // Update the weather widget
-            weatherInfo.innerHTML = `
-                <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Weather Icon" class="weather-icon">
-                <p><strong>Temperature:</strong> ${temperature}°C</p>
-                <p><strong>Humidity:</strong> ${humidity}%</p>
-                <p><strong>Wind Speed:</strong> ${windSpeed} m/s</p>
-                <p><strong>Condition:</strong> ${weatherDescription}</p>
-                <p class="${statusClass}">${weatherStatus}</p>
-            `;
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-            showAlert('Failed to load weather data.', 'error');
-        });
-}
-
-// Function to get the user's location
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                fetchWeather(latitude, longitude); // Fetch weather data
-            },
-            error => {
-                console.error('Error getting location:', error);
-                showAlert('Unable to fetch location.', 'error');
-            }
-        );
-    } else {
-        showAlert('Geolocation is not supported by your browser.', 'error');
+                // Update the weather widget
+                weatherInfo.innerHTML = `
+                    <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="Icône météo" class="weather-icon">
+                    <p><strong>Température :</strong> ${temperature}°C</p>
+                    <p><strong>Humidité :</strong> ${humidity}%</p>
+                    <p><strong>Vitesse du vent :</strong> ${windSpeed} m/s</p>
+                    <p><strong>Condition :</strong> ${weatherDescription}</p>
+                    <p class="${statusClass}">${weatherStatus}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+                showAlert('Échec du chargement des données météorologiques.', 'error');
+            });
     }
-}
 
-// Load weather data when the page loads
-getLocation();
+    // Function to get the user's location
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    fetchWeather(latitude, longitude); // Fetch weather data
+                },
+                error => {
+                    console.error('Error getting location:', error);
+                    showAlert('Impossible de récupérer la position.', 'error');
+                }
+            );
+        } else {
+            showAlert('La géolocalisation n\'est pas prise en charge par votre navigateur.', 'error');
+        }
+    }
 
- // Function to generate the mini calendar
- function generateMiniCalendar() {
-            const calendarElement = document.getElementById('calendar');
-            const seasonElement = document.getElementById('season');
-            const today = new Date();
-            const month = today.getMonth();
-            const year = today.getFullYear();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
+    // Load weather data when the page loads
+    getLocation();
 
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const seasonNames = ["Winter", "Spring", "Summer", "Autumn"];
+    // Function to generate the mini calendar
+    function generateMiniCalendar() {
+        const calendarElement = document.getElementById('calendar');
+        const seasonElement = document.getElementById('current-season');
+        const today = new Date();
+        const month = today.getMonth();
+        const year = today.getFullYear();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
 
-            // Determine the season based on the month
-            let season;
-            if (month >= 11 || month < 2) {
-                season = seasonNames[0]; // Winter
-            } else if (month >= 2 && month < 5) {
-                season = seasonNames[1]; // Spring
-            } else if (month >= 5 && month < 8) {
-                season = seasonNames[2]; // Summer
-            } else {
-                season = seasonNames[3]; // Autumn
-            }
+        const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        const seasonNames = ["Hiver", "Printemps", "Été", "Automne"];
 
-            // Display the season
-            seasonElement.textContent = season;
-
-            // Generate the calendar grid
-            let calendarHTML = `<div class="calendar-grid">`;
-
-            // Add empty cells for days before the first day of the month
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                calendarHTML += `<div class="calendar-day"></div>`;
-            }
-
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const isToday = day === today.getDate() && month === today.getMonth();
-                calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
-            }
-
-            calendarHTML += `</div>`;
-            calendarElement.innerHTML = calendarHTML;
+        // Determine the season based on the month
+        let season;
+        if (month >= 11 || month < 2) {
+            season = seasonNames[0]; // Winter
+        } else if (month >= 2 && month < 5) {
+            season = seasonNames[1]; // Spring
+        } else if (month >= 5 && month < 8) {
+            season = seasonNames[2]; // Summer
+        } else {
+            season = seasonNames[3]; // Autumn
         }
 
-        // Generate the mini calendar when the page loads
-        generateMiniCalendar();
+        // Display the season
+        seasonElement.textContent = season;
+
+        // Generate the calendar grid
+        let calendarHTML = `<div class="calendar-grid">`;
+
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            calendarHTML += `<div class="calendar-day"></div>`;
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isToday = day === today.getDate() && month === today.getMonth();
+            calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
+        }
+
+        calendarHTML += `</div>`;
+        calendarElement.innerHTML = calendarHTML;
+    }
+
+    // Generate the mini calendar when the page loads
+    generateMiniCalendar();
 
     // Function to load notifications
     function loadNotifications() {
@@ -1521,9 +1523,9 @@ getLocation();
                             <div class="notification-content">
                                 <div class="notification-text">
                                     <strong>${notification.sender_username}</strong> 
-                                    ${notification.type === 'like' ? 'liked your post' : 
-                                      notification.type === 'comment' ? 'commented on your post' : 
-                                      'sent you a message'}
+                                    ${notification.type === 'like' ? 'a aimé votre publication' : 
+                                      notification.type === 'comment' ? 'a commenté votre publication' : 
+                                      'vous a envoyé un message'}
                                 </div>
                                 <div class="notification-time">
                                     ${formatTimeAgo(notification.created_at)}
@@ -1532,13 +1534,13 @@ getLocation();
                         </div>
                     `).join('');
                 } else {
-                    notificationList.innerHTML = '<div class="notification-item">No notifications</div>';
+                    notificationList.innerHTML = '<div class="notification-item">Aucune notification</div>';
                 }
             })
             .catch(error => {
                 console.error('Error loading notifications:', error);
                 const notificationList = document.querySelector('.notification-list');
-                notificationList.innerHTML = '<div class="notification-item">Error loading notifications</div>';
+                notificationList.innerHTML = '<div class="notification-item">Erreur lors du chargement des notifications</div>';
             });
     }
 
@@ -1567,10 +1569,10 @@ getLocation();
         const now = new Date();
         const seconds = Math.floor((now - date) / 1000);
         
-        if (seconds < 60) return 'just now';
-        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-        return `${Math.floor(seconds / 86400)}d ago`;
+        if (seconds < 60) return 'à l\'instant';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m il y a`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h il y a`;
+        return `${Math.floor(seconds / 86400)}j il y a`;
     }
 
     // Load notifications when page loads

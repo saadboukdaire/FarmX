@@ -82,7 +82,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Profile</title>
+    <title>FarmX - Profil</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -226,8 +226,8 @@ $conn->close();
 
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -3px;
+            right: -3px;
             background-color: #ff4d4d;
             color: white;
             border-radius: 50%;
@@ -237,7 +237,6 @@ $conn->close();
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
             display: none;
         }
 
@@ -258,7 +257,7 @@ $conn->close();
         .profile-container {
             max-width: 800px;
             margin: 0px auto;
-            padding: 20px;
+            padding: 20px 0; /* Changed from 20px to 20px 0 to remove horizontal padding */
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -274,7 +273,7 @@ $conn->close();
         .edit-profile-button {
             position: absolute;
             top: 0;
-            right: 0;
+            right: 50px; /* Adjusted to move further left */
         }
 
         .edit-profile-button button {
@@ -324,9 +323,47 @@ $conn->close();
             color: #666;
         }
 
+        /* Bio Section */
+        .bio-section {
+            background-color: white;
+            padding: 15px 20px; /* Added horizontal padding to match original inner content indentation */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            margin-top: 25px;
+        }
+
+        .bio-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #3e8e41;
+            padding-bottom: 8px;
+            position: relative; /* Re-added for pseudo-element positioning */
+        }
+
+        .bio-section h2::after {
+            content: '';
+            position: absolute;
+            left: -20px; /* Adjusted to span full container width */
+            right: -20px; /* Adjusted to span full container width */
+            bottom: 0;
+            height: 2px;
+            background-color: #3e8e41;
+        }
+
+        .bio-section p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+
         /* Profile Info Section */
         .profile-section {
-            margin-top: 40px;
+            background-color: white;
+            padding: 20px; /* This section is already padded, but let's ensure it's consistent if we remove container padding */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 25px;
             margin-bottom: 25px;
             width: 100%;
             box-sizing: border-box;
@@ -334,25 +371,37 @@ $conn->close();
 
         .profile-section h2 {
             font-size: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #3e8e41;
-            border-bottom: 2px solid #3e8e41;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
+            position: relative; /* Re-added for pseudo-element positioning */
+        }
+
+        .profile-section h2::after {
+            content: '';
+            position: absolute;
+            left: -20px; /* Adjusted to span full container width */
+            right: -20px; /* Adjusted to span full container width */
+            bottom: 0;
+            height: 2px;
+            background-color: #3e8e41;
         }
 
         .profile-section .info {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
-            padding: 12px;
-            background-color: #f9f9f9;
+            padding: 15px; /* Changed from 12px to 15px to match .post */
+            background-color: white; /* Changed from #f9f9f9 to white to match .post */
             border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added box-shadow to match .post */
             transition: all 0.3s ease;
         }
 
         .profile-section .info:hover {
-            background-color: #f0f0f0;
-            transform: translateX(5px);
+            /* Removed background-color and transform to match other sections */
+            /* background-color: #f5f5f5; */
+            /* transform: translateX(5px); */
         }
 
         .profile-section .info i {
@@ -379,15 +428,30 @@ $conn->close();
 
         /* Posts Section */
         .posts-section {
+            background-color: white; /* Added background to match other sections */
+            padding: 20px; /* Added padding to match .profile-section */
+            border-radius: 8px; /* Added border-radius */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added box-shadow */
             margin-top: 25px;
+            margin-bottom: 25px;
         }
 
         .posts-section h2 {
             font-size: 20px;
             margin-bottom: 20px;
             color: #3e8e41;
-            border-bottom: 2px solid #3e8e41;
             padding-bottom: 8px;
+            position: relative; /* Re-added for pseudo-element positioning */
+        }
+
+        .posts-section h2::after {
+            content: '';
+            position: absolute;
+            left: -20px; /* Adjusted to span full container width */
+            right: -20px; /* Adjusted to span full container width */
+            bottom: 0;
+            height: 2px;
+            background-color: #3e8e41;
         }
 
        .posts-grid {
@@ -414,7 +478,7 @@ $conn->close();
         .post {
             background-color: white;
             border-radius: 8px;
-            padding: 15px;
+            padding: 15px 20px; /* Changed from 15px to 15px 20px */
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
@@ -642,7 +706,7 @@ $conn->close();
             transform: scale(1.1);
         }
 
-        .delete-post-btn:hover i {
+        .delete-post-btn:hover {
             color: #cc0000;
             transform: scale(1.1);
         }
@@ -655,6 +719,246 @@ $conn->close();
         .delete-post-btn:hover {
             background-color: rgba(255, 77, 77, 0.1);
         }
+
+        /* Custom Alert Styles (copied from edit_profile.php) */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Keeping this as per attached file */
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
+
+        .alert-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .alert-content button {
+            padding: 14px 35px;
+            background: linear-gradient(45deg, #ff4d4d, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 18px rgba(255, 77, 77, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .alert-content button:hover {
+            background: linear-gradient(45deg, #cc0000, #ff4d4d);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 77, 77, 0.5);
+        }
+
+        .alert-content button:active {
+            transform: translateY(0);
+        }
+
+        .alert-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            color: #ff4d4d;
+        }
+
+        .error-alert .alert-content i {
+            color: #ff4d4d;
+        }
+
+        /* Custom Alert Modals (copied from edit_profile.php) */
+        .confirm-modal, .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Unified background-color to match custom-alert */
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-buttons .confirm-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF4D4D);
+            color: #fff;
+            box-shadow: 0 5px 18px rgba(255, 77, 77, 0.4);
+        }
+
+        .modal-buttons .confirm-btn:hover {
+            background: linear-gradient(45deg, #FF4D4D, #E60000);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 77, 77, 0.5);
+        }
+
+        .modal-buttons .cancel-btn {
+            background: linear-gradient(45deg, #b0b0b0, #9e9e9e);
+            color: #fff;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1); /* Keep this as is for a neutral button, matching other general button shadows */
+        }
+
+        .modal-buttons .cancel-btn:hover {
+            background: linear-gradient(45deg, #9e9e9e, #8a8a8a);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Overrides for custom alert to ensure it appears above modals */
+        .custom-alert {
+            z-index: 1002;
+        }
+
+        /* Ensure confirm-modal content and buttons match custom-alert content */
+        #confirmPostDeleteModal .modal-content {
+            background: rgba(255, 255, 255, 0.95); /* Match custom-alert background */
+            padding: 30px; /* Match custom-alert padding */
+            border-radius: 20px; /* Match custom-alert border-radius */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Match custom-alert box-shadow */
+            max-width: 350px; /* Match custom-alert max-width */
+        }
+
+        #confirmPostDeleteModal .modal-content::before {
+            height: 5px; /* Match custom-alert height */
+        }
+
+        #confirmPostDeleteModal .modal-content p {
+            font-size: 16px; /* Match custom-alert p font-size */
+            margin: 20px 0; /* Match custom-alert p margin */
+            line-height: 1.5; /* Match custom-alert p line-height */
+            font-weight: 500; /* Match custom-alert p font-weight */
+        }
+
+        #confirmPostDeleteModal .modal-buttons button {
+            padding: 12px 30px; /* Match custom-alert button padding */
+            border-radius: 25px; /* Match custom-alert button border-radius */
+            font-size: 15px; /* Match custom-alert button font-size */
+            font-weight: 600; /* Match custom-alert button font-weight */
+            letter-spacing: 1px; /* Match custom-alert button letter-spacing */
+        }
+
+        #confirmPostDeleteModal .modal-buttons .confirm-btn {
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); /* Match custom-alert button box-shadow */
+        }
+
+        #confirmPostDeleteModal .modal-buttons .cancel-btn {
+            background: linear-gradient(45deg, #b0b0b0, #9e9e9e); /* Ensure grey gradient */
+            color: #fff; /* Ensure white text */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Use a neutral shadow, consistent with general button shadows */
+        }
+
+        #confirmPostDeleteModal .modal-buttons .cancel-btn:hover {
+            background: linear-gradient(45deg, #9e9e9e, #8a8a8a); /* Darker grey gradient on hover */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Neutral shadow on hover */
+        }
     </style>
 </head>
 <body>
@@ -662,17 +966,17 @@ $conn->close();
         <div class="header-content">
             <div class="logo">
                 <a href="main.php">
-                    <img src="Images/logoinv.png" alt="FarmX Logo">
+                    <img src="Images/logoinv.png" alt="Logo FarmX">
                 </a>
             </div>
             <div class="nav-links">
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
                 </a>
-                <a href="main.php" title="Home">
+                <a href="main.php" title="Accueil">
                     <i class='bx bxs-home'></i>
                 </a>
-                <a href="market.php" title="Marketplace">
+                <a href="market.php" title="Marché">
                     <i class='bx bxs-store'></i>
                 </a>
             </div>
@@ -683,10 +987,10 @@ $conn->close();
                         <span class="notification-badge">0</span>
                     </a>
                 </div>
-                <a href="profile.php" class="activated" title="Profile">
+                <a href="profile.php" class="activated" title="Profil">
                     <i class='bx bxs-user'></i>
                 </a>
-                <a href="logout.php" title="Logout">
+                <a href="logout.php" title="Déconnexion">
                     <i class='bx bx-log-out'></i>
                 </a>
             </div>
@@ -698,13 +1002,13 @@ $conn->close();
         <!-- Profile Header -->
         <div class="profile-header">
             <!-- Add a timestamp to the image URL to force browser refresh -->
-            <img id="profile-picture" src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture">
+            <img id="profile-picture" src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Image de profil">
             <h1 id="profile-name"><?php echo htmlspecialchars($username ?? ''); ?></h1>
             <p class="user-tag"><?php echo htmlspecialchars($userTag ?? ''); ?></p>
             <!-- Move edit profile button here -->
             <?php if ($isOwnProfile): ?>
             <div class="edit-profile-button">
-                <a href="edit_profile.php" class="edit-profile-btn" title="Edit Profile">
+                <a href="edit_profile.php" class="edit-profile-btn" title="Modifier le profil">
                     <i class='bx bxs-edit-alt'></i>
                 </a>
             </div>
@@ -713,20 +1017,20 @@ $conn->close();
 
         <!-- Bio Section -->
         <div class="bio-section">
-            <h2>About Me</h2>
-            <p><?php echo !empty($bio) ? htmlspecialchars($bio) : 'No bio added yet.'; ?></p>
+            <h2>À propos de moi</h2>
+            <p><?php echo !empty($bio) ? htmlspecialchars($bio) : 'Aucune bio ajoutée pour le moment.'; ?></p>
         </div>
 
         <!-- Profile Info Section -->
         <div class="profile-section">
-            <h2>Profile Information</h2>
+            <h2>Informations de profil</h2>
             <div class="info">
                 <i class='bx bx-badge-check'></i>
                 <span class="user-type"><?php echo htmlspecialchars($userTag ?? ''); ?></span>
             </div>
             <div class="info">
                 <i class='bx bx-calendar'></i>
-                <span class="join-date">Member since <?php echo date('F Y', strtotime($createdAt)); ?></span>
+                <span class="join-date">Membre depuis le <?php echo date('F Y', strtotime($createdAt)); ?></span>
             </div>
             <div class="info">
                 <i class='bx bx-envelope'></i>
@@ -746,18 +1050,18 @@ $conn->close();
 
       <!-- Posts Section -->
 <div class="posts-section">
-    <h2>My Posts</h2>
+    <h2>Mes publications</h2>
     <?php if (empty($posts)): ?>
-        <p>No posts yet.</p>
+        <p>Aucune publication pour le moment.</p>
     <?php else: ?>
         <div class="posts-grid">
             <?php foreach ($posts as $post): ?>
                 <div class="post">
                     <div class="post-header">
-                        <img src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                        <img src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Image de profil" class="profile-pic">
                         <div class="post-info">
                             <h3><?php echo htmlspecialchars($username ?? ''); ?></h3>
-                            <span class="post-date"><?php echo date('F j, Y', strtotime($post['created_at'])); ?></span>
+                            <span class="post-date"><?php echo date('j F Y', strtotime($post['created_at'])); ?></span>
                         </div>
                     </div>
                     <div class="post-content">
@@ -772,18 +1076,19 @@ $conn->close();
                             if (in_array(strtolower($extension), $video_extensions)) {
                                 echo '<video src="' . $media_url . '" class="post-media" controls></video>';
                             } else {
-                                echo '<img src="' . $media_url . '" alt="Post Media" class="post-media">';
+                                echo '<img src="' . $media_url . '" alt="Média de publication" class="post-media">';
                             }
                         ?>
                     <?php endif; ?>
                     <div class="post-footer-actions">
-                        <a href="main.php?post_id=<?php echo $post['id']; ?>" class="view-in-feed-btn" title="View in Feed">
+                        <a href="main.php?post_id=<?php echo $post['id']; ?>" class="view-in-feed-btn" title="Voir dans le fil">
                             <i class='bx bx-show'></i>
                         </a>
                         <?php if ($isOwnProfile): ?>
-                        <form method="POST" style="display: inline;">
+                        <form method="POST" class="delete-post-form" data-post-id="<?php echo $post['id']; ?>" style="display: inline;">
                             <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                            <button type="submit" name="delete_post" class="delete-post-btn" title="Delete Post">
+                            <input type="hidden" name="delete_post" value="1">
+                            <button type="submit" class="delete-post-btn" title="Supprimer la publication">
                                 <i class='bx bx-trash'></i>
                             </button>
                         </form>
@@ -796,12 +1101,25 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Confirmation Modal for Post Deletion -->
+    <div id="confirmPostDeleteModal" class="confirm-modal">
+        <div class="modal-content">
+            <h3>Confirmer la suppression</h3>
+            <p>Êtes-vous sûr de vouloir supprimer cette publication? Cette action est irréversible.</p>
+            <div class="modal-buttons">
+                <button type="button" class="confirm-btn" id="confirm-post-delete-btn">Supprimer</button>
+                <button type="button" class="cancel-btn" id="cancel-post-delete-btn">Annuler</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Function to update notification count
         function updateNotificationCount() {
             fetch('get_notification_count.php')
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Notification count data in profile.php:', data);
                     const badge = document.querySelector('.notification-badge');
                     badge.textContent = data.count;
                     badge.style.display = data.count > 0 ? 'flex' : 'none';
@@ -835,7 +1153,45 @@ $conn->close();
         // Apply styles when page loads
         document.addEventListener('DOMContentLoaded', applyCurrentPageStyle);
 
-        document.getElementById('popupOverlay').addEventListener('click', closePopup);
+        // Post Deletion Confirmation Logic
+        const deletePostButtons = document.querySelectorAll('.delete-post-btn');
+        const confirmPostDeleteModal = document.getElementById('confirmPostDeleteModal');
+        const confirmPostDeleteBtn = document.getElementById('confirm-post-delete-btn');
+        const cancelPostDeleteBtn = document.getElementById('cancel-post-delete-btn');
+        let currentPostForm = null; // To store the form to be submitted
+
+        deletePostButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                currentPostForm = this.closest('.delete-post-form');
+                confirmPostDeleteModal.style.display = 'flex';
+            });
+        });
+
+        cancelPostDeleteBtn.addEventListener('click', function() {
+            confirmPostDeleteModal.style.display = 'none';
+            currentPostForm = null; // Clear the stored form
+        });
+
+        confirmPostDeleteBtn.addEventListener('click', function() {
+            console.log('Confirm delete button clicked.');
+            if (currentPostForm) {
+                console.log('Submitting form for post:', currentPostForm.dataset.postId);
+                currentPostForm.submit(); // Submit the form if confirmed
+            } else {
+                console.log('No form to submit.');
+            }
+            confirmPostDeleteModal.style.display = 'none';
+        });
+
+        // Close modal if clicked outside
+        confirmPostDeleteModal.addEventListener('click', function(event) {
+            if (event.target === confirmPostDeleteModal) {
+                console.log('Clicked outside modal, closing.');
+                confirmPostDeleteModal.style.display = 'none';
+                currentPostForm = null; // Clear the stored form
+            }
+        });
     </script>
 </body>
 </html>

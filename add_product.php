@@ -9,8 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 // Check if user is a FarmX Producer
 if (!isset($_SESSION['user_tag']) || $_SESSION['user_tag'] !== 'FarmX Producer') {
-    header("Location: market.php");
-    exit();
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'farmer') {
+        header("Location: market.php");
+        exit();
+    }
 }
 
 // Database connection
@@ -63,11 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $success = $stmt->execute([$seller_id, $title, $description, $price, $image_url, $category]);
     
     if ($success) {
-        $_SESSION['add_success'] = "Product added successfully!";
+        $_SESSION['add_success'] = "Produit ajouté avec succès !";
         header("Location: market.php");
         exit();
     } else {
-        $error = "Failed to add product";
+        $error = "Échec de l'ajout du produit";
     }
 }
 ?>
@@ -76,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Add Product</title>
+    <title>FarmX - Ajouter Produit</title>
     <link rel="icon" href="Images/logo.jpg">   
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -280,63 +282,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="add-container">
         <a href="market.php" class="back-button">
-            <i class='bx bx-arrow-back'></i> Back to Marketplace
+            <i class='bx bx-arrow-back'></i> Retour au Marché
         </a>
 
         <div class="add-form">
-            <h2>Add New Product</h2>
+            <h2>Ajouter un nouveau produit</h2>
             <?php if (isset($error)): ?>
                 <div class="error-message"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
             <form action="add_product.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="product_name">Product Name</label>
-                    <input type="text" id="product_name" name="product_name" placeholder="Enter product name" required>
+                    <label for="product_name">Nom du produit</label>
+                    <input type="text" id="product_name" name="product_name" placeholder="Entrez le nom du produit" required>
                 </div>
 
                 <div class="form-group">
                     <label for="product_description">Description</label>
-                    <textarea id="product_description" name="product_description" placeholder="Enter product description" required></textarea>
+                    <textarea id="product_description" name="product_description" placeholder="Entrez la description du produit" required></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="product_price">Price (MAD)</label>
-                    <input type="number" id="product_price" name="product_price" placeholder="Enter price" step="0.01" min="0" required>
+                    <label for="product_price">Prix (MAD)</label>
+                    <input type="number" id="product_price" name="product_price" placeholder="Entrez le prix" step="0.01" min="0" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="product_category">Category</label>
+                    <label for="product_category">Catégorie</label>
                     <select id="product_category" name="product_category" required>
-                        <option value="">Select Category</option>
-                        <option value="vegetables">Vegetables</option>
+                        <option value="">Sélectionner une catégorie</option>
+                        <option value="vegetables">Légumes</option>
                         <option value="fruits">Fruits</option>
-                        <option value="dairy">Dairy Products</option>
-                        <option value="meat">Meat & Poultry</option>
-                        <option value="honey">Honey & Bee Products</option>
-                        <option value="grains">Grains & Cereals</option>
-                        <option value="other">Other</option>
+                        <option value="dairy">Produits Laitiers</option>
+                        <option value="meat">Viande & Volaille</option>
+                        <option value="honey">Miel & Produits Apicoles</option>
+                        <option value="grains">Céréales</option>
+                        <option value="other">Autre</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Product Image</label>
+                    <label>Image du produit</label>
                     <div class="file-upload-container">
                         <input type="file" id="product_image" name="product_image" accept="image/*" class="file-upload-input" required>
                         <label for="product_image" class="file-upload-label">
                             <i class='bx bx-cloud-upload file-upload-icon'></i>
                             <div class="file-upload-text">
-                                <span>Click to upload</span> or drag and drop<br>
-                                PNG, JPG or JPEG (max. 5MB)
+                                <span>Cliquer pour télécharger</span> ou glisser-déposer<br>
+                                PNG, JPG ou JPEG (max. 5MB)
                             </div>
                         </label>
                     </div>
                     <div class="preview-container" id="previewContainer">
-                        <img id="imagePreview" src="#" alt="Preview">
+                        <img id="imagePreview" src="#" alt="Aperçu de l'image">
                     </div>
                 </div>
 
-                <button type="submit">Add Product</button>
+                <button type="submit">Ajouter Produit</button>
             </form>
         </div>
     </div>
