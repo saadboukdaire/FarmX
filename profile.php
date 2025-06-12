@@ -226,17 +226,13 @@ $conn->close();
 
         .notification-badge {
             position: absolute;
-            top: -3px;
-            right: -3px;
-            background-color: #ff4d4d;
+            top: 0;
+            right: 0;
+            background-color: #ff4444;
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            padding: 2px 6px;
             font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             display: none;
         }
 
