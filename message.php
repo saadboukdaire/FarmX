@@ -145,16 +145,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_messages'])) {
     try {
         $pdo->beginTransaction();
 
-        // Get messages
-        $stmt = $pdo->prepare("SELECT * FROM messages 
-            WHERE (sender_id = :user AND receiver_id = :contact) 
-            OR (sender_id = :contact AND receiver_id = :user)
-            ORDER BY created_at ASC");
+        // Get messages with sender's username
+        $stmt = $pdo->prepare("SELECT m.*, u.username as sender_username 
+            FROM messages m
+            JOIN users u ON m.sender_id = u.id
+            WHERE (m.sender_id = :user AND m.receiver_id = :contact) 
+            OR (m.sender_id = :contact AND m.receiver_id = :user)
+            ORDER BY m.created_at ASC");
         $stmt->execute([
             'user' => $logged_in_user_id,
             'contact' => $contact_id,
         ]);
-        $messages = $stmt->fetchAll();
+        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Mark messages as read
         $stmt = $pdo->prepare("UPDATE messages SET is_read = TRUE 
@@ -173,11 +175,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch_messages'])) {
         ]);
 
         $pdo->commit();
-        echo json_encode($messages);
+        
+        // Ensure proper JSON response
+        header('Content-Type: application/json');
+        echo json_encode($messages, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Échec de la récupération des messages']);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Échec de la récupération des messages: ' . $e->getMessage()]);
     }
     exit;
 }
@@ -598,16 +604,45 @@ if (isset($_GET['to'])) {
         }
 
         .chat-header {
-            padding: 10px;
-            border-bottom: 1px solid #e0e0e0; /* Light gray border */
-            background-color: #f9f9f9; /* Light gray */
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #f9f9f9;
             border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .chat-header h2 {
             font-size: 20px;
             margin: 0;
-            color: #333; /* Dark text */
+            color: #333;
+        }
+
+        .profile-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #3e8e41;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+
+        .profile-link:hover {
+            background-color: #2d682f;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .profile-link i {
+            font-size: 16px;
         }
 
         .chat-messages {
@@ -670,6 +705,31 @@ if (isset($_GET['to'])) {
 
         .message.sent .message-time {
             color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .message.sent .message-sender {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .message.received .message-sender {
+            color: #3e8e41;
+        }
+
+        .username-link {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .username-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         .chat-input {
@@ -1042,16 +1102,21 @@ if (isset($_GET['to'])) {
         document.querySelectorAll('.contact').forEach(c => c.classList.remove('active'));
         const selectedContact = document.querySelector(`.contact[data-user-id="${user.id}"]`);
         if (selectedContact) {
-        selectedContact.classList.add('active');
-        
-        // Remove unread badge when chat is selected
-        const unreadBadge = selectedContact.querySelector('.unread-badge');
-        if (unreadBadge) {
-            unreadBadge.remove();
+            selectedContact.classList.add('active');
+            
+            // Remove unread badge when chat is selected
+            const unreadBadge = selectedContact.querySelector('.unread-badge');
+            if (unreadBadge) {
+                unreadBadge.remove();
             }
         }
         
-        chatHeaderEl.innerHTML = `<h2>${escapeHtml(user.username)}</h2>`;
+        chatHeaderEl.innerHTML = `
+            <h2>${escapeHtml(user.username)}</h2>
+            <a href="profile.php?id=${user.id}" class="profile-link" title="Voir le profil">
+                <i class='bx bx-user'></i>
+                Profil
+            </a>`;
         inputEl.disabled = false;
         sendBtn.disabled = false;
         inputEl.focus();
@@ -1340,7 +1405,7 @@ if (isset($_GET['to'])) {
                     contact.className = 'contact';
                     contact.dataset.userId = user.id;
                     
-                    const lastMessage = user.last_message || 'Start a new chat!';
+                    const lastMessage = user.last_message || 'Démarrer une nouvelle discussion !';
                     const unreadCount = user.unread_count > 0 ? `<span class="unread-badge">${user.unread_count}</span>` : '';
                     
                     contact.innerHTML = `

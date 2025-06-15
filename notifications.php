@@ -1,6 +1,30 @@
 <?php
 session_start();
 require_once 'config.php';
+date_default_timezone_set('Africa/Casablanca');
+
+function formatTimeAgo($datetime) {
+    $now = new DateTime();
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    if ($diff->y > 0) {
+        return 'il y a ' . $diff->y . ' an' . ($diff->y > 1 ? 's' : '');
+    }
+    if ($diff->m > 0) {
+        return $diff->m . ' mois';
+    }
+    if ($diff->d > 0) {
+        return 'il y a ' . $diff->d . ' jour' . ($diff->d > 1 ? 's' : '');
+    }
+    if ($diff->h > 0) {
+        return 'il y a ' . $diff->h . ' heure' . ($diff->h > 1 ? 's' : '');
+    }
+    if ($diff->i > 0) {
+        return 'il y a ' . $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
+    }
+    return 'à l\'instant';
+}
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -270,61 +294,155 @@ try {
             display: none;
         }
 
-        .notification-card {
+        .notification-item {
             background: white;
-            border-radius: 10px;
-            padding: 15px;
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
+            align-items: flex-start;
             gap: 15px;
-            transition: transform 0.2s;
-            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #3e8e41;
         }
 
-        .notification-card:hover {
+        .notification-item:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .notification-avatar {
-            width: 50px;
-            height: 50px;
+        .notification-icon {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.like {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .notification-icon.comment {
+            background-color: #4dabf7;
+            color: white;
+        }
+
+        .notification-icon.message {
+            background-color: #845ef7;
+            color: white;
         }
 
         .notification-content {
-            flex: 1;
+            flex-grow: 1;
         }
 
         .notification-header {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .notification-sender {
-            font-weight: bold;
-            color: #3e8e41;
+        .notification-type {
+            font-weight: 600;
+            color: #2d682f;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #e8f5e9;
         }
 
-        .notification-time {
-            color: #666;
-            font-size: 0.9em;
+        .notification-type.like {
+            background-color: #ffe3e3;
+            color: #e03131;
+        }
+
+        .notification-type.comment {
+            background-color: #e7f5ff;
+            color: #1971c2;
+        }
+
+        .notification-type.message {
+            background-color: #f3f0ff;
+            color: #5f3dc4;
         }
 
         .notification-text {
-            color: #333;
-            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
         }
 
-        .notification-preview {
+        .notification-post {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 3px solid #e0e0e0;
+        }
+
+        .notification-post-text {
+            color: #444;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .notification-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .notification-link {
+            color: #3e8e41;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notification-link:hover {
+            text-decoration: underline;
+        }
+
+        .mark-read-btn {
+            background: none;
+            border: none;
             color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
-            padding: 5px;
-            background: #f5f5f5;
-            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .mark-read-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .unread {
+            background-color: #f8f9fa;
+            border-left-color: #3e8e41;
+        }
+
+        .unread .notification-type {
+            font-weight: 700;
         }
 
         .no-notifications {
@@ -351,14 +469,31 @@ try {
                 padding: 0 10px;
             }
 
-            .notification-card {
+            .notification-item {
                 padding: 10px;
             }
 
-            .notification-avatar {
+            .notification-icon {
                 width: 40px;
                 height: 40px;
             }
+        }
+
+        @keyframes highlight-post {
+            0% {
+                background-color: rgba(62, 142, 65, 0.1);
+            }
+            50% {
+                background-color: rgba(62, 142, 65, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        .highlighted-post {
+            animation: highlight-post 2s ease-out;
+            border-left: 4px solid #3e8e41;
         }
     </style>
 </head>
@@ -408,27 +543,80 @@ try {
                 <div class="notification-group">
                     <div class="notification-group-header">Today</div>
                     <?php foreach ($groupedNotifications['today'] as $notification): ?>
-                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                                 alt="Profile" 
-                                 class="notification-avatar">
+                        <div class="notification-item <?php echo $notification['is_read'] ? '' : 'unread'; ?>">
+                            <div class="notification-icon <?php echo $notification['type']; ?>">
+                                <?php if ($notification['type'] === 'like'): ?>
+                                    <i class='bx bxs-heart'></i>
+                                <?php elseif ($notification['type'] === 'comment'): ?>
+                                    <i class='bx bxs-comment-detail'></i>
+                                <?php else: ?>
+                                    <i class='bx bxs-message-detail'></i>
+                                <?php endif; ?>
+                            </div>
                             <div class="notification-content">
                                 <div class="notification-header">
-                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                                    <span class="notification-time"><?php echo date('g:i a', strtotime($notification['created_at'])); ?></span>
+                                    <span class="notification-type <?php echo $notification['type']; ?>">
+                                        <?php 
+                                        switch($notification['type']) {
+                                            case 'like':
+                                                echo 'Like';
+                                                break;
+                                            case 'comment':
+                                                echo 'Commentaire';
+                                                break;
+                                            case 'message':
+                                                echo 'Message';
+                                                break;
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="notification-time">
+                                        <?php echo formatTimeAgo($notification['created_at']); ?>
+                                    </span>
                                 </div>
                                 <div class="notification-text">
-                                    <?php if ($notification['type'] === 'message'): ?>
-                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
-                                    <?php else: ?>
-                                        <?php htmlspecialchars($notification['content']); ?>
-                                    <?php endif; ?>
+                                    <strong><?php echo htmlspecialchars($notification['sender_username']); ?></strong>
+                                    <?php 
+                                    switch($notification['type']) {
+                                        case 'like':
+                                            echo ' a aimé votre publication';
+                                            break;
+                                        case 'comment':
+                                            echo ' a commenté votre publication';
+                                            break;
+                                        case 'message':
+                                            echo ' vous a envoyé un message';
+                                            break;
+                                    }
+                                    ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                                    <div class="notification-preview">
-                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-post">
+                                        <p class="notification-post-text"><?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <div class="notification-actions">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <a href="message.php?contact_id=<?php echo $notification['sender_id']; ?>" class="notification-link">
+                                            <i class='bx bx-message-square-detail'></i>
+                                            Voir le message
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="main.php?post_id=<?php echo $notification['post_id']; ?>" class="notification-link">
+                                            <i class='bx bx-show'></i>
+                                            Voir la publication
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$notification['is_read']): ?>
+                                        <form action="notifications.php" method="POST" style="display: inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                            <button type="submit" name="mark_read" class="mark-read-btn">
+                                                <i class='bx bx-check'></i>
+                                                Marquer comme lu
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -437,29 +625,82 @@ try {
 
             <?php if (!empty($groupedNotifications['yesterday'])): ?>
                 <div class="notification-group">
-                    <div class="notification-group-header">Yesterday</div>
+                    <div class="notification-group-header">Hier</div>
                     <?php foreach ($groupedNotifications['yesterday'] as $notification): ?>
-                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                                 alt="Profile" 
-                                 class="notification-avatar">
+                        <div class="notification-item <?php echo $notification['is_read'] ? '' : 'unread'; ?>">
+                            <div class="notification-icon <?php echo $notification['type']; ?>">
+                                <?php if ($notification['type'] === 'like'): ?>
+                                    <i class='bx bxs-heart'></i>
+                                <?php elseif ($notification['type'] === 'comment'): ?>
+                                    <i class='bx bxs-comment-detail'></i>
+                                <?php else: ?>
+                                    <i class='bx bxs-message-detail'></i>
+                                <?php endif; ?>
+                            </div>
                             <div class="notification-content">
                                 <div class="notification-header">
-                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                                    <span class="notification-time"><?php echo date('g:i a', strtotime($notification['created_at'])); ?></span>
+                                    <span class="notification-type <?php echo $notification['type']; ?>">
+                                        <?php 
+                                        switch($notification['type']) {
+                                            case 'like':
+                                                echo 'Like';
+                                                break;
+                                            case 'comment':
+                                                echo 'Commentaire';
+                                                break;
+                                            case 'message':
+                                                echo 'Message';
+                                                break;
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="notification-time">
+                                        <?php echo formatTimeAgo($notification['created_at']); ?>
+                                    </span>
                                 </div>
                                 <div class="notification-text">
-                                    <?php if ($notification['type'] === 'message'): ?>
-                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
-                                    <?php else: ?>
-                                        <?php htmlspecialchars($notification['content']); ?>
-                                    <?php endif; ?>
+                                    <strong><?php echo htmlspecialchars($notification['sender_username']); ?></strong>
+                                    <?php 
+                                    switch($notification['type']) {
+                                        case 'like':
+                                            echo ' a aimé votre publication';
+                                            break;
+                                        case 'comment':
+                                            echo ' a commenté votre publication';
+                                            break;
+                                        case 'message':
+                                            echo ' vous a envoyé un message';
+                                            break;
+                                    }
+                                    ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                                    <div class="notification-preview">
-                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-post">
+                                        <p class="notification-post-text"><?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <div class="notification-actions">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <a href="message.php?contact_id=<?php echo $notification['sender_id']; ?>" class="notification-link">
+                                            <i class='bx bx-message-square-detail'></i>
+                                            Voir le message
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="main.php?post_id=<?php echo $notification['post_id']; ?>" class="notification-link">
+                                            <i class='bx bx-show'></i>
+                                            Voir la publication
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$notification['is_read']): ?>
+                                        <form action="notifications.php" method="POST" style="display: inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                            <button type="submit" name="mark_read" class="mark-read-btn">
+                                                <i class='bx bx-check'></i>
+                                                Marquer comme lu
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -468,29 +709,82 @@ try {
 
             <?php if (!empty($groupedNotifications['this_week'])): ?>
                 <div class="notification-group">
-                    <div class="notification-group-header">This Week</div>
+                    <div class="notification-group-header">Cette semaine</div>
                     <?php foreach ($groupedNotifications['this_week'] as $notification): ?>
-                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                                 alt="Profile" 
-                                 class="notification-avatar">
+                        <div class="notification-item <?php echo $notification['is_read'] ? '' : 'unread'; ?>">
+                            <div class="notification-icon <?php echo $notification['type']; ?>">
+                                <?php if ($notification['type'] === 'like'): ?>
+                                    <i class='bx bxs-heart'></i>
+                                <?php elseif ($notification['type'] === 'comment'): ?>
+                                    <i class='bx bxs-comment-detail'></i>
+                                <?php else: ?>
+                                    <i class='bx bxs-message-detail'></i>
+                                <?php endif; ?>
+                            </div>
                             <div class="notification-content">
                                 <div class="notification-header">
-                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                                    <span class="notification-time"><?php echo date('D, g:i a', strtotime($notification['created_at'])); ?></span>
+                                    <span class="notification-type <?php echo $notification['type']; ?>">
+                                        <?php 
+                                        switch($notification['type']) {
+                                            case 'like':
+                                                echo 'Like';
+                                                break;
+                                            case 'comment':
+                                                echo 'Commentaire';
+                                                break;
+                                            case 'message':
+                                                echo 'Message';
+                                                break;
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="notification-time">
+                                        <?php echo formatTimeAgo($notification['created_at']); ?>
+                                    </span>
                                 </div>
                                 <div class="notification-text">
-                                    <?php if ($notification['type'] === 'message'): ?>
-                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
-                                    <?php else: ?>
-                                        <?php htmlspecialchars($notification['content']); ?>
-                                    <?php endif; ?>
+                                    <strong><?php echo htmlspecialchars($notification['sender_username']); ?></strong>
+                                    <?php 
+                                    switch($notification['type']) {
+                                        case 'like':
+                                            echo ' a aimé votre publication';
+                                            break;
+                                        case 'comment':
+                                            echo ' a commenté votre publication';
+                                            break;
+                                        case 'message':
+                                            echo ' vous a envoyé un message';
+                                            break;
+                                    }
+                                    ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                                    <div class="notification-preview">
-                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-post">
+                                        <p class="notification-post-text"><?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <div class="notification-actions">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <a href="message.php?contact_id=<?php echo $notification['sender_id']; ?>" class="notification-link">
+                                            <i class='bx bx-message-square-detail'></i>
+                                            Voir le message
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="main.php?post_id=<?php echo $notification['post_id']; ?>" class="notification-link">
+                                            <i class='bx bx-show'></i>
+                                            Voir la publication
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$notification['is_read']): ?>
+                                        <form action="notifications.php" method="POST" style="display: inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                            <button type="submit" name="mark_read" class="mark-read-btn">
+                                                <i class='bx bx-check'></i>
+                                                Marquer comme lu
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -499,29 +793,82 @@ try {
 
             <?php if (!empty($groupedNotifications['this_month'])): ?>
                 <div class="notification-group">
-                    <div class="notification-group-header">This Month</div>
+                    <div class="notification-group-header">Ce mois-ci</div>
                     <?php foreach ($groupedNotifications['this_month'] as $notification): ?>
-                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                                 alt="Profile" 
-                                 class="notification-avatar">
+                        <div class="notification-item <?php echo $notification['is_read'] ? '' : 'unread'; ?>">
+                            <div class="notification-icon <?php echo $notification['type']; ?>">
+                                <?php if ($notification['type'] === 'like'): ?>
+                                    <i class='bx bxs-heart'></i>
+                                <?php elseif ($notification['type'] === 'comment'): ?>
+                                    <i class='bx bxs-comment-detail'></i>
+                                <?php else: ?>
+                                    <i class='bx bxs-message-detail'></i>
+                                <?php endif; ?>
+                            </div>
                             <div class="notification-content">
                                 <div class="notification-header">
-                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                                    <span class="notification-time"><?php echo date('M j, g:i a', strtotime($notification['created_at'])); ?></span>
+                                    <span class="notification-type <?php echo $notification['type']; ?>">
+                                        <?php 
+                                        switch($notification['type']) {
+                                            case 'like':
+                                                echo 'Like';
+                                                break;
+                                            case 'comment':
+                                                echo 'Commentaire';
+                                                break;
+                                            case 'message':
+                                                echo 'Message';
+                                                break;
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="notification-time">
+                                        <?php echo formatTimeAgo($notification['created_at']); ?>
+                                    </span>
                                 </div>
                                 <div class="notification-text">
-                                    <?php if ($notification['type'] === 'message'): ?>
-                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
-                                    <?php else: ?>
-                                        <?php htmlspecialchars($notification['content']); ?>
-                                    <?php endif; ?>
+                                    <strong><?php echo htmlspecialchars($notification['sender_username']); ?></strong>
+                                    <?php 
+                                    switch($notification['type']) {
+                                        case 'like':
+                                            echo ' a aimé votre publication';
+                                            break;
+                                        case 'comment':
+                                            echo ' a commenté votre publication';
+                                            break;
+                                        case 'message':
+                                            echo ' vous a envoyé un message';
+                                            break;
+                                    }
+                                    ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                                    <div class="notification-preview">
-                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-post">
+                                        <p class="notification-post-text"><?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <div class="notification-actions">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <a href="message.php?contact_id=<?php echo $notification['sender_id']; ?>" class="notification-link">
+                                            <i class='bx bx-message-square-detail'></i>
+                                            Voir le message
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="main.php?post_id=<?php echo $notification['post_id']; ?>" class="notification-link">
+                                            <i class='bx bx-show'></i>
+                                            Voir la publication
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$notification['is_read']): ?>
+                                        <form action="notifications.php" method="POST" style="display: inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                            <button type="submit" name="mark_read" class="mark-read-btn">
+                                                <i class='bx bx-check'></i>
+                                                Marquer comme lu
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -530,29 +877,82 @@ try {
 
             <?php if (!empty($groupedNotifications['older'])): ?>
                 <div class="notification-group">
-                    <div class="notification-group-header">Older</div>
+                    <div class="notification-group-header">Plus ancien</div>
                     <?php foreach ($groupedNotifications['older'] as $notification): ?>
-                        <div class="notification-card" onclick="handleNotificationClick(<?php echo htmlspecialchars(json_encode($notification)); ?>)">
-                            <img src="<?php echo $notification['sender_picture'] ?: 'Images/profile.jpg'; ?>" 
-                                 alt="Profile" 
-                                 class="notification-avatar">
+                        <div class="notification-item <?php echo $notification['is_read'] ? '' : 'unread'; ?>">
+                            <div class="notification-icon <?php echo $notification['type']; ?>">
+                                <?php if ($notification['type'] === 'like'): ?>
+                                    <i class='bx bxs-heart'></i>
+                                <?php elseif ($notification['type'] === 'comment'): ?>
+                                    <i class='bx bxs-comment-detail'></i>
+                                <?php else: ?>
+                                    <i class='bx bxs-message-detail'></i>
+                                <?php endif; ?>
+                            </div>
                             <div class="notification-content">
                                 <div class="notification-header">
-                                    <span class="notification-sender"><?php echo htmlspecialchars($notification['sender_username']); ?></span>
-                                    <span class="notification-time"><?php echo date('M j, Y', strtotime($notification['created_at'])); ?></span>
+                                    <span class="notification-type <?php echo $notification['type']; ?>">
+                                        <?php 
+                                        switch($notification['type']) {
+                                            case 'like':
+                                                echo 'Like';
+                                                break;
+                                            case 'comment':
+                                                echo 'Commentaire';
+                                                break;
+                                            case 'message':
+                                                echo 'Message';
+                                                break;
+                                        }
+                                        ?>
+                                    </span>
+                                    <span class="notification-time">
+                                        <?php echo formatTimeAgo($notification['created_at']); ?>
+                                    </span>
                                 </div>
                                 <div class="notification-text">
-                                    <?php if ($notification['type'] === 'message'): ?>
-                                        <?php echo htmlspecialchars($notification['sender_username'] . ' sent you a message'); ?>
-                                    <?php else: ?>
-                                        <?php htmlspecialchars($notification['content']); ?>
-                                    <?php endif; ?>
+                                    <strong><?php echo htmlspecialchars($notification['sender_username']); ?></strong>
+                                    <?php 
+                                    switch($notification['type']) {
+                                        case 'like':
+                                            echo ' a aimé votre publication';
+                                            break;
+                                        case 'comment':
+                                            echo ' a commenté votre publication';
+                                            break;
+                                        case 'message':
+                                            echo ' vous a envoyé un message';
+                                            break;
+                                    }
+                                    ?>
                                 </div>
                                 <?php if ($notification['post_content']): ?>
-                                    <div class="notification-preview">
-                                        <?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?>
+                                    <div class="notification-post">
+                                        <p class="notification-post-text"><?php echo htmlspecialchars(substr($notification['post_content'], 0, 100)) . (strlen($notification['post_content']) > 100 ? '...' : ''); ?></p>
                                     </div>
                                 <?php endif; ?>
+                                <div class="notification-actions">
+                                    <?php if ($notification['type'] === 'message'): ?>
+                                        <a href="message.php?contact_id=<?php echo $notification['sender_id']; ?>" class="notification-link">
+                                            <i class='bx bx-message-square-detail'></i>
+                                            Voir le message
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="main.php?post_id=<?php echo $notification['post_id']; ?>" class="notification-link">
+                                            <i class='bx bx-show'></i>
+                                            Voir la publication
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$notification['is_read']): ?>
+                                        <form action="notifications.php" method="POST" style="display: inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                            <button type="submit" name="mark_read" class="mark-read-btn">
+                                                <i class='bx bx-check'></i>
+                                                Marquer comme lu
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -562,8 +962,8 @@ try {
     <?php else: ?>
         <div class="container">
             <div class="no-notifications">
-                <i class='bx bx-bell'></i>
-                <p>No notifications yet</p>
+                <i class='bx bx-bell-off'></i>
+                <p>Aucune notification</p>
             </div>
         </div>
     <?php endif; ?>
@@ -610,6 +1010,30 @@ try {
                     }
                 })
                 .catch(error => console.error('Error updating notification count:', error));
+        }
+
+        function highlightPost(postId) {
+            // Remove any existing highlights
+            document.querySelectorAll('.highlighted-post').forEach(el => {
+                el.classList.remove('highlighted-post');
+            });
+
+            // Find the post and highlight it
+            const post = document.querySelector(`[data-post-id="${postId}"]`);
+            if (post) {
+                post.classList.add('highlighted-post');
+                post.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Check if we have a post_id in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('post_id');
+        if (postId) {
+            // Wait for the page to load
+            window.addEventListener('load', () => {
+                highlightPost(postId);
+            });
         }
     </script>
 </body>

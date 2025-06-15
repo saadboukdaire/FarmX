@@ -81,8 +81,13 @@ if ($search) {
 }
 
 if ($category) {
-    $query .= " AND m.category = ?";
-    $params[] = $category;
+    if ($category === 'my_products' && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer') {
+        $query .= " AND m.seller_id = ?";
+        $params[] = $_SESSION['user_id'];
+    } else {
+        $query .= " AND m.category = ?";
+        $params[] = $category;
+    }
 }
 
 $query .= " ORDER BY m.created_at DESC";
@@ -308,103 +313,182 @@ $current_username = $user['username'];
             margin: 0 auto;
         }
 
-        .search-filter-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        .marketplace-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            margin-bottom: 30px;
+            padding: 0 20px;
         }
 
-        .search-filter-form {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .marketplace-filter-search-bar {
-            flex: 2;
-            position: relative;
-        }
-
-        .marketplace-filter-search-bar input {
-            width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            display: block;
-        }
-
-        .marketplace-filter-search-bar input:focus {
-            border-color: #3e8e41;
-            box-shadow: 0 0 0 2px rgba(62, 142, 65, 0.1);
-        }
-
-        .marketplace-filter-search-bar i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            font-size: 20px;
-        }
-
-        .filter-section {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex: 1;
-        }
-
-        .filter-section select {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-section select:focus {
-            border-color: #3e8e41;
-            box-shadow: 0 0 0 2px rgba(62, 142, 65, 0.1);
+        .marketplace-title {
+            font-size: 28px;
+            color: #2d682f;
+            font-weight: 600;
         }
 
         .add-product-btn {
-            padding: 12px 25px;
-            background-color: #3e8e41;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
+            background-color: #3e8e41;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
             transition: all 0.3s ease;
-            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(62, 142, 65, 0.2);
         }
 
         .add-product-btn:hover {
             background-color: #2d682f;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.3);
         }
 
         .add-product-btn i {
             font-size: 20px;
+        }
+
+        .search-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .search-form input:focus {
+            outline: none;
+            border-color: #3e8e41;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(62, 142, 65, 0.1);
+        }
+
+        .search-form button {
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-form button:hover {
+            background-color: #2d682f;
+            transform: translateY(-1px);
+        }
+
+        .search-form button i {
+            font-size: 20px;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            padding: 5px;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background-color: #f0f7f0;
+            color: #3e8e41;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .category-btn:hover {
+            background-color: #3e8e41;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(62, 142, 65, 0.2);
+        }
+
+        .category-btn.active {
+            background-color: #3e8e41;
+            color: white;
+            box-shadow: 0 4px 8px rgba(62, 142, 65, 0.2);
+        }
+
+        .my-products-btn {
+            background-color: #f0f7f0;
+            color: #3e8e41;
+            font-weight: 500;
+        }
+
+        .my-products-btn:hover {
+            background-color: #3e8e41;
+            color: white;
+        }
+
+        .my-products-btn.active {
+            background-color: #2d682f;
+            color: white;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-form button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .category-filter {
+                justify-content: center;
+            }
+
+            .category-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .marketplace-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .add-product-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         .product-grid {
@@ -882,34 +966,81 @@ $current_username = $user['username'];
     </div>
 
     <div class="marketplace-container">
-        <!-- Search and Filter Section -->
-        <div class="search-filter-section">
-            <form id="searchForm" method="GET" class="search-filter-form">
-                <div class="marketplace-filter-search-bar">
-                    <input type="text" id="searchInput" name="search" placeholder="Rechercher des produits..." value="<?php echo htmlspecialchars($search); ?>">
-                    <i class='bx bx-search-alt-2'></i>
-                </div>
-                <div class="filter-section">
-                    <select id="categoryFilter" name="category">
-                        <option value="">Toutes catégories</option>
-                        <option value="vegetables" <?php echo $category === 'vegetables' ? 'selected' : ''; ?>>Légumes</option>
-                        <option value="fruits" <?php echo $category === 'fruits' ? 'selected' : ''; ?>>Fruits</option>
-                        <option value="dairy" <?php echo $category === 'dairy' ? 'selected' : ''; ?>>Produits Laitiers</option>
-                        <option value="meat" <?php echo $category === 'meat' ? 'selected' : ''; ?>>Viande & Volaille</option>
-                        <option value="honey" <?php echo $category === 'honey' ? 'selected' : ''; ?>>Miel & Produits Apicoles</option>
-                        <option value="grains" <?php echo $category === 'grains' ? 'selected' : ''; ?>>Céréales</option>
-                        <option value="other" <?php echo $category === 'other' ? 'selected' : ''; ?>>Autre</option>
-                    </select>
-                    <button type="submit" class="search-button">
-                        <i class='bx bx-search'></i> Rechercher
-                    </button>
-                    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer'): ?>
-                    <button type="button" onclick="window.location.href='add_product.php'" class="add-product-btn">
-                        <i class='bx bx-plus'></i> Ajouter Produit
-                    </button>
-                    <?php endif; ?>
-                </div>
+        <div class="marketplace-header">
+            <h1 class="marketplace-title">Marché Agricole</h1>
+            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer'): ?>
+                <a href="add_product.php" class="add-product-btn">
+                    <i class='bx bx-plus-circle'></i>
+                    Ajouter un Produit
+                </a>
+            <?php endif; ?>
+        </div>
+
+        <div class="search-section">
+            <form action="market.php" method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Rechercher des produits..." value="<?php echo htmlspecialchars($search); ?>">
+                <button type="submit">
+                    <i class='bx bx-search'></i>
+                    Rechercher
+                </button>
             </form>
+
+            <div class="category-filter">
+                <a href="market.php" class="category-btn <?php echo empty($category) ? 'active' : ''; ?>">
+                    <i class='bx bx-grid-alt'></i>
+                    Tous
+                </a>
+                <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer'): ?>
+                    <a href="market.php?category=my_products" class="category-btn my-products-btn <?php echo $category === 'my_products' ? 'active' : ''; ?>">
+                        <i class='bx bx-package'></i>
+                        Mes Produits
+                    </a>
+                <?php endif; ?>
+                <a href="market.php?category=legumes" class="category-btn <?php echo $category === 'legumes' ? 'active' : ''; ?>">
+                    <i class='bx bx-leaf'></i>
+                    Légumes
+                </a>
+                <a href="market.php?category=fruits" class="category-btn <?php echo $category === 'fruits' ? 'active' : ''; ?>">
+                    <i class='bx bx-food-menu'></i>
+                    Fruits
+                </a>
+                <a href="market.php?category=produits_laitiers" class="category-btn <?php echo $category === 'produits_laitiers' ? 'active' : ''; ?>">
+                    <i class='bx bx-droplet'></i>
+                    Produits Laitiers
+                </a>
+                <a href="market.php?category=viande" class="category-btn <?php echo $category === 'viande' ? 'active' : ''; ?>">
+                    <i class='bx bx-meat'></i>
+                    Viande
+                </a>
+                <a href="market.php?category=miel" class="category-btn <?php echo $category === 'miel' ? 'active' : ''; ?>">
+                    <i class='bx bx-hive'></i>
+                    Miel & Produits Apicoles
+                </a>
+                <a href="market.php?category=cereales" class="category-btn <?php echo $category === 'cereales' ? 'active' : ''; ?>">
+                    <i class='bx bx-wheat'></i>
+                    Céréales
+                </a>
+                <a href="market.php?category=materiel_agricole" class="category-btn <?php echo $category === 'materiel_agricole' ? 'active' : ''; ?>">
+                    <i class='bx bx-tractor'></i>
+                    Matériel Agricole
+                </a>
+                <a href="market.php?category=produits_transformes" class="category-btn <?php echo $category === 'produits_transformes' ? 'active' : ''; ?>">
+                    <i class='bx bx-factory'></i>
+                    Produits Transformés
+                </a>
+                <a href="market.php?category=animaux" class="category-btn <?php echo $category === 'animaux' ? 'active' : ''; ?>">
+                    <i class='bx bx-cow'></i>
+                    Animaux d'Élevage
+                </a>
+                <a href="market.php?category=terrain" class="category-btn <?php echo $category === 'terrain' ? 'active' : ''; ?>">
+                    <i class='bx bx-map'></i>
+                    Terrains Agricoles
+                </a>
+                <a href="market.php?category=autre" class="category-btn <?php echo $category === 'autre' ? 'active' : ''; ?>">
+                    <i class='bx bx-dots-horizontal-rounded'></i>
+                    Autre
+                </a>
+            </div>
         </div>
 
         <?php if (isset($_SESSION['add_success'])): ?>

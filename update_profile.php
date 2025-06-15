@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Validate file type and size
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $maxFileSize = 2 * 1024 * 1024; // 2MB
 
         $fileType = $_FILES['profile-pic-upload']['type'];
@@ -148,6 +148,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Fetch current user data for comparison
+    $currentDataStmt = $conn->prepare("SELECT username, email, phone, bio, gender, profile_pic FROM users WHERE id = ?");
+    $currentDataStmt->bind_param("i", $userId);
+    $currentDataStmt->execute();
+    $currentData = $currentDataStmt->get_result()->fetch_assoc();
+    $currentDataStmt->close();
+
+    // Check if any changes were made
+    $changesMade = false;
+    if ($currentData['username'] !== $username ||
+        $currentData['email'] !== $email ||
+        $currentData['phone'] !== $phone ||
+        $currentData['bio'] !== $bio ||
+        $currentData['gender'] !== $gender ||
+        $shouldUpdateProfilePic) {
+        $changesMade = true;
+    }
+
     // Construct the SQL update query dynamically
     $sqlFields = ['username = ?', 'email = ?', 'phone = ?', 'bio = ?', 'gender = ?'];
     $bindTypes = "sssss";
@@ -181,6 +199,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updatePostsStmt->bind_param("si", $profilePicUrl, $userId);
             $updatePostsStmt->execute();
             $updatePostsStmt->close();
+        }
+        
+        // Only set success message if changes were made
+        if ($changesMade) {
+            $_SESSION['profile_update_success'] = "Votre profil a été mis à jour avec succès !";
         }
         header("Location: profile.php");
         exit();

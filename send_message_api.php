@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Check if this is the first message about this specific item
-    $content = "Hello, I'm interested in your item: {$item['title']} ({$item['price']} MAD).";
+    $content = "Bonjour, je suis intéressé(e) par votre article : {$item['title']} ({$item['price']} MAD).";
     
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages 
                           WHERE sender_id = ? 
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$buyer_id, $seller_id, $content]);
             
             // Create a notification for the seller
-            $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content) VALUES (?, ?, 'message', 'sent you a message about an item')");
+            $stmt = $pdo->prepare("INSERT INTO notifications (user_id, sender_id, type, content) VALUES (?, ?, 'message', 'vous a envoyé un message concernant un article')");
             $stmt->execute([$seller_id, $buyer_id]);
             
             $pdo->commit();

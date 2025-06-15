@@ -95,148 +95,200 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .add-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 20px auto;
             padding: 30px;
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .back-button {
+            grid-column: 1 / -1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #f5f5f5;
+            width: fit-content;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .back-button i {
+            font-size: 20px;
+        }
+
+        .add-form {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .add-form h2 {
-            text-align: center;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 20px 0;
-            background: linear-gradient(to right, #3e8e41, #2d682f);
-            border-radius: 12px;
-            display: inline-block;
-            width: 100%;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            margin-bottom: 30px;
+            color: #2d682f;
+            font-size: 28px;
+            margin-bottom: 10px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 8px;
             font-weight: 500;
             color: #444;
         }
 
-        .add-form input,
-        .add-form textarea,
-        .add-form select {
-            width: 100%;
-            padding: 12px 15px;
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 15px;
-            outline: none;
             transition: all 0.3s ease;
             background-color: #f8f9fa;
         }
 
-        .add-form input:focus,
-        .add-form textarea:focus,
-        .add-form select:focus {
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
             border-color: #3e8e41;
             background-color: white;
             box-shadow: 0 0 0 3px rgba(62, 142, 65, 0.1);
         }
 
-        .add-form textarea {
-            min-height: 120px;
+        .form-group textarea {
             resize: vertical;
+            min-height: 120px;
         }
 
-        .file-upload-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .file-upload-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-upload-label {
+        .image-upload-section {
+            grid-column: 1;
             display: flex;
             flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            background-color: #f8f9fa;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px;
-            border: 2px dashed #3e8e41;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: 2px dashed #e0e0e0;
         }
 
-        .file-upload-label:hover {
-            background-color: #f0f7f0;
-            border-color: #2d682f;
-        }
-
-        .file-upload-icon {
-            font-size: 40px;
-            color: #3e8e41;
-            margin-bottom: 10px;
-        }
-
-        .file-upload-text {
-            font-size: 16px;
-            color: #666;
-            text-align: center;
-        }
-
-        .file-upload-text span {
-            color: #3e8e41;
-            font-weight: 500;
-        }
-
-        .preview-container {
-            margin-top: 15px;
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
             display: none;
         }
 
-        .preview-container img {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .image-preview .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            text-align: center;
+            padding: 20px;
         }
 
-        .add-form button {
+        .image-preview .upload-placeholder i {
+            font-size: 48px;
+            color: #3e8e41;
+        }
+
+        .image-preview .upload-placeholder p {
+            font-size: 16px;
+            max-width: 250px;
+        }
+
+        .image-upload {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed #e0e0e0;
+            text-align: center;
+        }
+
+        .image-upload .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .image-upload input[type="file"] {
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            cursor: pointer;
+            height: 50px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .image-upload .file-input-button {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 15px;
+            height: 50px;
             background-color: #3e8e41;
             color: white;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
             font-weight: 500;
+            cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
+            z-index: 0;
         }
 
-        .add-form button:hover {
+        .image-upload .file-input-button:hover {
             background-color: #2d682f;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
+        }
+
+        .image-upload .file-input-button i {
+            font-size: 20px;
+        }
+
+        .image-upload .upload-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.5;
         }
 
         .success-message {
@@ -245,7 +297,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #28a745;
         }
 
         .error-message {
@@ -254,28 +305,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
         }
 
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            color: #666;
-            text-decoration: none;
-            margin-bottom: 20px;
-            padding: 8px 15px;
-            border-radius: 6px;
+        button[type="submit"] {
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
         }
 
-        .back-button:hover {
-            background-color: #f0f0f0;
-            color: #333;
+        button[type="submit"]:hover {
+            background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
         }
 
-        .back-button i {
-            margin-right: 8px;
-            font-size: 20px;
+        @media (max-width: 1024px) {
+            .add-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .image-preview {
+                height: 400px;
+                min-height: unset;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .add-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .image-preview {
+                height: 300px;
+            }
         }
     </style>
 </head>
@@ -285,122 +360,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class='bx bx-arrow-back'></i> Retour au Marché
         </a>
 
-        <div class="add-form">
-            <h2>Ajouter un nouveau produit</h2>
+        <div class="image-upload-section">
+            <div class="image-preview" id="imagePreview">
+                <div class="upload-placeholder">
+                    <i class='bx bx-image-add'></i>
+                    <p>Glissez et déposez une image ici ou cliquez pour sélectionner</p>
+                </div>
+                <img src="" alt="Aperçu de l'image" id="previewImage">
+            </div>
+            <div class="image-upload">
+                <div class="file-input-wrapper">
+                    <input type="file" id="product_image" name="product_image" accept="image/*" required>
+                    <div class="file-input-button">
+                        <i class='bx bx-upload'></i>
+                        Choisir une image
+                    </div>
+                </div>
+                <p class="upload-text">Formats acceptés : JPG, PNG, GIF, WebP. Taille maximale : 2MB</p>
+            </div>
+        </div>
+
+        <form class="add-form" method="POST" enctype="multipart/form-data">
+            <h2>Ajouter un Nouveau Produit</h2>
             <?php if (isset($error)): ?>
                 <div class="error-message"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
-            <form action="add_product.php" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="product_name">Nom du produit</label>
-                    <input type="text" id="product_name" name="product_name" placeholder="Entrez le nom du produit" required>
-                </div>
+            <div class="form-group">
+                <label for="product_name">Nom du produit:</label>
+                <input type="text" id="product_name" name="product_name" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="product_description">Description</label>
-                    <textarea id="product_description" name="product_description" placeholder="Entrez la description du produit" required></textarea>
-                </div>
+            <div class="form-group">
+                <label for="product_description">Description:</label>
+                <textarea id="product_description" name="product_description" required></textarea>
+            </div>
 
-                <div class="form-group">
-                    <label for="product_price">Prix (MAD)</label>
-                    <input type="number" id="product_price" name="product_price" placeholder="Entrez le prix" step="0.01" min="0" required>
-                </div>
+            <div class="form-group">
+                <label for="product_price">Prix (MAD):</label>
+                <input type="number" id="product_price" name="product_price" step="0.01" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="product_category">Catégorie</label>
-                    <select id="product_category" name="product_category" required>
-                        <option value="">Sélectionner une catégorie</option>
-                        <option value="vegetables">Légumes</option>
-                        <option value="fruits">Fruits</option>
-                        <option value="dairy">Produits Laitiers</option>
-                        <option value="meat">Viande & Volaille</option>
-                        <option value="honey">Miel & Produits Apicoles</option>
-                        <option value="grains">Céréales</option>
-                        <option value="other">Autre</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="product_category">Catégorie:</label>
+                <select id="product_category" name="product_category" required>
+                    <option value="">Sélectionnez une catégorie</option>
+                    <option value="legumes">Légumes</option>
+                    <option value="fruits">Fruits</option>
+                    <option value="produits_laitiers">Produits Laitiers</option>
+                    <option value="viande">Viande</option>
+                    <option value="miel">Miel & Produits Apicoles</option>
+                    <option value="cereales">Céréales</option>
+                    <option value="materiel_agricole">Matériel Agricole</option>
+                    <option value="produits_transformes">Produits Transformés</option>
+                    <option value="animaux">Animaux d'Élevage</option>
+                    <option value="terrain">Terrains Agricoles</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label>Image du produit</label>
-                    <div class="file-upload-container">
-                        <input type="file" id="product_image" name="product_image" accept="image/*" class="file-upload-input" required>
-                        <label for="product_image" class="file-upload-label">
-                            <i class='bx bx-cloud-upload file-upload-icon'></i>
-                            <div class="file-upload-text">
-                                <span>Cliquer pour télécharger</span> ou glisser-déposer<br>
-                                PNG, JPG ou JPEG (max. 5MB)
-                            </div>
-                        </label>
-                    </div>
-                    <div class="preview-container" id="previewContainer">
-                        <img id="imagePreview" src="#" alt="Aperçu de l'image">
-                    </div>
-                </div>
-
-                <button type="submit">Ajouter Produit</button>
-            </form>
-        </div>
+            <button type="submit">
+                <i class='bx bx-plus-circle'></i>
+                Ajouter le Produit
+            </button>
+        </form>
     </div>
 
     <script>
         // Preview image before upload
-        document.getElementById('product_image').addEventListener('change', function(e) {
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const uploadPlaceholder = document.querySelector('.upload-placeholder');
+        const fileInput = document.getElementById('product_image');
+
+        fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                const previewContainer = document.getElementById('previewContainer');
-                const imagePreview = document.getElementById('imagePreview');
-
                 reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.style.display = 'block';
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    uploadPlaceholder.style.display = 'none';
                 }
-
                 reader.readAsDataURL(file);
             }
         });
 
         // Drag and drop functionality
-        const dropZone = document.querySelector('.file-upload-label');
-        const fileInput = document.getElementById('product_image');
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
+        imagePreview.addEventListener('dragover', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
+            imagePreview.style.borderColor = '#3e8e41';
         });
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
+        imagePreview.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            imagePreview.style.borderColor = '#e0e0e0';
         });
 
-        function highlight(e) {
-            dropZone.classList.add('highlight');
-        }
-
-        function unhighlight(e) {
-            dropZone.classList.remove('highlight');
-        }
-
-        dropZone.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            fileInput.files = files;
+        imagePreview.addEventListener('drop', function(e) {
+            e.preventDefault();
+            imagePreview.style.borderColor = '#e0e0e0';
             
-            // Trigger change event to show preview
-            const event = new Event('change');
-            fileInput.dispatchEvent(event);
-        }
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
     </script>
 </body>
 </html> 

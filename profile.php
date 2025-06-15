@@ -955,6 +955,35 @@ $conn->close();
             background: linear-gradient(45deg, #9e9e9e, #8a8a8a); /* Darker grey gradient on hover */
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Neutral shadow on hover */
         }
+
+        /* Success Message Styles */
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .success-message i {
+            font-size: 24px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -995,6 +1024,17 @@ $conn->close();
 
     <!-- Profile Container -->
     <div class="profile-container">
+        <!-- Success Message -->
+        <?php if (isset($_SESSION['profile_update_success'])): ?>
+            <div class="success-message">
+                <i class='bx bx-check-circle'></i>
+                <?php 
+                    echo htmlspecialchars($_SESSION['profile_update_success']);
+                    unset($_SESSION['profile_update_success']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Profile Header -->
         <div class="profile-header">
             <!-- Add a timestamp to the image URL to force browser refresh -->

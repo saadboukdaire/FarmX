@@ -77,13 +77,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $success = $stmt->execute([$title, $description, $price, $image_url, $category, $product_id, $_SESSION['user_id']]);
     
     if ($success) {
-        // Set success message in session
-        $_SESSION['edit_success'] = "Product updated successfully!";
+        // Check if any changes were made
+        $changes = false;
+        if ($title !== $product['title'] ||
+            $description !== $product['description'] ||
+            $price != $product['price'] ||
+            $category !== $product['category'] ||
+            $image_url !== $product['image_url']) {
+            $changes = true;
+        }
+
+        if ($changes) {
+            // Set success message in session only if changes were made
+            $_SESSION['edit_success'] = "Produit mis à jour avec succès !";
+        }
         // Redirect back to marketplace
         header("Location: market.php");
         exit();
     } else {
-        $error = "Failed to update product";
+        $error = "Échec de la mise à jour du produit";
     }
 }
 ?>
@@ -92,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmX - Edit Product</title>
+    <title>FarmX - Modifier Produit</title>
     <link rel="icon" href="Images/logo.jpg">   
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
@@ -108,322 +120,347 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #333;
         }
 
-        header {
-            background-color: #3e8e41;
-            color: white;
-            padding: 8px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar {
-            flex-grow: 1;
-            margin: 0 20px;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 8px 15px 8px 35px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 12px;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .nav-links {
-            display: flex;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: 500;
-            padding: 10px 15px;
-            display: inline-block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #3e8e41;
-            background-color: white;
-        }
-
         .edit-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 30px;
             background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .back-button {
+            grid-column: 1 / -1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background-color: #f5f5f5;
+            width: fit-content;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .back-button i {
+            font-size: 20px;
+        }
+
+        .edit-form {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .edit-form h2 {
-            text-align: center;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 15px 0;
-            background: linear-gradient(to right, #3e8e41, #2d682f);
+            color: #2d682f;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #444;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            display: inline-block;
-            width: 100%;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
         }
 
-        .edit-form input,
-        .edit-form textarea,
-        .edit-form select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 14px;
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-        }
-
-        .edit-form input:focus,
-        .edit-form textarea:focus,
-        .edit-form select:focus {
             border-color: #3e8e41;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(62, 142, 65, 0.1);
         }
 
-        .edit-form button {
-            padding: 10px 20px;
-            background-color: #3e8e41;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
         }
 
-        .edit-form button:hover {
-            background-color: #2d682f;
+        .image-preview-section {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
         }
 
         .current-image {
-            max-width: 200px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        .image-upload-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px dashed #e0e0e0;
-            border-radius: 8px;
+        .current-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .image-upload {
             background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed #e0e0e0;
             text-align: center;
         }
 
-        .image-upload-section label {
+        .image-upload label {
             display: block;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .image-upload input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        /* Custom file input styling */
+        .image-upload {
+            position: relative;
+        }
+
+        .image-upload input[type="file"] {
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            cursor: pointer;
+            height: 50px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .image-upload .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .image-upload .file-input-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
             background-color: #3e8e41;
             color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
             font-weight: 500;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-            max-width: 200px; /* Limit label width */
-            margin-left: auto;
-            margin-right: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 0;
         }
 
-        .image-upload-section label:hover {
+        .image-upload .file-input-button:hover {
             background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
         }
 
-        .image-upload-section input[type="file"] {
-            display: none; /* Hide the default file input */
+        .image-upload .file-input-button i {
+            font-size: 20px;
         }
 
-        .image-upload-section .image-preview {
-            max-width: 150px;
-            max-height: 150px;
-            margin: 0 auto 10px auto;
-            border-radius: 5px;
-            object-fit: cover;
-            border: 1px solid #e0e0e0;
-        }
-
-        .image-upload-section .upload-text {
+        .image-upload .upload-text {
             font-size: 14px;
             color: #666;
             margin-top: 10px;
+            line-height: 1.5;
         }
 
         .success-message {
             background-color: #d4edda;
             color: #155724;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .back-button {
-            display: inline-block;
-            color: #666;
-            text-decoration: none;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
         }
 
-        .back-button i {
-            margin-right: 5px;
+        button[type="submit"] {
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2d682f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
+        }
+
+        @media (max-width: 1024px) {
+            .edit-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .current-image {
+                height: 400px;
+                min-height: unset;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .edit-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .current-image {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <img src="Images/logoinv.png" height="60px" title="Cultivez l'avenir, récoltez le succès">    
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search FarmX...">
-                <i class='bx bx-search-alt-2'></i>
-            </div>
-            <div class="right-nav">
-                <a href="main.php" title="Home">
-                    <i class='bx bxs-home'></i>
-                    <span class="tooltip">Home</span>
-                </a>
-                <a href="message.php" title="Messages">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="tooltip">Messages</span>
-                </a>
-                <a href="#" id="language-switch" title="Switch Language">
-                    <i class='bx bx-globe'></i>
-                    <span class="tooltip"><?php echo $_SESSION['language'] === 'en' ? 'Français' : 'English'; ?></span>
-                </a>
-                <a href="logout.php" title="Logout">
-                    <i class='bx bxs-log-out'></i>
-                    <span class="tooltip">Logout</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
     <div class="edit-container">
         <a href="market.php" class="back-button">
-            <i class='bx bx-arrow-back'></i> Back to Marketplace
+            <i class='bx bx-arrow-back'></i> Retour au Marché
         </a>
 
-        <div class="edit-form">
-            <h2>Edit Product</h2>
-            <?php if (isset($message)): ?>
-                <div class="success-message"><?= htmlspecialchars($message) ?></div>
+        <div class="image-preview-section">
+            <div class="current-image">
+                <?php if ($product['image_url']): ?>
+                    <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="Image actuelle du produit" id="imagePreview">
+                <?php else: ?>
+                    <img src="Images/default-product.jpg" alt="Image par défaut du produit" id="imagePreview">
+                <?php endif; ?>
+            </div>
+            <div class="image-upload">
+                <label for="product_image">Choisir une nouvelle image</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="product_image" name="product_image" accept="image/*">
+                    <div class="file-input-button">
+                        <i class='bx bx-upload'></i>
+                        Parcourir les fichiers
+                    </div>
+                </div>
+                <p class="upload-text">Téléchargez une nouvelle image pour remplacer l'image actuelle, ou laissez vide pour la conserver.</p>
+            </div>
+        </div>
+
+        <form class="edit-form" method="POST" enctype="multipart/form-data">
+            <h2>Modifier le Produit</h2>
+            <?php if (isset($_SESSION['edit_success'])): ?>
+                <div class="success-message"><?= htmlspecialchars($_SESSION['edit_success']) ?></div>
+                <?php unset($_SESSION['edit_success']); ?>
             <?php endif; ?>
             <?php if (isset($error)): ?>
                 <div class="error-message"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
-            <form class="edit-form" method="POST" enctype="multipart/form-data">
-                <label for="product_name">Product Name:</label>
+            <div class="form-group">
+                <label for="product_name">Nom du produit:</label>
                 <input type="text" id="product_name" name="product_name" value="<?php echo htmlspecialchars($product['title']); ?>" required>
+            </div>
 
+            <div class="form-group">
                 <label for="product_description">Description:</label>
-                <textarea id="product_description" name="product_description" rows="6" required><?php echo htmlspecialchars($product['description']); ?></textarea>
+                <textarea id="product_description" name="product_description" required><?php echo htmlspecialchars($product['description']); ?></textarea>
+            </div>
 
-                <label for="product_price">Price (MAD):</label>
+            <div class="form-group">
+                <label for="product_price">Prix (MAD):</label>
                 <input type="number" id="product_price" name="product_price" step="0.01" value="<?php echo htmlspecialchars($product['price']); ?>" required>
+            </div>
 
-                <label for="product_category">Category:</label>
+            <div class="form-group">
+                <label for="product_category">Catégorie:</label>
                 <select id="product_category" name="product_category" required>
-                    <option value="vegetables" <?php echo $product['category'] === 'vegetables' ? 'selected' : ''; ?>>Vegetables</option>
+                    <option value="legumes" <?php echo $product['category'] === 'legumes' ? 'selected' : ''; ?>>Légumes</option>
                     <option value="fruits" <?php echo $product['category'] === 'fruits' ? 'selected' : ''; ?>>Fruits</option>
-                    <option value="dairy" <?php echo $product['category'] === 'dairy' ? 'selected' : ''; ?>>Dairy Products</option>
-                    <option value="meat" <?php echo $product['category'] === 'meat' ? 'selected' : ''; ?>>Meat & Poultry</option>
-                    <option value="honey" <?php echo $product['category'] === 'honey' ? 'selected' : ''; ?>>Honey & Bee Products</option>
-                    <option value="grains" <?php echo $product['category'] === 'grains' ? 'selected' : ''; ?>>Grains & Cereals</option>
-                    <option value="other" <?php echo $product['category'] === 'other' ? 'selected' : ''; ?>>Other</option>
+                    <option value="produits_laitiers" <?php echo $product['category'] === 'produits_laitiers' ? 'selected' : ''; ?>>Produits Laitiers</option>
+                    <option value="viande" <?php echo $product['category'] === 'viande' ? 'selected' : ''; ?>>Viande</option>
+                    <option value="miel" <?php echo $product['category'] === 'miel' ? 'selected' : ''; ?>>Miel & Produits Apicoles</option>
+                    <option value="cereales" <?php echo $product['category'] === 'cereales' ? 'selected' : ''; ?>>Céréales</option>
+                    <option value="materiel_agricole" <?php echo $product['category'] === 'materiel_agricole' ? 'selected' : ''; ?>>Matériel Agricole</option>
+                    <option value="produits_transformes" <?php echo $product['category'] === 'produits_transformes' ? 'selected' : ''; ?>>Produits Transformés</option>
+                    <option value="animaux" <?php echo $product['category'] === 'animaux' ? 'selected' : ''; ?>>Animaux d'Élevage</option>
+                    <option value="terrain" <?php echo $product['category'] === 'terrain' ? 'selected' : ''; ?>>Terrains Agricoles</option>
+                    <option value="autre" <?php echo $product['category'] === 'autre' ? 'selected' : ''; ?>>Autre</option>
                 </select>
+            </div>
 
-                <label>Current Image:</label>
-                <div class="image-upload-section">
-                    <?php if ($product['image_url']): ?>
-                        <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="Current Product Image" class="image-preview" id="imagePreview">
-                    <?php else: ?>
-                        <img src="Images/default-product.jpg" alt="Default Product Image" class="image-preview" id="imagePreview">
-                    <?php endif; ?>
-                    <input type="file" id="product_image" name="product_image" accept="image/*">
-                    <label for="product_image">Choose New Image</label>
-                    <p class="upload-text">Upload a new image to replace the current one, or leave blank to keep it.</p>
-                </div>
-
-                <button type="submit">Update Product</button>
-            </form>
-        </div>
+            <button type="submit">
+                <i class='bx bx-save'></i>
+                Mettre à jour le produit
+            </button>
+        </form>
     </div>
 
     <script>
-    document.getElementById('language-switch').addEventListener('click', function(e) {
-        e.preventDefault();
-        const currentLang = '<?php echo $_SESSION['language'] ?? 'en'; ?>';
-        const newLang = currentLang === 'en' ? 'fr' : 'en';
-        
-        fetch('update_language.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'language=' + newLang
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
+        // Preview image before upload
+        document.getElementById('product_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
             }
         });
-    });
     </script>
 </body>
 </html> 

@@ -862,7 +862,7 @@ $conn->close();
             <div class="form-group full-width">
                 <label for="profile-pic-upload">Photo de profil:</label>
                 <div class="profile-pic-upload-container">
-                    <input type="file" id="profile-pic-upload" name="profile-pic-upload" accept="image/*" style="display: none;">
+                    <input type="file" id="profile-pic-upload" name="profile-pic-upload" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
                     <label for="profile-pic-upload" class="custom-file-upload">
                         <i class='bx bx-upload'></i> Choisir un fichier
                     </label>

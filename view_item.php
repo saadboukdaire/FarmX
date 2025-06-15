@@ -211,48 +211,31 @@ if (!$item) {
             background-color: white;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
         }
 
         .item-header {
+            grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 30px;
-            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .item-title {
-            font-size: 32px;
+            font-size: 28px;
             color: #2d682f;
             font-weight: 600;
             line-height: 1.3;
             flex: 1;
         }
 
-        .item-price {
-            font-size: 36px;
-            font-weight: bold;
-            color: #3e8e41;
-            background-color: #f0f7f0;
-            padding: 15px 25px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 20px 0;
-        }
-
-        .item-price::before {
-            content: 'MAD';
-            font-size: 18px;
-            color: #666;
-            font-weight: normal;
-        }
-
         .item-category {
             font-size: 16px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 500;
             display: inline-block;
             padding: 8px 16px;
@@ -261,31 +244,61 @@ if (!$item) {
             color: #3e8e41;
         }
 
-        .item-image {
+        .item-image-container {
+            grid-column: 1;
+            position: relative;
             width: 100%;
-            max-height: 500px;
-            object-fit: cover;
+            height: 100%;
+            min-height: 500px;
+            overflow: hidden;
             border-radius: 16px;
-            margin-bottom: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
         .item-details {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
         }
 
         .item-description {
             font-size: 16px;
-            line-height: 1.8;
+            line-height: 1.6;
             color: #444;
-            margin-bottom: 20px;
             background-color: #f9f9f9;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             border-left: 4px solid #3e8e41;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .item-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3e8e41;
+            background-color: #f0f7f0;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-price::before {
+            content: 'MAD';
+            font-size: 16px;
+            color: #666;
+            font-weight: normal;
         }
 
         .item-posted-time {
@@ -298,57 +311,32 @@ if (!$item) {
             background-color: #f9f9f9;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
-            flex: 1;
-        }
-
-        .item-posted-time i {
-            font-size: 18px;
-            color: #3e8e41;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
         }
 
         .seller-info {
             background-color: #f9f9f9;
-            padding: 35px;
+            padding: 25px;
             border-radius: 12px;
-            margin-bottom: 20px;
             border: 1px solid #e0e0e0;
-            min-height: 250px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            margin-top: auto;
         }
 
         .seller-info h3 {
             color: #2d682f;
-            margin-bottom: 25px;
-            font-size: 22px;
+            margin-bottom: 20px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .seller-info h3 i {
-            color: #3e8e41;
-        }
-
         .seller-info p {
-            margin: 15px 0;
+            margin: 12px 0;
             color: #555;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 16px;
-        }
-
-        .seller-info p i {
-            color: #3e8e41;
-            font-size: 20px;
+            font-size: 15px;
         }
 
         .contact-seller {
@@ -357,7 +345,7 @@ if (!$item) {
             gap: 8px;
             background-color: #3e8e41;
             color: white;
-            padding: 15px 30px;
+            padding: 12px 25px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 500;
@@ -365,18 +353,13 @@ if (!$item) {
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            flex: 1;
-            justify-content: center;
+            margin-top: 15px;
         }
 
         .contact-seller:hover {
             background-color: #2d682f;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(62, 142, 65, 0.2);
-        }
-
-        .contact-seller i {
-            font-size: 20px;
         }
 
         .back-button {
@@ -401,22 +384,34 @@ if (!$item) {
             font-size: 20px;
         }
 
-        @media (max-width: 768px) {
-            .item-details {
+        @media (max-width: 1024px) {
+            .item-container {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
 
-            .item-header {
-                flex-direction: column;
+            .item-image-container {
+                height: 400px;
+                min-height: unset;
             }
 
-            .item-price {
-                width: 100%;
-                justify-content: center;
+            .item-description {
+                max-height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .item-container {
+                padding: 20px;
+                margin: 10px;
             }
 
             .item-title {
                 font-size: 24px;
+            }
+
+            .item-image-container {
+                height: 300px;
             }
         }
 
@@ -488,10 +483,10 @@ if (!$item) {
                 <a href="message.php" title="Messages">
                     <i class='bx bxs-message-dots'></i>
                 </a>
-                <a href="main.php" title="Home">
+                <a href="main.php" title="Accueil">
                     <i class='bx bxs-home'></i>
                 </a>
-                <a href="market.php" class="activated" title="Marketplace">
+                <a href="market.php" class="activated" title="Marché">
                     <i class='bx bxs-store'></i>
                 </a>
             </div>
@@ -502,10 +497,10 @@ if (!$item) {
                         <span class="notification-badge">0</span>
                     </a>
                 </div>
-                <a href="profile.php" title="Profile">
+                <a href="profile.php" title="Profil">
                     <i class='bx bxs-user'></i>
                 </a>
-                <a href="logout.php" title="Logout">
+                <a href="logout.php" title="Déconnexion">
                     <i class='bx bx-log-out'></i>
                 </a>
             </div>
@@ -514,7 +509,7 @@ if (!$item) {
 
     <div class="item-container">
         <a href="market.php" class="back-button">
-            <i class='bx bx-arrow-back'></i> Back to Marketplace
+            <i class='bx bx-arrow-back'></i> Retour au Marché
         </a>
 
         <div class="item-header">
@@ -523,39 +518,37 @@ if (!$item) {
 
         <p class="item-category"><?php echo htmlspecialchars(ucfirst($item['category'])); ?></p>
 
-        <?php if ($item['image_url']): ?>
-            <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="item-image">
-        <?php endif; ?>
+        <div class="item-image-container">
+            <?php if ($item['image_url']): ?>
+                <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="item-image">
+            <?php endif; ?>
+        </div>
 
         <div class="item-details">
-            <div class="main-content">
-                <div class="item-description">
-                    <?php echo nl2br(htmlspecialchars($item['description'])); ?>
-                </div>
-                <div class="item-price"><?php echo number_format($item['price'], 2); ?></div>
-                <div class="action-row">
-                    <p class="item-posted-time">
-                        <i class='bx bx-time'></i>
-                        Posted: <?php echo date('Y-m-d H:i', strtotime($item['created_at'])); ?>
-                    </p>
-
-                    <button onclick="contactSeller(<?php echo $item['seller_id']; ?>, <?php echo $item['id']; ?>)" class="contact-seller">
-                        <i class='bx bx-message-square-dots'></i> Contact Seller
-                    </button>
-                </div>
+            <div class="item-description">
+                <?php echo nl2br(htmlspecialchars($item['description'])); ?>
+            </div>
+            
+            <div class="item-price"><?php echo number_format($item['price'], 2); ?></div>
+            
+            <div class="item-posted-time">
+                <i class='bx bx-time'></i>
+                Publié le: <?php echo date('Y-m-d H:i', strtotime($item['created_at'])); ?>
             </div>
 
-            <div class="sidebar">
-                <div class="seller-info">
-                    <h3><i class='bx bx-user'></i> Seller Information</h3>
-                    <p><i class='bx bx-user-circle'></i> <strong>Name:</strong> <?php echo htmlspecialchars($item['username']); ?></p>
-                    <?php if ($item['email']): ?>
-                        <p><i class='bx bx-envelope'></i> <strong>Email:</strong> <?php echo htmlspecialchars($item['email']); ?></p>
-                    <?php endif; ?>
-                    <?php if ($item['phone']): ?>
-                        <p><i class='bx bx-phone'></i> <strong>Phone:</strong> <?php echo htmlspecialchars($item['phone']); ?></p>
-                    <?php endif; ?>
-                </div>
+            <div class="seller-info">
+                <h3><i class='bx bx-user'></i> Informations du Vendeur</h3>
+                <p><i class='bx bx-user-circle'></i> <strong>Nom:</strong> <?php echo htmlspecialchars($item['username']); ?></p>
+                <?php if ($item['email']): ?>
+                    <p><i class='bx bx-envelope'></i> <strong>Email:</strong> <?php echo htmlspecialchars($item['email']); ?></p>
+                <?php endif; ?>
+                <?php if ($item['phone']): ?>
+                    <p><i class='bx bx-phone'></i> <strong>Téléphone:</strong> <?php echo htmlspecialchars($item['phone']); ?></p>
+                <?php endif; ?>
+                
+                <button onclick="contactSeller(<?php echo $item['seller_id']; ?>, <?php echo $item['id']; ?>)" class="contact-seller">
+                    <i class='bx bx-message-square-dots'></i> Contacter le Vendeur
+                </button>
             </div>
         </div>
     </div>
@@ -567,7 +560,7 @@ if (!$item) {
             <i class='bx bx-check-circle'></i>
         </div>
         <div class="popup-message" id="popupMessage"></div>
-        <button class="popup-button" onclick="closePopup()">OK</button>
+        <button class="popup-button" onclick="closePopup()">D'accord</button>
     </div>
 
     <script>
@@ -605,16 +598,16 @@ if (!$item) {
             .then(response => {
                 if (response.success) {
                     if (response.message === 'Message already sent') {
-                        showPopup('Seller already notified about your interest in this item.');
+                        showPopup('Le vendeur a déjà été notifié de votre intérêt pour cet article.');
                     } else {
-                        showPopup('Seller has been notified about your interest in this item.');
+                        showPopup('Le vendeur a été notifié de votre intérêt pour cet article.');
                     }
                 } else {
-                    showPopup('Failed to notify seller: ' + (response.error || 'Unknown error'), false);
+                    showPopup('Échec de la notification du vendeur: ' + (response.error || 'Erreur inconnue'), false);
                 }
             })
             .catch(error => {
-                showPopup('Error notifying seller: ' + error.message, false);
+                showPopup('Erreur lors de la notification du vendeur: ' + error.message, false);
             });
         }
 

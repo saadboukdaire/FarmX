@@ -1205,7 +1205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                 const isLiked = post.is_liked || false;
 
                 const postHtml = `
-                    <div class="post" id="post-${post.id}">
+                    <div class="post" id="post-${post.id}" data-post-id="${post.id}">
                         <div class="post-header">
                             <img src="${post.profile_pic || 'Images/profile.jpg'}" alt="Photo de profil de ${post.username}" class="profile-pic" onerror="this.src='Images/profile.jpg'">
                             <div class="post-info">
