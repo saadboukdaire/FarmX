@@ -108,10 +108,42 @@ PFE/
 
 ## 🖼️ Screenshots
 
-*(Please add screenshots of your application here. You can capture images of the login page, main feed, marketplace, profile, and chatbot to showcase the project.)*
+Here are some screenshots showcasing the platform's features.
 
-**Example Screenshot:**
-<!-- ![Login Page Screenshot](path/to/your/screenshot.png) -->
+### Authentification
+*Login and registration pages.*
+![Login Page](Screenshots/Authentification/Screenshot%202025-06-12%20113908.png)
+![Signup Page](Screenshots/Authentification/Screenshot%202025-06-12%20113927.png)
+
+### Main Feed
+*The central social hub for user posts.*
+![Main Feed](Screenshots/main%20feed/Screenshot%202025-06-14%20231542.png)
+![Feed Details](Screenshots/main%20feed/Screenshot%202025-06-23%20164845.png)
+
+### Marketplace
+*Browse and list agricultural products.*
+![Marketplace](Screenshots/marketplace/Screenshot%202025-06-14%20230653.png)
+![Product Details](Screenshots/marketplace/Screenshot%202025-06-23%20200719.png)
+
+### Profile
+*User profiles with their posts and information.*
+![User Profile](Screenshots/profile/Screenshot%202025-06-24%20110219.png)
+![Profile Edit](Screenshots/profile/Screenshot%202025-06-24%20110235.png)
+
+### Real-time Messaging
+*Private conversations between users.*
+![Messaging Interface](Screenshots/messagerie/Screenshot%202025-06-14%20232147.png)
+![Chat Conversation](Screenshots/messagerie/Screenshot%202025-06-14%20232156.png)
+
+### Notifications
+*Stay updated on platform activities.*
+![Notifications List](Screenshots/notifications/Screenshot%202025-06-14%20234535.png)
+![Notification Details](Screenshots/notifications/Screenshot%202025-06-14%20234921.png)
+
+### AI Chatbot
+*Get instant answers to agricultural questions.*
+![Chatbot UI](Screenshots/chatbot/Screenshot%202025-06-24%20105453.png)
+![Chatbot Response](Screenshots/chatbot/Screenshot%202025-06-24%20105523.png)
 
 ##
 <p align="center">
