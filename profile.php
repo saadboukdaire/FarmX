@@ -85,6 +85,7 @@ $conn->close();
     <title>FarmX - Profil</title>
     <link rel="icon" href="Images/logo.jpg">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -1039,7 +1040,10 @@ $conn->close();
         <div class="profile-header">
             <!-- Add a timestamp to the image URL to force browser refresh -->
             <img id="profile-picture" src="<?php echo $profilePic ? $profilePic . '?t=' . time() : 'Images/profile.jpg'; ?>" alt="Image de profil">
-            <h1 id="profile-name"><?php echo htmlspecialchars($username ?? ''); ?></h1>
+            <h1 id="profile-name">
+                <i class="fas fa-seedling" style="color:#4CAF50;margin-right:8px;"></i>
+                <?php echo htmlspecialchars($username ?? ''); ?>
+            </h1>
             <p class="user-tag"><?php echo htmlspecialchars($userTag ?? ''); ?></p>
             <!-- Move edit profile button here -->
             <?php if ($isOwnProfile): ?>

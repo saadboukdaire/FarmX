@@ -110,6 +110,7 @@ $current_username = $user['username'];
     <title>FarmX - Marketplace</title>
     <link rel="icon" href="Images/logo.jpg">   
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -967,7 +968,10 @@ $current_username = $user['username'];
 
     <div class="marketplace-container">
         <div class="marketplace-header">
-            <h1 class="marketplace-title">Marché Agricole</h1>
+            <h1 class="marketplace-title">
+                <i class="fas fa-seedling" style="color:#4CAF50;margin-right:8px;"></i>
+                Marketplace
+            </h1>
             <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'farmer'): ?>
                 <a href="add_product.php" class="add-product-btn">
                     <i class='bx bx-plus-circle'></i>

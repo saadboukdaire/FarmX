@@ -251,6 +251,7 @@ if (isset($_GET['to'])) {
     <title>FarmX - Messages</title>
     <link rel="icon" href="Images/logo.jpg">  
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -1000,7 +1001,10 @@ if (isset($_GET['to'])) {
     <div class="layout-container">
         <!-- Left Section (Contacts) -->
         <div class="left-section">
-            <h1>Communauté </h1>
+            <h1>
+                <i class="fas fa-seedling" style="color:#4CAF50;margin-right:8px;"></i>
+                Communauté
+            </h1>
             <div class="user-filter">
                 <select id="userFilter" class="filter-select">
                     <option value="all">Tous les utilisateurs</option>

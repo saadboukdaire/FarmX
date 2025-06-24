@@ -1,0 +1,5 @@
+# Ignore the .env file containing sensitive information
+.env 
+
+# Ignore local configuration files
+config.ini

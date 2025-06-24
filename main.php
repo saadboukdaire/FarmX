@@ -976,6 +976,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             color: #666;
             font-size: 14px;
         }
+
+        .chatbot-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #3e8e41;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(62,142,65,0.08);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .chatbot-link:hover {
+            background: #2d682f;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(62,142,65,0.15);
+            transform: translateY(-2px) scale(1.03);
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -1024,8 +1047,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     </header>
 
     <div class="layout-container">
-    <div class="left-section">
-            <!-- Mini Calendar -->
+        <div class="left-section">
+            <!-- Chatbot Link -->
+            <a href="chatbot.php" class="chatbot-link">
+                <i class='bx bx-bot' style="font-size: 28px;"></i> Discuter avec AgriBot
+            </a>
+            <!-- Mini Calendar below chatbot link -->
             <div class="mini-calendar">
                 <h3>Calendrier</h3>
                 <div id="calendar"></div>
@@ -1034,7 +1061,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
                 </div>
             </div>
         </div>
-
         <div class="middle-section">
             <!-- Post Creation -->
             <div class="post-creation">
@@ -1080,14 +1106,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         </div>
 
         <div class="right-section">
-    <!-- Weather Widget -->
-    <div class="weather-widget">
-        <h3>Météo actuelle</h3>
-        <div id="weather-info">
-            <p>Chargement des données météo...</p>
+            <!-- Weather Widget only -->
+            <div class="weather-widget">
+                <h3>Météo actuelle</h3>
+                <div id="weather-info">
+                    <p>Chargement des données météo...</p>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
     </div>
 
     <script>

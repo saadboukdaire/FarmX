@@ -352,9 +352,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 height: 300px;
             }
         }
+
+        /* Custom Alert Styles */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff4d4d, #cc0000);
+        }
+
+        .success-alert .alert-content::before {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
+
+        .alert-content p {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .alert-content button {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff4d4d, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-alert .alert-content button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
+        }
+
+        .success-alert .alert-content button:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .alert-content button:active {
+            transform: translateY(0);
+        }
+
+        .alert-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            color: #ff4d4d;
+        }
+
+        .success-alert .alert-content i {
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
+    <!-- Custom Alert Modal -->
+    <div id="customAlert" class="custom-alert">
+        <div class="alert-content">
+            <i class='bx bxs-error-circle'></i>
+            <p id="alertMessage"></p>
+            <button id="alertCloseButton">OK</button>
+        </div>
+    </div>
+
     <div class="add-container">
         <a href="market.php" class="back-button">
             <i class='bx bx-arrow-back'></i> Retour au Marché
@@ -385,6 +500,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (isset($error)): ?>
                 <div class="error-message"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
+
+            <!-- Champ caché pour l'image -->
+            <input type="hidden" name="product_image" id="hidden_image_input">
 
             <div class="form-group">
                 <label for="product_name">Nom du produit:</label>
@@ -432,6 +550,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const previewImage = document.getElementById('previewImage');
         const uploadPlaceholder = document.querySelector('.upload-placeholder');
         const fileInput = document.getElementById('product_image');
+        const hiddenImageInput = document.getElementById('hidden_image_input');
+        const form = document.querySelector('.add-form');
 
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -467,6 +587,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const event = new Event('change');
                 fileInput.dispatchEvent(event);
             }
+        });
+
+        // Function to show custom alert
+        function showAlert(message, type = 'error') {
+            const alertModal = document.getElementById("customAlert");
+            const alertMessage = document.getElementById("alertMessage");
+            const alertIcon = alertModal.querySelector('i');
+            
+            // Remove existing classes
+            alertModal.classList.remove('success-alert', 'error-alert');
+            // Add appropriate class
+            alertModal.classList.add(type + '-alert');
+            
+            // Update icon based on type
+            alertIcon.className = type === 'success' ? 'bx bxs-check-circle' : 'bx bxs-error-circle';
+            
+            alertMessage.textContent = message;
+            alertModal.style.display = "flex";
+
+            const closeButton = document.getElementById("alertCloseButton");
+            closeButton.onclick = function() {
+                alertModal.style.display = "none";
+                // If it's a success message, redirect to market
+                if (type === 'success') {
+                    window.location.href = 'market.php';
+                }
+            };
+
+            alertModal.onclick = function(event) {
+                if (event.target === alertModal) {
+                    alertModal.style.display = "none";
+                    // If it's a success message, redirect to market
+                    if (type === 'success') {
+                        window.location.href = 'market.php';
+                    }
+                }
+            };
+        }
+
+        // Gestion de la soumission du formulaire
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Vérifier si une image a été sélectionnée
+            if (!fileInput.files[0]) {
+                showAlert('Veuillez sélectionner une image pour votre produit.', 'error');
+                return;
+            }
+            
+            // Créer un FormData pour l'upload
+            const formData = new FormData();
+            formData.append('product_name', document.getElementById('product_name').value);
+            formData.append('product_description', document.getElementById('product_description').value);
+            formData.append('product_price', document.getElementById('product_price').value);
+            formData.append('product_category', document.getElementById('product_category').value);
+            formData.append('product_image', fileInput.files[0]);
+            
+            // Envoyer le formulaire
+            fetch('add_product.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('success') || data.includes('Produit ajouté')) {
+                    showAlert('Produit ajouté avec succès !', 'success');
+                } else {
+                    showAlert('Erreur lors de l\'ajout du produit. Veuillez réessayer.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Erreur de connexion. Veuillez réessayer.', 'error');
+            });
         });
     </script>
 </body>
