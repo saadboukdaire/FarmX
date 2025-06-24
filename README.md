@@ -144,6 +144,8 @@ Here are some screenshots showcasing the platform's features.
 *Get instant answers to agricultural questions.*
 ![Chatbot UI](Screenshots/chatbot/Screenshot%202025-06-24%20105453.png)
 ![Chatbot Response](Screenshots/chatbot/Screenshot%202025-06-24%20105523.png)
+![Chatbot Conversation 1](Screenshots/chatbot/Screenshot%202025-06-24%20105559.png)
+![Chatbot Conversation 2](Screenshots/chatbot/Screenshot%202025-06-24%20105626.png)
 
 ##
 <p align="center">
